@@ -13,9 +13,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{454A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComicBookShopCore.EmployeeModule", "ComicBookShopCore.EmployeeModule\ComicBookShopCore.EmployeeModule.csproj", "{EC5B4191-371A-4935-BD0C-5166B53472FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComicBookShopCore.ComicBookModule", "ComicBookShopCore.ComicBookModule\ComicBookShopCore.ComicBookModule.csproj", "{D575AD37-BA12-4ECE-B319-92442D62C7BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComicBookShopCore.ComicBookModule", "ComicBookShopCore.ComicBookModule\ComicBookShopCore.ComicBookModule.csproj", "{D575AD37-BA12-4ECE-B319-92442D62C7BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComicBookShopCore.OrderModule", "ComicBookShopCore.OrderModule\ComicBookShopCore.OrderModule.csproj", "{22752916-861F-4DA4-A59B-3514F79A5EB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComicBookShopCore.OrderModule", "ComicBookShopCore.OrderModule\ComicBookShopCore.OrderModule.csproj", "{22752916-861F-4DA4-A59B-3514F79A5EB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComicBookShopCore.Desktop.Tests", "ComicBookShopCore.Desktop.Tests\ComicBookShopCore.Desktop.Tests.csproj", "{22747F53-A4F0-40C1-8141-2258C89040C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{22752916-861F-4DA4-A59B-3514F79A5EB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22752916-861F-4DA4-A59B-3514F79A5EB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22752916-861F-4DA4-A59B-3514F79A5EB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22747F53-A4F0-40C1-8141-2258C89040C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22747F53-A4F0-40C1-8141-2258C89040C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22747F53-A4F0-40C1-8141-2258C89040C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22747F53-A4F0-40C1-8141-2258C89040C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

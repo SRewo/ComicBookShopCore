@@ -22,7 +22,7 @@
 
             <Label Content="Search:" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="16" FontWeight="bold" />
 
-            <TextBox Width="200px" Height="30px" Text="{Binding Path=SearchWord, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,10,0">
+            <TextBox Width="200px" Height="30px" Text="{Binding Path=SearchWord, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,10,0" IsEnabled="{Binding IsSearchEnabled}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="TextChanged">
                         <i:InvokeCommandAction Command="{Binding SearchWordChanged}" />
@@ -34,14 +34,14 @@
 
         <DataGrid Grid.Row="2" ItemsSource="{Binding ViewList}" IsReadOnly="True" AutoGenerateColumns="False" SelectedItem="{Binding SelectedArtist}" SelectionMode="Single" Background="#f5f5f5" Margin="40,20,40,20">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Id}" Header="Id"></DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Name}" Header="Name"></DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Description}" Header="Description"></DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Id}" Header="Id"/>
+                <DataGridTextColumn Binding="{Binding Name}" Header="Name"/>
+                <DataGridTextColumn Binding="{Binding Description}" Header="Description"/>
             </DataGrid.Columns>
         </DataGrid>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Edit Artist" VerticalAlignment="Center" Height="30px" Width="125px" Margin="0,0,10,0" Command="{Binding EditArtistCommand}"/>
+            <Button Content="Edit Artist" VerticalAlignment="Center" Height="30px" Width="125px" Margin="0,0,10,0" Command="{Binding EditArtistCommand}" IsEnabled="{Binding IsEditEnabled}"/>
             <Button Content="Add Artist" VerticalAlignment="Center" Height="30px" Width="125px" Margin="0,0,10,0" Command="{Binding AddArtistCommand}"/>
         </StackPanel>
     </Grid>

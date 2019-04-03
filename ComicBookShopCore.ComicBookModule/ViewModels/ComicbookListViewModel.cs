@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
@@ -15,7 +16,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 {
     public class ComicBookListViewModel : BindableBase, INavigationAware
     {
-        private IRegionManager _regionManager;
+        private readonly IRegionManager _regionManager;
         private IRepository<ComicBook> _comicBookRepository;
         private IRepository<Publisher> _publisherRepository;
         private List<ComicBook> _allComicBooks;
@@ -65,12 +66,20 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             set => SetProperty(ref _selectedComicBook, value);
         }
 
-        private bool _canEdit;
+        private bool _isEditEnabled;
 
-        public bool CanEdit
+        public bool IsEditEnabled
         {
-            get => _canEdit;
-            set => SetProperty(ref _canEdit, value);
+            get => _isEditEnabled;
+            set => SetProperty(ref _isEditEnabled, value);
+        }
+
+        private bool _isSearchEnabled;
+
+        public bool IsSearchEnabled
+        {
+            get => _isSearchEnabled;
+            set => SetProperty(ref _isSearchEnabled, value);
         }
 
 
@@ -84,52 +93,55 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             AddComicBookCommand = new DelegateCommand(OpenAdd);
             EditComicBookCommand = new DelegateCommand(OpenEdit);
 
-            ViewList = _allComicBooks;
-
             _regionManager = manager;
 
         }
 
         private void PublisherChanged()
         {
-            if(ViewList != null)
-                if (string.IsNullOrEmpty(SearchWord))
-                {
-                    ViewList = _allComicBooks.Where(x => x.Series.Publisher.Equals(SelectedPublisher)).ToList();
-                }
-                else
-                {
-                    ViewList = _allComicBooks.Where(x =>
-                        x.Series.Publisher.Equals(SelectedPublisher) && ( CheckStringEquals(x.Title,SearchWord) || CheckStringEquals(x.Series.Name,SearchWord)|| x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name,SearchWord)))).ToList();
-                }
+            if (string.IsNullOrEmpty(SearchWord))
+            {
+
+                ViewList = _allComicBooks.Where(x => x.Series.Publisher.Equals(SelectedPublisher)).ToList();
+
+            }
+            else
+            {
+
+                ViewList = _allComicBooks.Where(x =>
+                    x.Series.Publisher.Equals(SelectedPublisher) && ( CheckStringEquals(x.Title,SearchWord) || CheckStringEquals(x.Series.Name,SearchWord)|| x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name,SearchWord)))).ToList();
+
+            }
 
         }
 
         private void Search()
         {
-            if (ViewList != null) { 
 
-                if (SelectedPublisher == null)
-                {
-                    ViewList = _allComicBooks.Where(x =>
-                        CheckStringEquals(x.Title, SearchWord) || CheckStringEquals(x.Series.Name, SearchWord) || x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name, SearchWord))).ToList();
-                }
-                else
-                {
-                    ViewList = _allComicBooks.Where(x =>
-                        x.Series.Publisher.Equals(SelectedPublisher) && (CheckStringEquals(x.Title, SearchWord) || CheckStringEquals(x.Series.Name, SearchWord) || x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name, SearchWord)))).ToList();
-                }
-            }
+           if (SelectedPublisher == null)
+           {
+
+               ViewList = _allComicBooks.Where(x =>
+                   CheckStringEquals(x.Title, SearchWord) || CheckStringEquals(x.Series.Name, SearchWord) || x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name, SearchWord))).ToList();
+
+           }
+           else
+           {
+
+               ViewList = _allComicBooks.Where(x =>
+                   x.Series.Publisher.Equals(SelectedPublisher) && (CheckStringEquals(x.Title, SearchWord) || CheckStringEquals(x.Series.Name, SearchWord) || x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name, SearchWord)))).ToList();
+
+           }
+            
         }
 
         private void ResetSearch()
         {
-            if (ViewList != null)
-            {
+
                 SearchWord = String.Empty;
                 SelectedPublisher = null;
                 ViewList = _allComicBooks.ToList();
-            }
+
         }
 
         private void OpenAdd()
@@ -142,13 +154,15 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         private void OpenEdit()
         {
 
-            NavigationParameters parameters = new NavigationParameters();
-            parameters.Add("ComicBook",SelectedComicBook);
+            var parameters = new NavigationParameters()
+            {
+                { "ComicBook",SelectedComicBook}
+            };
             _regionManager.RequestNavigate("content","AddEditComicBook",parameters);
 
         }
 
-        private bool CheckStringEquals(string first, string second)
+        private static bool CheckStringEquals(string first, string second)
         {
             return first.IndexOf(second, StringComparison.OrdinalIgnoreCase) != -1;
         }
@@ -166,12 +180,13 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-
+            SelectedComicBook = null;
+            ViewList = null;
             GetData();
-
+            CanSearchCheck();
         }
 
-        public async void GetData()
+        public void GetData()
         {
             using (var context = new ShopDbEntities())
             {
@@ -179,14 +194,30 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
                 _comicBookRepository = new SqlRepository<ComicBook>(context);
                 if (_comicBookRepository.GetAll().Count() != 0)
                 {
-                    _allComicBooks = await _comicBookRepository.GetAll().Include(x => x.ComicBookArtists).Include(x => x.Series).Include(x => x.Series.Publisher).Include(x => x.ComicBookArtists.Select(z => z.Artist)).ToListAsync();
+                    _allComicBooks = _comicBookRepository.GetAll().Include(x => x.ComicBookArtists).Include(x => x.Series).Include(x => x.Series.Publisher).Include(x => x.ComicBookArtists.Select(z => z.Artist)).ToList();
                 }
                 ViewList = _allComicBooks;
 
                 _publisherRepository = new SqlRepository<Publisher>(context);
-                Publishers = await _publisherRepository.GetAll().ToListAsync();
+                Publishers = _publisherRepository.GetAll().ToList();
 
             }
+        }
+
+        public void CanSearchCheck()
+        {
+            IsSearchEnabled = ViewList != null;
+        }
+
+        public void CanEditCheck()
+        {
+            IsEditEnabled = SelectedComicBook != null;
+        }
+
+        protected override void OnPropertyChanged(PropertyChangedEventArgs args)
+        {
+            base.OnPropertyChanged(args);
+            CanEditCheck();
         }
     }
 }
