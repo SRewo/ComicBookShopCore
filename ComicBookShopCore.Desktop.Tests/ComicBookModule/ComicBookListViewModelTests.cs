@@ -6,7 +6,7 @@ using ComicBookShopCore.Data;
 using Prism.Regions;
 using Xunit;
 
-namespace ComicBookShopCore.Desktop.Tests
+namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
 {
     public class ComicBookListViewModelTests
     {
@@ -62,6 +62,9 @@ namespace ComicBookShopCore.Desktop.Tests
         {
 
             var model = new ComicBookListViewModel(new RegionManager());
+
+            Assert.False(model.IsEditEnabled);
+
             model.SelectedComicBook = new ComicBook();
 
             Assert.True(model.IsEditEnabled);

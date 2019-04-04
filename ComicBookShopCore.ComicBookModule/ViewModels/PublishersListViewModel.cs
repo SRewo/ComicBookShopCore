@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
@@ -16,17 +18,23 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
     {
         private List<Publisher> _allPublishers;
         private SqlRepository<Publisher> _publisherRepository;
-        private IRegionManager _regionManager;
+        private readonly IRegionManager _regionManager;
+
+        public DelegateCommand SearchWordChanged { get; set; }
+        public DelegateCommand AddPublisherCommand { get; set; }
+        public DelegateCommand EditPublisherCommand { get; set; }
+
 
         private string _searchWord;
-        private List<Publisher> _viewList;
-        private Publisher _selectedPublisher;
-
+        
         public string SearchWord
         {
             get => _searchWord;
             set => SetProperty(ref _searchWord, value);
         }
+
+
+        private List<Publisher> _viewList;
 
         public List<Publisher> ViewList
         {
@@ -34,15 +42,32 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             set => SetProperty(ref _viewList, value);
         }
 
+
+        private Publisher _selectedPublisher;
+
         public Publisher SelectedPublisher
         {
             get => _selectedPublisher;
             set => SetProperty(ref _selectedPublisher, value);
         }
 
-        public DelegateCommand SearchWordChanged { get; set; }
-        public DelegateCommand AddPublisherCommand { get; set; }
-        public DelegateCommand EditPublisherCommand { get; set; }
+        private bool _isEditEnabled;
+
+        public bool IsEditEnabled
+        {
+            get => _isEditEnabled;
+            set => SetProperty(ref _isEditEnabled, value);
+        }
+
+
+        private bool _isSearchEnabled;
+
+        public bool IsSearchEnabled
+        {
+            get => _isSearchEnabled;
+            set => SetProperty(ref _isSearchEnabled, value);
+        }
+
 
         public PublishersListViewModel(IRegionManager regionManager)
         {
@@ -58,42 +83,20 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         private void Search()
         {
 
-            if (string.IsNullOrEmpty(_searchWord))
-            {
+                ViewList = SearchWord == String.Empty ? _allPublishers : _allPublishers.Where(x=> x.Name.Contains(SearchWord)).ToList();
 
-                ViewList = _allPublishers;
-
-            }
-            else
-            {
-
-                var query = from publisher in _allPublishers
-                    where publisher.Name.ToLower().Contains(_searchWord.ToLower())
-                            select publisher;
-                ViewList = query.ToList();
-
-            }
         }
 
         private void OpenEdit()
         {
 
-            if (_selectedPublisher == null)
+            var parameters = new NavigationParameters
             {
+                { "publisher", SelectedPublisher }
+            };
 
-                MessageBox.Show("You have to choose publisher.");
+            _regionManager.RequestNavigate("content","AddEditPublisher",parameters);
 
-            }
-            else
-            {
-
-                var parameters = new NavigationParameters
-                {
-                    { "publisher", _selectedPublisher }
-                };
-                _regionManager.RequestNavigate("content","AddEditPublisher",parameters);
-
-            }
         }
 
         private void OpenAdd()
@@ -105,6 +108,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         {
 
             GetTable();
+            CanSearchCheck();
 
         }
 
@@ -118,15 +122,31 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         }
 
-        private async void GetTable()
+        private void GetTable()
         {
-            using (var datacontext = new ShopDbEntities())
+            using (var context = new ShopDbEntities())
             {
 
-                _publisherRepository = new SqlRepository<Publisher>(datacontext);
-                _allPublishers = await _publisherRepository.GetAll().ToListAsync();
+                _publisherRepository = new SqlRepository<Publisher>(context);
+                _allPublishers = _publisherRepository.GetAll().ToList();
                 ViewList = _allPublishers;
             }
+        }
+
+        public void CanEditCheck()
+        {
+            IsEditEnabled = SelectedPublisher != null;
+        }
+
+        public void CanSearchCheck()
+        {
+            IsSearchEnabled = ViewList != null;
+        }
+
+        protected override void OnPropertyChanged(PropertyChangedEventArgs args)
+        {
+            base.OnPropertyChanged(args);
+            CanEditCheck();
         }
     }
 }

@@ -5,7 +5,7 @@ using ComicBookShopCore.ComicBookModule.ViewModels;
 using ComicBookShopCore.Data;
 using Prism.Regions;
 
-namespace ComicBookShopCore.Desktop.Tests
+namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
 {
     public class ArtistListViewModelTests
     {
@@ -60,6 +60,9 @@ namespace ComicBookShopCore.Desktop.Tests
         {
 
             var model = new ArtistListViewModel(new RegionManager());
+
+            Assert.False(model.IsEditEnabled);
+
             model.SelectedArtist = new Artist();
             
             Assert.True(model.IsEditEnabled);
