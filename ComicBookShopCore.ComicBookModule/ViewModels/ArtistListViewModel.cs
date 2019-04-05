@@ -66,22 +66,17 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         }
 
 
-        public ArtistListViewModel(IRegionManager manager)
+        public ArtistListViewModel(IRegionManager manager, IRepository<Artist> repository)
         {
 
             _regionManager = manager;
             AddArtistCommand = new DelegateCommand(OpenAdd);
             EditArtistCommand = new DelegateCommand(OpenEdit);
             SearchWordChanged = new DelegateCommand(Search);
-            _artistRepository = new SqlRepository<Artist>(new ShopDbEntities());
-
-        }
-
-        public ArtistListViewModel(IRegionManager manager, IRepository<Artist> repository) : this(manager)
-        {
             _artistRepository = repository;
-        }
 
+        }
+            
 
         public void OpenAdd()
         {
@@ -90,7 +85,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         }
 
-        private void OpenEdit()
+        public void OpenEdit()
         {
             var parameters = new NavigationParameters
             {
@@ -99,7 +94,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             _regionManager.RequestNavigate("content","AddEditArtist",parameters);
         }
 
-        private void Search()
+        public void Search()
         {
 
             ViewList = string.IsNullOrEmpty(SearchWord) ? _allArtists : _allArtists.Where(c => c.Name.Contains(SearchWord)).ToList(); ;
