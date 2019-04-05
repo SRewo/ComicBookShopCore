@@ -10,6 +10,7 @@ using Prism.Mvvm;
 using Prism.Regions;
 using System.Windows;
 using System.Windows.Input;
+using Prism.Ioc;
 
 namespace ComicBookShopCore.ComicBookModule.ViewModels
 {
@@ -19,6 +20,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         private IRepository<Artist> _artistRepository;
         private List<Artist> _allArtists;
         private readonly IRegionManager _regionManager;
+
         public DelegateCommand AddArtistCommand { get; private set; }
         public DelegateCommand EditArtistCommand { get; private set; }
         public DelegateCommand SearchWordChanged { get; private set; }
@@ -71,11 +73,17 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             AddArtistCommand = new DelegateCommand(OpenAdd);
             EditArtistCommand = new DelegateCommand(OpenEdit);
             SearchWordChanged = new DelegateCommand(Search);
+            _artistRepository = new SqlRepository<Artist>(new ShopDbEntities());
 
         }
 
+        public ArtistListViewModel(IRegionManager manager, IRepository<Artist> repository) : this(manager)
+        {
+            _artistRepository = repository;
+        }
 
-        private void OpenAdd()
+
+        public void OpenAdd()
         {
             
             _regionManager.RequestNavigate("content","AddEditArtist");
@@ -118,15 +126,12 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         }
 
-        private void GetTable()
+        public void GetTable()
         {
-            using (var context = new ShopDbEntities())
-            {
 
-                _artistRepository = new SqlRepository<Artist>(context);
-                _allArtists = _artistRepository.GetAll().ToList();
-                ViewList = _allArtists;
-            }
+           _allArtists = _artistRepository.GetAll().ToList();
+            ViewList = _allArtists;
+
         }
 
         public void CanSearchCheck()
