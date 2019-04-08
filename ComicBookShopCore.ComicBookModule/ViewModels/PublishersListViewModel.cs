@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
-using ComicBookShopCore.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -17,7 +16,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
     public class PublishersListViewModel : BindableBase, INavigationAware
     {
         private List<Publisher> _allPublishers;
-        private SqlRepository<Publisher> _publisherRepository;
+        private IRepository<Publisher> _publisherRepository;
         private readonly IRegionManager _regionManager;
 
         public DelegateCommand SearchWordChanged { get; set; }
@@ -69,7 +68,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         }
 
 
-        public PublishersListViewModel(IRegionManager regionManager)
+        public PublishersListViewModel(IRegionManager regionManager, IRepository<Publisher> repository)
         {
             
             SearchWordChanged = new DelegateCommand(Search);
@@ -77,17 +76,18 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             AddPublisherCommand = new DelegateCommand(OpenAdd);
 
             _regionManager = regionManager;
+            _publisherRepository = repository;
 
         }
 
-        private void Search()
+        public void Search()
         {
 
                 ViewList = SearchWord == String.Empty ? _allPublishers : _allPublishers.Where(x=> x.Name.Contains(SearchWord)).ToList();
 
         }
 
-        private void OpenEdit()
+        public void OpenEdit()
         {
 
             var parameters = new NavigationParameters
@@ -99,15 +99,16 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         }
 
-        private void OpenAdd()
+        public void OpenAdd()
         {
             _regionManager.RequestNavigate("content","AddEditPublisher");
         }
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-
-            GetTable();
+            SearchWord = null;
+            ViewList = null;
+            GetData();
             CanSearchCheck();
 
         }
@@ -122,15 +123,10 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         }
 
-        private void GetTable()
+        public void GetData()
         {
-            using (var context = new ShopDbEntities())
-            {
-
-                _publisherRepository = new SqlRepository<Publisher>(context);
                 _allPublishers = _publisherRepository.GetAll().ToList();
                 ViewList = _allPublishers;
-            }
         }
 
         public void CanEditCheck()

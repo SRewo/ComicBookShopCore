@@ -1,16 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using Autofac.Extras.Moq;
-using Xunit;
 using ComicBookShopCore.ComicBookModule.ViewModels;
-using ComicBookShopCore.ComicBookModule.Views;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using Moq;
 using Prism.Regions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
 {
@@ -91,7 +88,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
                 model.GetTable();
                 var actual = model.ViewList;
 
-                Assert.True(actual != null);
+                Assert.NotNull(actual);
                 Assert.Equal(expected.Count, actual.Count);
             }
 
@@ -159,6 +156,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
                 actual = model.ViewList.Count;
 
                 Assert.Equal(expected, actual);
+                
             }
         }
 

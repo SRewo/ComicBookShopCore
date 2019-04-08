@@ -17,7 +17,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
     public class ArtistListViewModel : BindableBase, INavigationAware
     {
 
-        private IRepository<Artist> _artistRepository;
+        private readonly IRepository<Artist> _artistRepository;
         private List<Artist> _allArtists;
         private readonly IRegionManager _regionManager;
 

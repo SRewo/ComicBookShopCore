@@ -22,7 +22,11 @@ namespace ComicBookShopCore.Desktop
     {
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+
             containerRegistry.RegisterInstance<IRepository<Artist>>(new SqlRepository<Artist>(new ShopDbEntities()));
+            containerRegistry.RegisterInstance<IRepository<Publisher>>(
+                new SqlRepository<Publisher>(new ShopDbEntities()));
+
         }
 
         protected override Window CreateShell()
