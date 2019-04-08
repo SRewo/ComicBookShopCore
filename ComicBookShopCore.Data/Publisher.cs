@@ -8,7 +8,9 @@ namespace ComicBookShopCore.Data
         
         public int Id { get; private set; }
 
+
         private string _name;
+
         [Required]
         public string Name {
             get => _name; 
@@ -30,6 +32,15 @@ namespace ComicBookShopCore.Data
         {
             get => _creationDateTime;
             set => SetProperty(ref _creationDateTime, value);
+        }
+
+        public Publisher()
+        {
+        }
+
+        public Publisher(int id)
+        {
+            Id = id;
         }
     }
 

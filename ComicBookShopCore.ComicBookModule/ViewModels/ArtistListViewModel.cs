@@ -97,7 +97,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         public void Search()
         {
 
-            ViewList = string.IsNullOrEmpty(SearchWord) ? _allArtists : _allArtists.Where(c => c.Name.Contains(SearchWord)).ToList(); ;
+            ViewList = string.IsNullOrEmpty(SearchWord) ? _allArtists : _allArtists.Where(c => c.Name.Contains(SearchWord)).ToList();
 
         }
 

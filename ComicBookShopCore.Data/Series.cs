@@ -31,6 +31,15 @@ namespace ComicBookShopCore.Data
             set => SetProperty(ref _description, value);
         }
 
+        public Series()
+        {
+        }
+
+        public Series(int id)
+        {
+            Id = id;
+        }
+
         public override string ToString()
         {
             return Name;
