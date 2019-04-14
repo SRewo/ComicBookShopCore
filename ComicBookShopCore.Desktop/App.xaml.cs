@@ -28,7 +28,7 @@ namespace ComicBookShopCore.Desktop
             containerRegistry.RegisterInstance<IRepository<Publisher>>(
                 new SqlRepository<Publisher>(context));
             containerRegistry.RegisterInstance<IRepository<Series>>(new SqlRepository<Series>(context));
-
+            containerRegistry.RegisterInstance<IRepository<ComicBook>>(new SqlRepository<ComicBook>(context));
         }
 
         protected override Window CreateShell()

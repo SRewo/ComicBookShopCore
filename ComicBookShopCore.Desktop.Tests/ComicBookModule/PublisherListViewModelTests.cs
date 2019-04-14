@@ -78,56 +78,46 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         [Fact]
         public void GetData_ValidCall()
         {
-            using (var mock = AutoMock.GetLoose())
-            {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
+            var model = mock.Create<PublishersListViewModel>();
+            model.GetData();
 
-                mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
-                var model = mock.Create<PublishersListViewModel>();
-                model.GetData();
+            var expected = GetPublishersSample().Count();
+            var actual = model.ViewList.Count;
 
-                var expected = GetPublishersSample().Count();
-                var actual = model.ViewList.Count;
-
-                Assert.NotNull(model.ViewList);
-                Assert.Equal(expected,actual);
-                mock.Mock<IRepository<Publisher>>().Verify(x => x.GetAll(), Times.Exactly(1));
-
-            }
+            Assert.NotNull(model.ViewList);
+            Assert.Equal(expected, actual);
+            mock.Mock<IRepository<Publisher>>().Verify(x => x.GetAll(), Times.Exactly(1));
         }
 
         [Fact]
         public void OpenAdd_ValidCall()
         {
-            using (var mock = AutoMock.GetLoose())
-            {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IRegionManager>().Setup(x => x.RequestNavigate("content", "AddEditPublisher"));
+            var model = mock.Create<PublishersListViewModel>();
+            model.OpenAdd();
 
-                mock.Mock<IRegionManager>().Setup(x => x.RequestNavigate("content", "AddEditPublisher"));
-                var model = mock.Create<PublishersListViewModel>();
-                model.OpenAdd();
-
-                mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content","AddEditPublisher"));
-
-            }
+            mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content", "AddEditPublisher"));
         }
 
         [Fact]
         public void OpenEdit_ValidCall()
         {
-            using (var mock = AutoMock.GetLoose())
-            {
-                var publisher = new Publisher();
-                var parameters = new NavigationParameters()
+            using var mock = AutoMock.GetLoose();
+            var publisher = new Publisher();
+            var parameters = new NavigationParameters()
                 {
                     {"publisher",publisher}
                 };
 
-                mock.Mock<IRegionManager>().Setup(x => x.RequestNavigate("content", "AddEditPublisher", parameters));
-                var model = mock.Create<PublishersListViewModel>();
-                model.SelectedPublisher = publisher;
-                model.OpenEdit();
+            mock.Mock<IRegionManager>().Setup(x => x.RequestNavigate("content", "AddEditPublisher", parameters));
+            var model = mock.Create<PublishersListViewModel>();
+            model.SelectedPublisher = publisher;
+            model.OpenEdit();
 
-                mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content","AddEditPublisher",parameters), Times.Once);
-            }
+            mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content", "AddEditPublisher", parameters), Times.Once);
         }
 
         private IQueryable<Publisher> GetPublishersSample()

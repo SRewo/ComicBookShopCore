@@ -42,6 +42,20 @@ namespace ComicBookShopCore.Data
         {
             Id = id;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() == typeof(Publisher))
+            {
+                var ob = obj as Publisher;
+                return this.Id == ob.Id;
+            }
+            return false;
+        }
+        public override int GetHashCode()
+        {
+            return Id == 0 ? base.GetHashCode() : Id.GetHashCode();
+        }
     }
 
     public class CustomDateAttribute : RangeAttribute
@@ -54,4 +68,5 @@ namespace ComicBookShopCore.Data
             ErrorMessage = "You have to choose a date between 01.01.1900 and today";
         }
     }
+
 }
