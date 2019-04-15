@@ -11,6 +11,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
     public class AddEditPublisherViewModel : BindableBase, INavigationAware
     {
         private IRegionManager _regionManager;
+        private IRepository<Publisher> _publisherRepository;
         public DelegateCommand GoBackCommand { get; set; }
         public DelegateCommand SavePublisherCommand { get; set; }
 
@@ -21,8 +22,6 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             get => _canSave;
             set => SetProperty(ref _canSave, value);
         }
-
-        private SqlRepository<Publisher> _publisherRepository;
 
         private Publisher _publisher;
 
@@ -48,12 +47,14 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             set => SetProperty(ref _dateErrorMessage, value);
         }
 
-        public AddEditPublisherViewModel(IRegionManager manager)
+        public AddEditPublisherViewModel(IRegionManager manager, IRepository<Publisher> repository)
         {
 
-            _regionManager = manager;
             GoBackCommand = new DelegateCommand(GoBack);
             SavePublisherCommand = new DelegateCommand(SavePublisher);
+
+            _regionManager = manager;
+            _publisherRepository = repository;
 
         }
 
@@ -74,34 +75,31 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             Publisher = null;
             NameErrorMessage = string.Empty;
             DateErrorMessage = string.Empty;
+            CanSave = false;
 
 
-            Publisher = (Publisher) navigationContext.Parameters["publisher"];
-            if (Publisher == null)
+            Publisher = (Publisher)navigationContext.Parameters["publisher"];
+            Publisher ??= new Publisher()
             {
-                CanSave = false;
-                Publisher = new Publisher()
-                {
-                    CreationDateTime = DateTime.Now
-                };
-
-            }
+                CreationDateTime = DateTime.Now
+            };
 
             Publisher.PropertyChanged += CanExecuteChanged;
             Publisher.ErrorsChanged += Publisher_ErrorsChanged;
         }
 
-        private void Publisher_ErrorsChanged(object sender, System.ComponentModel.DataErrorsChangedEventArgs e)
+        public void Publisher_ErrorsChanged(object sender, System.ComponentModel.DataErrorsChangedEventArgs e)
         {
 
             NameErrorMessage = Publisher.GetFirstError("Name");
             DateErrorMessage = Publisher.GetFirstError("CreationDateTime");
+
         }
 
-        private void CanExecuteChanged(object sender, EventArgs e)
+        public void CanExecuteChanged(object sender, EventArgs e)
         {
 
-            if(!string.IsNullOrEmpty(Publisher.Name))
+            if(!string.IsNullOrEmpty(Publisher.Name) && Publisher.CreationDateTime != DateTime.MinValue)
                 CanSave = !Publisher.HasErrors;
             else
                 CanSave = false;
@@ -113,29 +111,23 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             _regionManager.RequestNavigate("content","PublisherList");
         }
 
-        private void SavePublisher()
+        public void SavePublisher()
         {
             if (Publisher != null)
             {
-                using (var context = new ShopDbEntities())
+
+                if (Publisher.Id == 0)
                 {
-
-                    _publisherRepository = new SqlRepository<Publisher>(context);
-                    if (Publisher.Id == 0)
-                    {
-                        _publisherRepository.Add(Publisher);
-                    }
-                    else
-                    {
-                        _publisherRepository.Update(Publisher);
-                    }
-                    context.SaveChanges();
-
+                    _publisherRepository.Add(Publisher);
+                }
+                else
+                {
+                    _publisherRepository.Update(Publisher);
                 }
 
-                _regionManager.RequestNavigate("content", "PublisherList");
-
             }
+
+            GoBack();
 
         }
     }

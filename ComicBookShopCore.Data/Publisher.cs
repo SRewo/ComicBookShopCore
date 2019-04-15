@@ -11,7 +11,9 @@ namespace ComicBookShopCore.Data
 
         private string _name;
 
-        [Required]
+        [Required(ErrorMessage = "Publisher name cannot be empty")]
+        [MinLength(3, ErrorMessage = "Publisher name is too short.")]
+        [MaxLength(40, ErrorMessage = "Publisher name is too long")]
         public string Name {
             get => _name; 
             set => SetProperty(ref _name, value); 
