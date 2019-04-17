@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComicBookShopCore.ComicBook
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComicBookShopCore.OrderModule", "ComicBookShopCore.OrderModule\ComicBookShopCore.OrderModule.csproj", "{22752916-861F-4DA4-A59B-3514F79A5EB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComicBookShopCore.Desktop.Tests", "ComicBookShopCore.Desktop.Tests\ComicBookShopCore.Desktop.Tests.csproj", "{22747F53-A4F0-40C1-8141-2258C89040C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComicBookShopCore.Desktop.Tests", "ComicBookShopCore.Desktop.Tests\ComicBookShopCore.Desktop.Tests.csproj", "{22747F53-A4F0-40C1-8141-2258C89040C2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComicBookShopCore.Web", "ComicBookShopCore.Web\ComicBookShopCore.Web.csproj", "{57C5EC9B-CC3E-4E9D-9240-DBD53C5B6E1A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +55,10 @@ Global
 		{22747F53-A4F0-40C1-8141-2258C89040C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22747F53-A4F0-40C1-8141-2258C89040C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22747F53-A4F0-40C1-8141-2258C89040C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57C5EC9B-CC3E-4E9D-9240-DBD53C5B6E1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57C5EC9B-CC3E-4E9D-9240-DBD53C5B6E1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57C5EC9B-CC3E-4E9D-9240-DBD53C5B6E1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57C5EC9B-CC3E-4E9D-9240-DBD53C5B6E1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
