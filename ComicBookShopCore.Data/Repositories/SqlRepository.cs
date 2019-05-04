@@ -32,7 +32,6 @@ namespace ComicBookShopCore.Data.Repositories
 
         public IQueryable<T> GetAll()
         {
-
             return _dbSet;
 
         }
@@ -52,5 +51,9 @@ namespace ComicBookShopCore.Data.Repositories
            _dbContext.SaveChanges();
         }
 
+        public void Reload(T entity)
+        {
+            _dbContext.Entry(entity).Reload();
+        }
     }
 }

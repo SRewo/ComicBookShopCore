@@ -47,30 +47,25 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             set => SetProperty(ref _lastNameErrorMessage, value);
         }
 
-        public AddEditArtistViewModel(IRegionManager manager)
+        public AddEditArtistViewModel(IRegionManager manager, IRepository<Artist> artistRepository)
         {
 
             _regionManager = manager;
             GoBackCommand = new DelegateCommand(GoBack);
             SaveArtistCommand = new DelegateCommand(SaveArtist);
-
+            _artistRepository = artistRepository;
         }
 
-        private void ArtistOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        public void ArtistOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(Artist.FirstName) && !string.IsNullOrEmpty(Artist.LastName))
-            {
-                CanSave = !Artist.HasErrors;
-            }
-            else
-            {
-                CanSave = false;
-            }
+
+            CanSave = !string.IsNullOrEmpty(Artist.FirstName) && !string.IsNullOrEmpty(Artist.LastName) ? !Artist.HasErrors : false;
+
         }
 
         private void GoBack()
         {
-            
+            _artistRepository.Reload(Artist);
             _regionManager.RequestNavigate("content","ArtistList");
 
         }
@@ -89,44 +84,37 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         {
 
             Artist = null;
-            Artist = (Artist) navigationContext.Parameters["Artist"];
             FirstNameErrorMessage = string.Empty;
             LastNameErrorMessage = string.Empty;
-
-            Artist = Artist ?? new Artist();
-
             CanSave = false;
+
+            Artist = (Artist) navigationContext.Parameters["Artist"];
+            Artist ??= new Artist();
+
             Artist.PropertyChanged += ArtistOnPropertyChanged;
             Artist.ErrorsChanged += Artist_ErrorsChanged;
         }
 
-        private void Artist_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+        public void Artist_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
         {
 
             FirstNameErrorMessage = Artist.GetFirstError("FirstName");
             LastNameErrorMessage = Artist.GetFirstError("LastName");
+
         }
 
         private void SaveArtist()
         {
-
-            using (var context = new ShopDbEntities())
+            if (Artist.Id <= 0)
             {
-
-                _artistRepository = new SqlRepository<Artist>(context);
-                if (Artist.Id == 0)
-                {
-                    _artistRepository.Add(Artist);
-                }
-                else
-                {
-                    _artistRepository.Update(Artist);
-                }
-                context.SaveChanges();
-
+                _artistRepository.Add(Artist);
+            }
+            else
+            {
+                _artistRepository.Update(Artist);
             }
 
-            _regionManager.RequestNavigate("content","ArtistListView");
+            GoBack();
 
         }
     }

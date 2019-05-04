@@ -50,30 +50,15 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             set => SetProperty(ref _canSave, value);
         }
 
-        private bool _isAddingSeries;
-
-        public bool IsAddingSeries
-        {
-            get => _isAddingSeries;
-            set => SetProperty(ref _isAddingSeries, value);
-        }
-
-    public AddEditSeriesViewModel(IRegionManager manager)
+    public AddEditSeriesViewModel(IRegionManager manager, IRepository<Publisher> publisherRepostory, IRepository<Series> seriesRepository)
         {
 
             _regionManager = manager;
+            _publisherRepository = publisherRepostory;
+            _seriesRepository = seriesRepository;
 
             GoBackCommand = new DelegateCommand(GoBack);
             SaveSeriesCommand = new DelegateCommand(SaveSeries);
-
-
-            using (var context = new ShopDbEntities())
-            {
-                
-                _publisherRepository = new SqlRepository<Publisher>(context);
-                Publishers = _publisherRepository.GetAll().ToList();
-
-            }
 
         }
 
@@ -90,70 +75,64 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            Series = null;
-            CanSave = false;
-            NameErrorMessage = string.Empty;
-            Series = (Series) navigationContext.Parameters["series"];
-            if (Series == null)
-            {
-           
-                Series = new Series();
-                IsAddingSeries = true;
 
-            }
-            else
-            {
-                IsAddingSeries = false;
-            }
+            ResetForm();
 
+            Series = (Series)navigationContext.Parameters["series"];
+            Series ??= new Series();
+
+            GetPublishersFromRepository();
 
             Series.PropertyChanged += CanSaveChanged;
             Series.ErrorsChanged += Series_ErrorsChanged;
         }
 
-        private void Series_ErrorsChanged(object sender, System.ComponentModel.DataErrorsChangedEventArgs e)
+        public void Series_ErrorsChanged(object sender, System.ComponentModel.DataErrorsChangedEventArgs e)
         {
             NameErrorMessage = Series.GetFirstError("Name");
         }
 
-        private void CanSaveChanged(object sender, EventArgs e)
+        public void CanSaveChanged(object sender, EventArgs e)
         {
 
-            if (!string.IsNullOrEmpty(Series.Name) && Series.Publisher != null)
-                CanSave = !Series.HasErrors;
-            else
-                CanSave = false;
+            CanSave = (!string.IsNullOrEmpty(Series.Name) && Series.Publisher != null) ? !Series.HasErrors : false;
             
+        }
+
+        public void ResetForm()
+        {
+            Series = null;
+            CanSave = false;
+            NameErrorMessage = string.Empty;
+            Publishers = null;
         }
 
         private void GoBack()
         {
-
+            _seriesRepository.Reload(Series);
             _regionManager.RequestNavigate("content","SeriesList");
 
+        }
+
+        public void GetPublishersFromRepository()
+        {
+            Publishers = _publisherRepository.GetAll().ToList();
         }
 
         private void SaveSeries()
         {
 
-            using (var context = new ShopDbEntities())
+            if(Series.Id <= 0)
             {
-                
-                _seriesRepository = new SqlRepository<Series>(context);
-                context.Publishers.Attach(Series.Publisher);
-                if(Series.Id == 0)
-                {
-                    _seriesRepository.Add(Series);
-                }
-                else
-                {
-                    _seriesRepository.Update(Series);
-                }
-                context.SaveChanges();
-
+                _seriesRepository.Add(Series);
+            }
+            else
+            {
+                _seriesRepository.Update(Series);
             }
 
-            _regionManager.RequestNavigate("content","SeriesList");
+
+            GoBack();
 
         }
     }

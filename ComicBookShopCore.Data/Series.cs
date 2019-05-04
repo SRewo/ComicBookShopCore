@@ -7,7 +7,7 @@ namespace ComicBookShopCore.Data
         public int Id { get; private set; }
         private string _name;
 
-        [Required]
+        [Required(ErrorMessage = "Series name cannot be empty")]
         public string Name
         {
             get => _name;

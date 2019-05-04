@@ -181,7 +181,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         {
             if (_comicBookRepository.GetAll().Count() != 0)
             {
-                AllComicBooks = _comicBookRepository.GetAll().Include(x => x.ComicBookArtists).Include(x => x.Series).Include(x => x.Series.Publisher).Include(x => x.ComicBookArtists.Select(z => z.Artist)).ToList();
+                AllComicBooks = _comicBookRepository.GetAll().Include(x => x.ComicBookArtists).ThenInclude(z => z.Artist).Include(x => x.Series).Include(x => x.Series.Publisher).ToList();
             }
             ViewList = AllComicBooks;
 

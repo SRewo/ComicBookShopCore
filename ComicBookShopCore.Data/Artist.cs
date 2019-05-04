@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using static ComicBookShopCore.Data.CustomValidation;
 
 namespace ComicBookShopCore.Data
 {
@@ -8,7 +9,8 @@ namespace ComicBookShopCore.Data
 
         private string _firstName;
 
-        [Required]
+        [Required(ErrorMessage = "First name cannot be empty.")]
+        [NameValidation(ErrorMessage ="First name cannot contain special characters.")]
         public string FirstName
         {
             get => _firstName;
@@ -17,7 +19,8 @@ namespace ComicBookShopCore.Data
 
         private string _lastName;
 
-        [Required]
+        [Required(ErrorMessage = "Last name cannot be empty.")]
+        [NameValidation(ErrorMessage = "Last name cannot contain special characters.")]
         public string LastName
         {
             get => _lastName;
@@ -37,6 +40,16 @@ namespace ComicBookShopCore.Data
         public override string ToString()
         {
             return Name;
+        }
+
+        public Artist()
+        {
+
+        }
+
+        public Artist(int id)
+        {
+            Id = id;
         }
     }
 }

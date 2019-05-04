@@ -12,11 +12,11 @@ namespace ComicBookShopCore.Data
 
         private string _title;
 
-        [Required]
+        [Required(ErrorMessage = "Comic book title cannot be empty.")]
         public string Title
         {
             get => _title;
-            set => SetProperty(ref _title,value);
+            set => SetProperty(ref _title, value);
         }
 
         private DateTime _onSaleDate;
@@ -34,7 +34,7 @@ namespace ComicBookShopCore.Data
         public double Price
         {
             get => _price;
-            set => SetProperty(ref _price,value);
+            set => SetProperty(ref _price, value);
         }
 
         private int _quantity;
@@ -61,16 +61,16 @@ namespace ComicBookShopCore.Data
         public ObservableCollection<ComicBookArtist> ComicBookArtists
         {
             get => _comicBookArtists;
-            set => SetProperty(ref _comicBookArtists,value);
+            set => SetProperty(ref _comicBookArtists, value);
         }
 
         public string ShortArtistDetail => GetShortArtistDetail();
 
 
         private string GetShortArtistDetail()
-        { 
+        {
 
-            var n =  ComicBookArtists.Count;
+            var n = ComicBookArtists.Count;
             var result = string.Empty;
             foreach (var artist in ComicBookArtists)
             {
@@ -79,6 +79,16 @@ namespace ComicBookShopCore.Data
             }
 
             return result;
+        }
+
+        public ComicBook()
+        {
+
+        }
+        
+        public ComicBook(int id)
+        {
+            Id = id;
         }
     }
 }

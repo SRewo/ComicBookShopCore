@@ -71,10 +71,6 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-
-            Publisher = null;
-            NameErrorMessage = string.Empty;
-            DateErrorMessage = string.Empty;
             CanSave = false;
 
 
@@ -108,6 +104,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         private void GoBack()
         {
+            _publisherRepository.Reload(Publisher);
             _regionManager.RequestNavigate("content","PublisherList");
         }
 
@@ -116,7 +113,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             if (Publisher != null)
             {
 
-                if (Publisher.Id == 0)
+                if (Publisher.Id <= 0)
                 {
                     _publisherRepository.Add(Publisher);
                 }
