@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ComicBookShopCore.ComicBookModule\ComicBookShopCore.ComicBookModule.csproj" />
+    <ProjectReference Include="..\ComicBookShopCore.EmployeeModule\ComicBookShopCore.EmployeeModule.csproj" />
   </ItemGroup>
 
 </Project>

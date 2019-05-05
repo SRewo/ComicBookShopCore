@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using ComicBookShopCore.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -54,6 +55,18 @@ namespace ComicBookShopCore.Data.Repositories
         public void Reload(T entity)
         {
             _dbContext.Entry(entity).Reload();
+        }
+
+        public bool CanOpen()
+        {
+            try
+            {
+                return _dbContext.Database.CanConnect();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }

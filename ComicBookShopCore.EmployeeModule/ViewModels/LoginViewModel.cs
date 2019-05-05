@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using ComicBookShopCore.Data;
+using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
 using ComicBookShopCore.EmployeeModule.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -14,7 +17,7 @@ namespace ComicBookShopCore.EmployeeModule.ViewModels
     public class LoginViewModel : BindableBase
     {
         private readonly IRegionManager _regionManager;
-        private SqlRepository<Employee> _employeeRepository;
+        private IRepository<Employee> _employeeRepository;
         private Employee _loggedEmployee;
 
         public DelegateCommand<object> SignInCommand { get; set; }
@@ -45,23 +48,25 @@ namespace ComicBookShopCore.EmployeeModule.ViewModels
 
 
 
-        public LoginViewModel(IRegionManager manager)
+        public LoginViewModel(IRegionManager manager, IRepository<Employee> employeeRepository)
         {
 
             SignInCommand = new DelegateCommand<object>(SignIn);
+
+            _employeeRepository = employeeRepository;
             _regionManager = manager;
             
             CheckDb();
 
         }
 
-        private void SignIn(object obj)
+        public void SignIn(object obj)
         {
             var passwordContainer = (IContainPassword) obj;
             if (passwordContainer != null)
             {
                 var secureString = passwordContainer.Password;
-                if (CheckUserExists(Username) && CheckPasswords(_loggedEmployee,secureString))
+                if (CheckUserExists(Username) && CheckPasswords(_loggedEmployee, secureString))
                 {
 
                     GlobalVariables.LoggedEmployee = _loggedEmployee;
@@ -81,35 +86,33 @@ namespace ComicBookShopCore.EmployeeModule.ViewModels
             
         }
 
-        private void Redirect()
+        public void Redirect()
         {
+            try
+            {
+                var activeRegion = _regionManager.Regions["content"].ActiveViews.FirstOrDefault();
+                _regionManager.Regions["content"].Deactivate(activeRegion);
 
-            var activeRegion = _regionManager.Regions["content"].ActiveViews.FirstOrDefault();
-            _regionManager.Regions["content"].Deactivate(activeRegion);
-
-            _regionManager.RequestNavigate("menu", "MenuView");
-
-        }
-
-        private bool CheckUserExists(string login)
-        {
-                
-            using (var context = new ShopDbEntities())
+                _regionManager.RequestNavigate("menu", "MenuView");
+            }catch(Exception ex)
             {
 
-                _employeeRepository = new SqlRepository<Employee>(context);
-
-                _loggedEmployee = _employeeRepository.GetAll().FirstOrDefault(x => x.Login == login);
             }
+        }
+
+        public bool CheckUserExists(string login)
+        {
+                
+            _loggedEmployee = _employeeRepository.GetAll().FirstOrDefault(x => x.Login == login);
 
             return _loggedEmployee != null;
 
         }
 
-        private static bool CheckPasswords(Employee emp, SecureString securePassword)
+        public static bool CheckPasswords(Employee emp, SecureString securePassword)
         {
 
-            return emp.Password == Encrypt(new System.Net.NetworkCredential(string.Empty, securePassword).Password);
+            return emp.Password.ToUpper() == Encrypt(new System.Net.NetworkCredential(string.Empty, securePassword).Password);
 
         }
 
@@ -125,21 +128,15 @@ namespace ComicBookShopCore.EmployeeModule.ViewModels
             return stringBuilder.ToString().ToUpper();
         }
 
-        private void CheckDb()
+        public void CheckDb()
         {
-            using (var context = new ShopDbEntities())
+
+            CanLogIn = _employeeRepository.CanOpen();
+            if (!CanLogIn)
             {
-                if (!context.Database.CanConnect())
-                {
-                    ErrorMessage =
-                        "Unable to connect with database. Please restart program and try again. If after few tries problem still persists, please call to: 999999";
-                    CanLogIn = false;
-                }
-                else
-                {
-                    CanLogIn = true;
-                }
+                ErrorMessage = "Unable to connect with database. Please restart program and try again.";
             }
+
         }
     }
 }

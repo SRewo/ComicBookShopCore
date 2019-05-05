@@ -12,5 +12,6 @@ namespace ComicBookShopCore.Data.Interfaces
         IQueryable<T> GetAll();
         T GetById(int id);
         void Reload(T entity);
+        bool CanOpen();
     }
 }
