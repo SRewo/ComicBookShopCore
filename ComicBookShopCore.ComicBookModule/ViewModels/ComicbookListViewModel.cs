@@ -85,7 +85,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         public ComicBookListViewModel(IRegionManager manager, IRepository<Publisher> publisherRepository, IRepository<ComicBook> comicBookRepository)
         {
 
-            SelectedPublisherChanged = new DelegateCommand(PublisherChanged);
+            SelectedPublisherChanged = new DelegateCommand(Search);
             SearchWordChanged = new DelegateCommand(Search);
             ResetSearchCommand = new DelegateCommand(ResetSearch);
             AddComicBookCommand = new DelegateCommand(OpenAdd);
@@ -95,15 +95,6 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             _comicBookRepository = comicBookRepository;
             _publisherRepository = publisherRepository;
             
-
-        }
-
-        private void PublisherChanged()
-        {
-
-                ViewList = SearchWord == null ? AllComicBooks.Where(x => x.Series.Publisher.Equals(SelectedPublisher)).ToList() :
-                    AllComicBooks.Where(x => x.Series.Publisher.Equals(SelectedPublisher) && (CheckStringEquals(x.Title, SearchWord) || CheckStringEquals(x.Series.Name, SearchWord) || x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name, SearchWord)))).ToList();
-
 
         }
 
@@ -166,6 +157,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             ViewList = null;
             GetComicBooks();
             GetPublishers();
+            ResetSearch();
             CanSearchCheck();
 
         }

@@ -165,7 +165,9 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
                 AllComicBooks = GetComicBooksSample().ToList(),
                 SelectedPublisher = GetPublishersSample().First()
             };
+            model.SearchWord = string.Empty;
             model.SelectedPublisherChanged.Execute();
+            
 
             Assert.NotEmpty(model.ViewList);
             Assert.Single(model.ViewList);
@@ -180,6 +182,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
                 AllComicBooks = GetComicBooksSample().ToList(),
                 SelectedPublisher = GetPublishersSample().First()
             };
+            model.SearchWord = string.Empty;
             model.SelectedPublisherChanged.Execute();
             model.SearchWord = "Ant";
             model.SearchWordChanged.Execute();
