@@ -21,17 +21,17 @@
                     if (premieresCount > i && i != 0)
                     {
                         <div class="carousel-item">
-                            <img class="d-block  mx-auto" style="max-height:400px;" src="https://www.atomcomics.pl/environment/cache/images/0_0_productGfx_305e7f7d5b5776b075da2c8a03273892.jpg" alt="First slide">
+                            <img class="d-block  mx-auto" style="max-height:400px;" src="~/images/ComicBooks/@Model.PremieresList[i].Id/1.jpeg" alt="First slide">
                             <div class="carousel-caption d-none d-md-block">
                                 <h5>@Model.PremieresList[i].Title</h5>
-                                <p>Release Date: @Model.PremieresList[i].OnSaleDate.ToShortDateString()</p>
+                                <p>Release Date: @Model.PremieresList[i].OnSaleDate.ToShortDateString() </p>
                             </div>
                         </div>
                     }
                     else if (premieresCount > i && i == 0)
                     {
                         <div class="carousel-item active">
-                            <img class="d-block  mx-auto" style="max-height:400px;" src="https://www.atomcomics.pl/environment/cache/images/0_0_productGfx_305e7f7d5b5776b075da2c8a03273892.jpg" alt="First slide">
+                            <img class="d-block  mx-auto" style="max-height:400px;" src="~/images/ComicBooks/@Model.PremieresList[i].Id/1.jpeg" alt="First slide">
                             <div class="carousel-caption d-none d-md-block">
                                 <h5>@Model.PremieresList[i].Title</h5>
                                 <p>Release Date: @Model.PremieresList[i].OnSaleDate.ToShortDateString()</p>
@@ -41,7 +41,7 @@
                     else if (listCount > j && i == 0)
                     {
                         <div class="carousel-item active">
-                            <img class="d-block  mx-auto" style="max-height:400px;" src="https://www.atomcomics.pl/environment/cache/images/0_0_productGfx_305e7f7d5b5776b075da2c8a03273892.jpg" alt="First slide">
+                            <img class="d-block  mx-auto" style="max-height:400px;" src="~/images/ComicBooks/@Model.ViewList[j].Id/1.jpeg" alt="First slide">
                             <div class="carousel-caption d-none d-md-block">
                                 <h5>@Model.ViewList[j].Title</h5>
                                 <p>Release Date: @Model.ViewList[j].OnSaleDate.ToShortDateString()</p>
@@ -51,7 +51,7 @@
                     } else if( listCount > j)
                     {
                         <div class="carousel-item">
-                            <img class="d-block  mx-auto" style="max-height:400px;" src="https://www.atomcomics.pl/environment/cache/images/0_0_productGfx_305e7f7d5b5776b075da2c8a03273892.jpg" alt="First slide">
+                            <img class="d-block  mx-auto" style="max-height:400px;" src="~/images/ComicBooks/@Model.ViewList[j].Id/1.jpeg" alt="First slide">
                             <div class="carousel-caption d-none d-md-block">
                                 <h5>@Model.ViewList[j].Title</h5>
                                 <p>Release Date: @Model.ViewList[j].OnSaleDate.ToShortDateString()</p>
@@ -92,7 +92,7 @@
         if (listCount > i)
         {
                 <div class="card border-dark float-sm-left d-sm-flex justify-content-center" style="width: 18rem; height:45rem; margin:10px 10px 10px 10px;">
-                    <img class="card-img-top" src="https://www.atomcomics.pl/environment/cache/images/0_0_productGfx_ce5cfba505b3d10503d93cd50e5ba209.jpg" alt="Card image cap">
+                    <img class="card-img-top" src="~/images/ComicBooks/@Model.ViewList[i].Id/1.jpeg" alt="Card image cap">
                     <div class="card-body flex-column d-flex">
                         <h5 class="card-title" style="font-weight:bold;">@Model.ViewList[i].Title</h5>
                         <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
