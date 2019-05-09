@@ -8,8 +8,12 @@ namespace ComicBookShopCore.Data
         
         public int Id { get; private set; }
 
+
         private string _name;
-        [Required]
+
+        [Required(ErrorMessage = "Publisher name cannot be empty")]
+        [MinLength(3, ErrorMessage = "Publisher name is too short.")]
+        [MaxLength(40, ErrorMessage = "Publisher name is too long")]
         public string Name {
             get => _name; 
             set => SetProperty(ref _name, value); 
@@ -31,6 +35,29 @@ namespace ComicBookShopCore.Data
             get => _creationDateTime;
             set => SetProperty(ref _creationDateTime, value);
         }
+
+        public Publisher()
+        {
+        }
+
+        public Publisher(int id)
+        {
+            Id = id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() == typeof(Publisher))
+            {
+                var ob = obj as Publisher;
+                return this.Id == ob.Id;
+            }
+            return false;
+        }
+        public override int GetHashCode()
+        {
+            return Id == 0 ? base.GetHashCode() : Id.GetHashCode();
+        }
     }
 
     public class CustomDateAttribute : RangeAttribute
@@ -43,4 +70,5 @@ namespace ComicBookShopCore.Data
             ErrorMessage = "You have to choose a date between 01.01.1900 and today";
         }
     }
+
 }

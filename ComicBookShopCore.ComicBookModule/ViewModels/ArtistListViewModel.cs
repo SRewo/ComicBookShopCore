@@ -10,15 +10,17 @@ using Prism.Mvvm;
 using Prism.Regions;
 using System.Windows;
 using System.Windows.Input;
+using Prism.Ioc;
 
 namespace ComicBookShopCore.ComicBookModule.ViewModels
 {
     public class ArtistListViewModel : BindableBase, INavigationAware
     {
 
-        private IRepository<Artist> _artistRepository;
+        private readonly IRepository<Artist> _artistRepository;
         private List<Artist> _allArtists;
         private readonly IRegionManager _regionManager;
+
         public DelegateCommand AddArtistCommand { get; private set; }
         public DelegateCommand EditArtistCommand { get; private set; }
         public DelegateCommand SearchWordChanged { get; private set; }
@@ -64,25 +66,26 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         }
 
 
-        public ArtistListViewModel(IRegionManager manager)
+        public ArtistListViewModel(IRegionManager manager, IRepository<Artist> repository)
         {
 
             _regionManager = manager;
             AddArtistCommand = new DelegateCommand(OpenAdd);
             EditArtistCommand = new DelegateCommand(OpenEdit);
             SearchWordChanged = new DelegateCommand(Search);
+            _artistRepository = repository;
 
         }
+            
 
-
-        private void OpenAdd()
+        public void OpenAdd()
         {
             
             _regionManager.RequestNavigate("content","AddEditArtist");
 
         }
 
-        private void OpenEdit()
+        public void OpenEdit()
         {
             var parameters = new NavigationParameters
             {
@@ -91,10 +94,10 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             _regionManager.RequestNavigate("content","AddEditArtist",parameters);
         }
 
-        private void Search()
+        public void Search()
         {
 
-            ViewList = string.IsNullOrEmpty(SearchWord) ? _allArtists : _allArtists.Where(c => c.Name.Contains(SearchWord)).ToList(); ;
+            ViewList = string.IsNullOrEmpty(SearchWord) ? _allArtists : _allArtists.Where(c => c.Name.Contains(SearchWord)).ToList();
 
         }
 
@@ -118,15 +121,12 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         }
 
-        private void GetTable()
+        public void GetTable()
         {
-            using (var context = new ShopDbEntities())
-            {
 
-                _artistRepository = new SqlRepository<Artist>(context);
-                _allArtists = _artistRepository.GetAll().ToList();
-                ViewList = _allArtists;
-            }
+           _allArtists = _artistRepository.GetAll().ToList();
+            ViewList = _allArtists;
+
         }
 
         public void CanSearchCheck()

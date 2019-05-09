@@ -35,7 +35,7 @@
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction Command="{Binding SelectedPublisherChanged}"/>
+                            <i:InvokeCommandAction Command="{Binding SelectedPublisherChangedCommand}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ComboBox>
@@ -47,7 +47,7 @@
                 <TextBox Width="250px" Height="30" Text="{Binding Path=SearchWord, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,20,0">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
-                            <i:InvokeCommandAction Command="{Binding SearchWordChanged}" />
+                            <i:InvokeCommandAction Command="{Binding SearchWordChangedCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
@@ -81,11 +81,12 @@
             <Button Content="Remove Item" Height="30" Width="125" Margin="0,0,20,0" Command="{Binding RemoveItemCommand}"/>
             <Label Content="Total Price: "/>
             <TextBox Height="30" Width="250" TextAlignment="Right" IsEnabled="False" Text="{Binding Order.TotalPrice,StringFormat={}{0:C}}" Margin="0,0,20,0"/>
-          </StackPanel>
+        </StackPanel>
 
         <StackPanel Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
-            <Button Content="Go Back" Height="30" Width="125" Margin="0,0,20,0"/>
-            <Button Content="Place Order" Height="30" Width="125" Margin="0,0,20,0" IsEnabled="{Binding CanSave}"/>
+            <Button Content="Go Back" Height="30" Width="125" Margin="0,0,20,0" Command="{Binding GoBackCommand}"/>
+            <Button Content="Place Order" Height="30" Width="125" Margin="0,0,20,0" IsEnabled="{Binding CanSave}" Command="{Binding SaveOrderCommand}"/>
         </StackPanel>
+        <Label VerticalAlignment="Top" HorizontalAlignment="Left" Content="{Binding ErrorMessage}" Foreground="Red" Margin="76,282.667,0,0" />
     </Grid>
 </UserControl>

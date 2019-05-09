@@ -11,5 +11,7 @@ namespace ComicBookShopCore.Data.Interfaces
         void Delete(T entity);
         IQueryable<T> GetAll();
         T GetById(int id);
+        void Reload(T entity);
+        bool CanOpen();
     }
 }

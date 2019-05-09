@@ -8,6 +8,9 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using ComicBookShopCore.Data;
+using ComicBookShopCore.Data.Interfaces;
+using ComicBookShopCore.Data.Repositories;
 using ComicBookShopCore.Desktop.Views;
 
 namespace ComicBookShopCore.Desktop
@@ -19,7 +22,17 @@ namespace ComicBookShopCore.Desktop
     {
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            var context = new ShopDbEntities();
 
+            containerRegistry.RegisterInstance<IRepository<Artist>>(new SqlRepository<Artist>(context));
+            containerRegistry.RegisterInstance<IRepository<Publisher>>(
+                new SqlRepository<Publisher>(context));
+            containerRegistry.RegisterInstance<IRepository<Series>>(new SqlRepository<Series>(context));
+            containerRegistry.RegisterInstance<IRepository<ComicBook>>(new SqlRepository<ComicBook>(context));
+            containerRegistry.RegisterInstance<IRepository<ComicBookArtist>>(new SqlRepository<ComicBookArtist>(context));
+            containerRegistry.RegisterInstance<IRepository<Employee>>(new SqlRepository<Employee>(context));
+            containerRegistry.RegisterInstance<IRepository<Order>>(new SqlRepository<Order>(context));
+            
         }
 
         protected override Window CreateShell()

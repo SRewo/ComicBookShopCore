@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using ComicBookShopCore.Data;
@@ -16,8 +17,8 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
     public class SeriesListViewModel : BindableBase , INavigationAware
     {
         private List<Series> _allSeries;
-        private IRepository<Series> _seriesRepository;
-        private IRepository<Publisher> _publisherRepository;
+        private readonly IRepository<Series> _seriesRepository;
+        private readonly IRepository<Publisher> _publisherRepository;
         private readonly IRegionManager _regionManager;
         public DelegateCommand EditSeriesCommand { get; set; }
         public DelegateCommand AddSeriesCommand { get; set; }
@@ -33,6 +34,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             set => SetProperty(ref _searchWord, value);
         }
 
+
         private List<Series> _viewList;
 
         public List<Series> ViewList
@@ -40,6 +42,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             get => _viewList;
             set => SetProperty(ref _viewList, value);
         }
+
 
         private Series _selectedSeries;
 
@@ -49,6 +52,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             set => SetProperty(ref _selectedSeries, value);
         }
 
+
         private List<Publisher> _publishers;
 
         public List<Publisher> Publishers
@@ -56,6 +60,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             get => _publishers;
             set => SetProperty(ref _publishers, value);
         }
+
 
         private Publisher _selectedPublisher;
            
@@ -66,84 +71,56 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         }
 
 
-        private bool _canEdit;
+        private bool _isEditEnabled;
 
-        public bool CanEdit
+        public bool IsEditEnabled
         {
-            get => _canEdit;
-            set => SetProperty(ref _canEdit, value);
+            get => _isEditEnabled;
+            set => SetProperty(ref _isEditEnabled, value);
         }
 
 
-        public SeriesListViewModel(IRegionManager manager)
+        public SeriesListViewModel(IRegionManager manager, IRepository<Publisher> publisherRepository, IRepository<Series> seriesRepository)
         {
 
-            SearchWordChanged = new DelegateCommand(SearchByWord);
-            SelectedPublisherChanged = new DelegateCommand(SearchByPublisher);
+            SearchWordChanged = new DelegateCommand(Search);
+            SelectedPublisherChanged = new DelegateCommand(Search);
             ResetSearchCommand = new DelegateCommand(ResetSearch);
             AddSeriesCommand = new DelegateCommand(OpenAdd);
             EditSeriesCommand = new DelegateCommand(OpenEdit);
 
             _regionManager = manager;
+            _publisherRepository = publisherRepository;
+            _seriesRepository = seriesRepository;
         }
 
-        private void SearchByWord()
+        public void Search()
         {
 
-            if (SelectedPublisher == null)
-            {
-                var series = _allSeries.Where(c => c.Name.ToLower().Contains(SearchWord.Trim().ToLower()));
+                var series = SelectedPublisher == null ? _allSeries.Where(c => c.Name.ToLower().Contains(SearchWord.Trim().ToLower())) : 
+                    _allSeries.Where(c => c.Name.ToLower().Contains(SearchWord.Trim().ToLower()) && c.Publisher.Id.Equals(SelectedPublisher.Id));
 
                 ViewList = series.ToList();
-            }
-            else
-            {
-                var series = _allSeries.Where(c => c.Name.ToLower().Contains(SearchWord.Trim().ToLower()) && c.Publisher.Id.Equals(SelectedPublisher.Id));
-
-                ViewList = series.ToList();
-            }
 
         }
 
-        private void SearchByPublisher()
-        {
-
-            if (string.IsNullOrEmpty(SearchWord) && SelectedPublisher != null)
-            {
-
-                var series = _allSeries.Where(c => c.Publisher.Id.Equals(SelectedPublisher.Id));
-
-                ViewList = series.ToList();
-
-            }
-            else if(SelectedPublisher != null)
-            {
-
-                var series = _allSeries.Where(c => c.Name.ToLower().Contains(SearchWord.Trim().ToLower()) && c.Publisher.Id.Equals(SelectedPublisher.Id));
-
-                ViewList = series.ToList();
-
-            }
-
-        }
-
-        private void ResetSearch()
+        public void ResetSearch()
         {
 
             SearchWord = string.Empty;
             SelectedPublisher = null;
-            ViewList = _allSeries.ToList();
+            ViewList = _allSeries;
 
         }
 
-        private void OpenAdd()
+        public void OpenAdd()
         {
 
             _regionManager.RequestNavigate("content","AddEditSeries");
 
         }
 
-        private void OpenEdit()
+        public void OpenEdit()
         {
 
                 var parameters = new NavigationParameters()
@@ -155,10 +132,41 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         }
 
+        public void CanEditCheck()
+        {
+            IsEditEnabled = SelectedSeries != null;
+        }
+
+        public void GetSeriesData()
+        {
+
+            _allSeries = _seriesRepository.GetAll().Include(m => m.Publisher).ToList();
+            ViewList = _allSeries;
+
+        }
+
+        public void GetPublisherData()
+        {
+
+            Publishers = _publisherRepository.GetAll().ToList();
+
+        }
+
+
+        protected override void OnPropertyChanged(PropertyChangedEventArgs args)
+        {
+            base.OnPropertyChanged(args);
+            CanEditCheck();
+        }
+
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            GetTable();
-            CanEdit = false;
+            
+            GetSeriesData();
+            ResetSearch();
+            GetPublisherData();
+            _isEditEnabled = false;
+
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -171,24 +179,5 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         }
 
-        private async void GetTable()
-        {
-            using (var context = new ShopDbEntities())
-            {
-
-                _seriesRepository = new SqlRepository<Series>(context);
-                _allSeries = await _seriesRepository.GetAll().Include(m => m.Publisher).ToListAsync();
-                ViewList = _allSeries;
-
-                _publisherRepository = new SqlRepository<Publisher>(context);
-                Publishers = await _publisherRepository.GetAll().ToListAsync();
-            }
-        }
-
-        protected override void OnPropertyChanged(PropertyChangedEventArgs args)
-        {
-            base.OnPropertyChanged(args);
-            CanEdit = SelectedSeries != null;
-        }
     }
 }

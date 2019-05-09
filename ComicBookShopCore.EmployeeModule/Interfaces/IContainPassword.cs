@@ -1,6 +1,6 @@
 ﻿namespace ComicBookShopCore.EmployeeModule.Interfaces
 {
-    interface IContainPassword
+    public interface IContainPassword
     {
         System.Security.SecureString Password { get; }
     }

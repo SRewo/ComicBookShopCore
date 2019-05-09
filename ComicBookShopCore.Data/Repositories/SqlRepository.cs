@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using ComicBookShopCore.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,29 +9,30 @@ namespace ComicBookShopCore.Data.Repositories
     {
 
         private readonly DbSet<T> _dbSet;
+        private readonly DbContext _dbContext;
 
         public SqlRepository(DbContext dataContext)
         {
 
             _dbSet = dataContext.Set<T>();
-
+            _dbContext = dataContext;
         }
 
         public void Add(T entity)
         {
             _dbSet.Add(entity);
+            _dbContext.SaveChanges();
         }
 
         public void Delete(T entity)
         {
 
             _dbSet.Remove(entity);
-
+            _dbContext.SaveChanges();
         }
 
         public IQueryable<T> GetAll()
         {
-
             return _dbSet;
 
         }
@@ -47,8 +49,24 @@ namespace ComicBookShopCore.Data.Repositories
         {
             
            _dbSet.Update(entity);
-
+           _dbContext.SaveChanges();
         }
 
+        public void Reload(T entity)
+        {
+            _dbContext.Entry(entity).Reload();
+        }
+
+        public bool CanOpen()
+        {
+            try
+            {
+                return _dbContext.Database.CanConnect();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
     }
 }
