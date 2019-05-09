@@ -1,7 +1,4 @@
-﻿@{
-    var model = new LayoutViewModel();
-}
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -40,10 +37,10 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="#">All</a>
-                            @foreach (var publisher in model.Publishers)
-                            {
-                                <a class="dropdown-item" asp-controller="Home" asp-action="Index">@publisher.Name</a>
-                            }
+                            <a class="dropdown-item" href="#">Dc Comics</a>
+                            <a class="dropdown-item" href="#">Marvel Comics</a>
+                            <a class="dropdown-item" href="#">Dark Horse Comics</a>
+                            <a class="dropdown-item" href="#">Other</a>
                         </div>
                     </li>
                     <li>
@@ -54,10 +51,12 @@
                     </li>
                 </ul>
             </div>
-            <form class="form-inline align-content-lg-end">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-primary my-2 my-sm-0" type="submit">Search</button>
-            </form>
+            <div class="form-inline align-content-lg-end">
+                <ul class="navbar-nav flex-grow-1">
+                    <li>
+                        <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="About">Login\Register</a>
+                </ul>
+            </div>
         </div>
     </nav>
 </header>

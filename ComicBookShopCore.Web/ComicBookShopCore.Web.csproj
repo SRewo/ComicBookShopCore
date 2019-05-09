@@ -14,4 +14,9 @@
     <ProjectReference Include="..\ComicBookShopCore.Data\ComicBookShopCore.Data.csproj" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\ComicBooks\" />
+  </ItemGroup>
+
 </Project>

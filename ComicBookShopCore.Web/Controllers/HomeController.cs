@@ -5,14 +5,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ComicBookShopCore.Web.Models;
+using ComicBookShopCore.Data;
+using ComicBookShopCore.Data.Interfaces;
+using ComicBookShopCore.Data.Repositories;
 
 namespace ComicBookShopCore.Web.Controllers
 {
     public class HomeController : Controller
     {
+        private ShopDbEntities _context = new ShopDbEntities();
+        private IRepository<ComicBook> _comicBookRepository;
         public IActionResult Index()
         {
-            return View();
+            _comicBookRepository = new SqlRepository<ComicBook>(_context);
+            var model = new IndexViewModel(_comicBookRepository);
+            return View(model);
         }
 
         public IActionResult Privacy()

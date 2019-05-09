@@ -1,5 +1,7 @@
-﻿@{
+﻿@model IndexViewModel
+@{
     ViewData["Title"] = "Home Page";
+    Model.GetData();
 }
 <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" style="margin: 30px 30px 30px 30px;">
     <ol class="carousel-indicators">
@@ -37,46 +39,36 @@
 
 </div>
 <section class="container-fluid">
-    <div class="card border-dark float-sm-left d-sm-flex" style="width: 18rem; height:44rem; margin:10px 10px 10px 10px;">
+    <div class="card border-dark float-sm-left d-sm-flex" style="width: 18rem; height:45rem; margin:10px 10px 10px 10px;">
         <img class="card-img-top" src="https://www.atomcomics.pl/environment/cache/images/0_0_productGfx_ce5cfba505b3d10503d93cd50e5ba209.jpg" alt="Card image cap">
         <div class="card-body">
             <h5 class="card-title" style="font-weight:bold;">BATMAN THE DAWNBREAKER #1</h5>
             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <h6><b>On Sale From:</b> 21.01.2019</h6>
             <h6 class="price">Price: $9.99</h6>
             <a href="#" class="btn btn-primary">Show Details</a>
         </div>
     </div>
-    <div class="card border-dark float-sm-left d-sm-flex" style="width: 18rem; height:44rem; margin:10px 10px 10px 10px;">
-        <div style="background: black; text-align:center;">
-            <img class="card-img-top" style="align-self: center;" src="https://www.atomcomics.pl/environment/cache/images/0_0_productGfx_305e7f7d5b5776b075da2c8a03273892.jpg" alt="Card image cap">
-        </div>
-        <div class="card-body ">
-            <h5 class="card-title">BATMAN LOST #1 (METAL)</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <h6 class="price">Price: $9.99</h6>
-            <a href="#" class="btn btn-primary align-bottom">Go somewhere</a>
-        </div>
-    </div>
-    <div class="card border-dark float-sm-left d-sm-flex" style="width: 18rem; height:44rem; margin:10px 10px 10px 10px;">
-        <div style="background: black; text-align:center;">
-            <img class="card-img-top" style="align-self: center;" src="https://www.atomcomics.pl/environment/cache/images/0_0_productGfx_305e7f7d5b5776b075da2c8a03273892.jpg" alt="Card image cap">
-        </div>
-        <div class="card-body ">
-            <h5 class="card-title">BATMAN LOST #1 (METAL)</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <h6 class="price">Price: $9.99</h6>
-            <a href="#" class="btn btn-primary align-bottom">Go somewhere</a>
-        </div>
-    </div>
-    <div class="card border-dark float-sm-left d-sm-flex" style="width: 18rem; height:44rem; margin:10px 10px 10px 10px;">
-        <div style="background: black; text-align:center;">
-            <img class="card-img-top" style="align-self: center;" src="https://www.atomcomics.pl/environment/cache/images/0_0_productGfx_305e7f7d5b5776b075da2c8a03273892.jpg" alt="Card image cap">
-        </div>
-        <div class="card-body ">
-            <h5 class="card-title">BATMAN LOST #1 (METAL)</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <h6 class="price">Price: $9.99</h6>
-            <a href="#" class="btn btn-primary align-bottom">Go somewhere</a>
-        </div>
-    </div>
+    @{ 
+        for (int i = 0; i < 9; i++)
+        {
+            if (Model.ViewList.Count() > i)
+            {
+                <div class="card border-dark float-sm-left d-sm-flex justify-content-center" style="width: 18rem; height:45rem; margin:10px 10px 10px 10px;">
+                    <img class="card-img-top" src="https://www.atomcomics.pl/environment/cache/images/0_0_productGfx_ce5cfba505b3d10503d93cd50e5ba209.jpg" alt="Card image cap">
+                    <div class="card-body flex-column">
+                        <h5 class="card-title" style="font-weight:bold;">@Model.ViewList[i].Title</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        <h6><b>On Sale From:</b> @Model.ViewList[i].OnSaleDate.ToShortDateString()</h6>
+                        <h6 class="price">Price: $@Model.ViewList[i].Price</h6>
+                        <div class="align-self-end"><a href="#" class="btn btn-primary mt-auto">Show Details</a></div>
+                    </div>
+                    </div>
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
 </section>
