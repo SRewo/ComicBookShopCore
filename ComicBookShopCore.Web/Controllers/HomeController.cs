@@ -17,14 +17,29 @@ namespace ComicBookShopCore.Web.Controllers
         private IRepository<ComicBook> _comicBookRepository;
         public IActionResult Index()
         {
-            _comicBookRepository = new SqlRepository<ComicBook>(_context);
             var model = new IndexViewModel(_comicBookRepository);
             return View(model);
+        }
+
+        [HttpGet("/comics/{id}/{page}", Name = "ComicBookList")]
+        public IActionResult ComicBookList(int? id, int? page)
+        {
+
+            if (!id.HasValue && !page.HasValue)
+                return RedirectToAction("Index");
+
+            var model1 = new ComicBookListViewModel(_comicBookRepository, id.Value, page.Value);
+            return View(model1);
         }
 
         public IActionResult Privacy()
         {
             return View();
+        }
+
+        public HomeController()
+        {
+            _comicBookRepository = new SqlRepository<ComicBook>(_context);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
