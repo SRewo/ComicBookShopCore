@@ -6,7 +6,7 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="720" d:DesignWidth="1280">
     <Grid>
 
         <Grid.ColumnDefinitions>
@@ -18,6 +18,8 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="100px"/>
+            <RowDefinition/>
+            <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
@@ -52,6 +54,12 @@
             <TextBlock Text="{Binding QuantityErrorMessage}" Width="160px" TextWrapping="Wrap" FontSize="11px" VerticalAlignment="Top" Foreground="Red" FontFamily="Nirmala UI"/>
         </StackPanel>
 
+        <Label Grid.Row="6" Grid.Column="0" Content="Short Description:" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontFamily="Nirmala UI"/>
+        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding ComicBook.ShortDescription}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200px" />
+
+        <Label Grid.Row="7" Grid.Column="0" Content="Short Description:" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontFamily="Nirmala UI"/>
+        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding ComicBook.Description}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="300px" Height="80px" TextWrapping="Wrap"/>
+
         <ComboBox Grid.Row="1" Grid.Column="3" Width="200px" Height="30px" VerticalAlignment="Center" IsTextSearchEnabled="True" ItemsSource="{Binding Artists, Mode=OneWay}" IsEditable="True" SelectedItem="{Binding SelectedArtist, Mode=TwoWay}" />
         <Button Grid.Row="1" Grid.Column="2" Width="125" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Add Artist" Margin="10,0,10,0" Command="{Binding AddArtistCommand}"/>
 
@@ -64,7 +72,7 @@
 
         <Button Grid.Row="4" Grid.Column="3" Width="125" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Remove Artist" Margin="10,0,10,0" Command="{Binding RemoveArtistCommand}"/>
 
-        <Button Grid.Row="5" Grid.Column="2" Width="125" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Back" Margin="10,0,10,0" Command="{Binding GoBackCommand}"/>
-        <Button Grid.Row="5" Grid.Column="3" Width="125" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Save" Margin="10,0,10,0" Command="{Binding SaveComicBookCommand}" IsEnabled="{Binding CanSave}"/>
+        <Button Grid.Row="7" Grid.Column="2" Width="125" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Back" Margin="10,0,10,0" Command="{Binding GoBackCommand}"/>
+        <Button Grid.Row="7" Grid.Column="3" Width="125" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Save" Margin="10,0,10,0" Command="{Binding SaveComicBookCommand}" IsEnabled="{Binding CanSave}"/>
     </Grid>
 </UserControl>

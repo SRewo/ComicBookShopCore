@@ -64,6 +64,25 @@ namespace ComicBookShopCore.Data
             set => SetProperty(ref _comicBookArtists, value);
         }
 
+        private string _shortDescription;
+
+        [MaxLength(120)]
+        public string ShortDescription
+        {
+            get => _shortDescription;
+            set => SetProperty(ref _shortDescription, value);
+        }
+
+        private string _description;
+      
+        public string Description
+        {
+            get => _description;
+            set => SetProperty(ref _description, value);
+        }
+
+
+
         public string ShortArtistDetail => GetShortArtistDetail();
 
 
