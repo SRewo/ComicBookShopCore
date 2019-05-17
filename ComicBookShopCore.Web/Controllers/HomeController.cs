@@ -8,13 +8,14 @@ using ComicBookShopCore.Web.Models;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace ComicBookShopCore.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private ShopDbEntities _context = new ShopDbEntities();
-        private IRepository<ComicBook> _comicBookRepository;
+        private readonly ShopDbEntities _context = new ShopDbEntities();
+        private readonly IRepository<ComicBook> _comicBookRepository;
         public IActionResult Index()
         {
             var model = new IndexViewModel(_comicBookRepository);
@@ -25,11 +26,28 @@ namespace ComicBookShopCore.Web.Controllers
         public IActionResult ComicBookList(int? id, int? page)
         {
 
-            if (!id.HasValue && !page.HasValue)
+            if (!id.HasValue | !page.HasValue)
                 return RedirectToAction("Index");
 
-            var model1 = new ComicBookListViewModel(_comicBookRepository, id.Value, page.Value);
-            return View(model1);
+            var model = new ComicBookListViewModel(_comicBookRepository, id.Value, page.Value);
+            return View(model);
+        }
+
+        [HttpGet("/comic/{id}", Name = "ComicBookDetails")]
+        public IActionResult ComicBookDetails(int? id)
+        {
+            if (!id.HasValue )
+                return RedirectToAction("Index");
+
+            var comic = _comicBookRepository.GetById(id.Value);
+            if (comic == null)
+                return RedirectToAction("Index");
+
+            comic = _comicBookRepository.GetAll().Include(x => x.Series).ThenInclude(x => x.Publisher)
+                .Include(x => x.ComicBookArtists).ThenInclude(x => x.Artist).First(x=> x.Id == id.Value);
+
+            var model = new ComicBookDetailsViewModel(comic);
+            return View(model);
         }
 
         public IActionResult Privacy()

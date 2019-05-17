@@ -27,8 +27,28 @@ namespace ComicBookShopCore.Web.Tests.ViewModels
             Assert.Equal(1, model.NumberOfPages);
         }
 
+        [Fact]
+        public void GetData_PublisherIsSelected_ValidCall()
+        {
+            var mock = new Mock<IRepository<ComicBook>>();
+            mock.Setup(x => x.GetAll()).Returns(GetComicBooksSample());
+            var model = new ComicBookListViewModel(mock.Object, 1, 1);
+            model.GetData();
 
+            Assert.NotEmpty(model.ViewList);
+            Assert.Equal(1, model.NumberOfPages);
+            Assert.Single(model.ViewList);
+        }
 
+        [Fact]
+        public void GetData_OtherPublishersSelected_ValidCall()
+        {
+            var mock = new Mock<IRepository<ComicBook>>();
+            mock.Setup(x => x.GetAll()).Returns(GetComicBooksSample);
+            var model = new ComicBookListViewModel(mock.Object, 4, 1);
+
+            Assert.Null(model.ViewList);
+        }
 
 
         private IQueryable<ComicBook> GetComicBooksSample()
@@ -50,7 +70,7 @@ namespace ComicBookShopCore.Web.Tests.ViewModels
                         new ComicBookArtist()
                         {
                             Artist = artists[0],
-                            Type = "Writter"
+                            Type = "Writer"
                         },
                         new ComicBookArtist()
                         {
@@ -71,7 +91,7 @@ namespace ComicBookShopCore.Web.Tests.ViewModels
                         new ComicBookArtist()
                         {
                             Artist = artists[2],
-                            Type = "Writter"
+                            Type = "Writer"
                         },
                         new ComicBookArtist()
                         {

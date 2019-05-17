@@ -48,7 +48,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
             model.ComicBook.ComicBookArtists.Add(new ComicBookArtist() {
                 Artist = model.SelectedArtist,
                 ComicBook = model.ComicBook,
-                Type = "Writter"
+                Type = "Writer"
             });
             model.AddArtistCommand.Execute();
 
@@ -73,7 +73,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
             {
                 Artist = model.SelectedArtist,
                 ComicBook = model.ComicBook,
-                Type = "Writter"
+                Type = "Writer"
             });
             model.SelectedComicBookArtist = model.ComicBook.ComicBookArtists[0];
             model.RemoveArtistCommand.Execute();
