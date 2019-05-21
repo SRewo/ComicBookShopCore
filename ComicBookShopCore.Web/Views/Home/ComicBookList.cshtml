@@ -2,8 +2,8 @@
 @{
     Model.GetData();
 }
-
-    <div class="row">
+<div class="row">
+    <div class="col">
         <nav aria-label="...">
             <ul class="pagination">
                 @{
@@ -16,7 +16,7 @@
                     else
                     {
                         <li class="page-item">
-                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@Model.Page-1">Previous</a>
+                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@(Model.Page-1)" asp-route-searchWord="@Model.SearchWord">Previous</a>
                         </li>
                     }
 
@@ -26,11 +26,11 @@
                     {
                         if (i == Model.Page)
                         {
-                            <li class="page-item active"><a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@i">@i</a></li>
+                            <li class="page-item active"><a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@i" asp-route-searchWord="@Model.SearchWord">@i</a></li>
                         }
                         else
                         {
-                            <li class="page-item"><a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@i">@i</a></li>
+                            <li class="page-item"><a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@i" asp-route-searchWord="@Model.SearchWord">@i</a></li>
                         }
 
                     }
@@ -38,19 +38,26 @@
                     if (Model.Page == Model.NumberOfPages)
                     {
                         <li class="page-item disabled">
-                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@Model.Page+1">Next</a>
+                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@(Model.Page+1)" asp-route-searchWord="@Model.SearchWord">Next</a>
                         </li>
                     }
                     else
                     {
                         <li class="page-item">
-                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@Model.Page+1">Next</a>
+                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@(Model.Page+1)" asp-route-searchWord="@Model.SearchWord">Next</a>
                         </li>
                     }
                 }
             </ul>
         </nav>
     </div>
+    <div class="col">
+        <form class="form-inline" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="1" method="get">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="searchWord">
+            <button class="btn btn-outline-success my-2 my-sm-0">Search</button>
+        </form>
+    </div>
+</div>
     <section class="container-fluid row">
         @{
         var listCount = Model.ViewList.Count;
@@ -90,7 +97,7 @@
                     else
                     {
                         <li class="page-item">
-                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@Model.Page-1">Previous</a>
+                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@(Model.Page-1)" asp-route-searchWord="@Model.SearchWord">Previous</a>
                         </li>
                     }
 
@@ -100,11 +107,11 @@
                     {
                         if (i == Model.Page)
                         {
-                            <li class="page-item active"><a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@i">@i</a></li>
+                            <li class="page-item active"><a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@i" asp-route-searchWord="@Model.SearchWord">@i</a></li>
                         }
                         else
                         {
-                            <li class="page-item"><a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@i">@i</a></li>
+                            <li class="page-item"><a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@i" asp-route-searchWord="@Model.SearchWord">@i</a></li>
                         }
 
                     }
@@ -112,13 +119,13 @@
                     if (Model.Page == Model.NumberOfPages)
                     {
                         <li class="page-item disabled">
-                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@Model.Page+1">Next</a>
+                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@(Model.Page+1)" asp-route-searchWord="@Model.SearchWord">Next</a>
                         </li>
                     }
                     else
                     {
                         <li class="page-item">
-                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@Model.Page+1">Next</a>
+                            <a class="page-link" asp-controller="Home" asp-action="ComicBookList" asp-route-id="@Model.PublisherId" asp-route-page="@(Model.Page+1)" asp-route-searchWord="@Model.SearchWord">Next</a>
                         </li>
                     }
                 }

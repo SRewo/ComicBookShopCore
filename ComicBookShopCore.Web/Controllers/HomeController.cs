@@ -22,14 +22,15 @@ namespace ComicBookShopCore.Web.Controllers
             return View(model);
         }
 
-        [HttpGet("/comics/{id}/{page}", Name = "ComicBookList")]
-        public IActionResult ComicBookList(int? id, int? page)
+        [HttpGet("comics/{id}/{page}", Name = "ComicBookList")]
+        public IActionResult ComicBookList(int? id, int? page, string searchWord)
         {
 
             if (!id.HasValue | !page.HasValue)
                 return RedirectToAction("Index");
 
-            var model = new ComicBookListViewModel(_comicBookRepository, id.Value, page.Value);
+            var model = new ComicBookListViewModel(_comicBookRepository, id.Value, page.Value, searchWord);
+
             return View(model);
         }
 

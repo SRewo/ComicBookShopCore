@@ -46,8 +46,23 @@ namespace ComicBookShopCore.Web.Tests.ViewModels
             var mock = new Mock<IRepository<ComicBook>>();
             mock.Setup(x => x.GetAll()).Returns(GetComicBooksSample);
             var model = new ComicBookListViewModel(mock.Object, 4, 1);
+            model.GetData();
 
-            Assert.Null(model.ViewList);
+            Assert.Empty(model.ViewList);
+        }
+
+        [Fact]
+        public void GetData_WithSearchWord_ValidCall()
+        {
+            var mock = new Mock<IRepository<ComicBook>>();
+            mock.Setup(x => x.GetAll()).Returns(GetComicBooksSample);
+            var model = new ComicBookListViewModel(mock.Object, 0,1, "Ant");
+            model.GetData();
+
+            Assert.NotEmpty(model.ViewList);
+            Assert.Single(model.ViewList);
+            Assert.Equal(1, model.NumberOfPages);
+            Assert.Equal(GetComicBooksSample().ToList()[1].Title, model.ViewList.First().Title);
         }
 
 
