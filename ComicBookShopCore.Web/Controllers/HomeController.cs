@@ -8,7 +8,11 @@ using ComicBookShopCore.Web.Models;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace ComicBookShopCore.Web.Controllers
 {
@@ -16,6 +20,8 @@ namespace ComicBookShopCore.Web.Controllers
     {
         private readonly ShopDbEntities _context = new ShopDbEntities();
         private readonly IRepository<ComicBook> _comicBookRepository;
+        private SignInManager<User> _signManager;
+        private UserManager<User> _userManager;
         public IActionResult Index()
         {
             var model = new IndexViewModel(_comicBookRepository);
@@ -51,14 +57,55 @@ namespace ComicBookShopCore.Web.Controllers
             return View(model);
         }
 
+        [Route("login")]
+        public async Task<IActionResult> LoginPage()
+        {
+            var model = new LoginPageViewModel();
+            var store = new UserStore(_context);
+            var address = new Address()
+                {
+                    City = "Katowice",
+                    Country = "Poland",
+                    PostalCode = "40-003",
+                    Region = "Śląskie",
+                    StreetName = "ul. Teatralna 2012",
+                };
+            var user = new User()
+            {
+                UserName = "admin",
+                Address = address,
+                DateOfBirth = new DateTime(1992, 10, 21),
+                Email = "admin@admin.pl",
+                FirstName = "Super",
+                LastName = "Admin"
+            };
+                var result = await _userManager.CreateAsync(user, "@Dmin123");
+                if (result.Succeeded)
+                {
+                    await _signManager.SignInAsync(user, false);
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        model.Errors.Add(error.Description);
+
+                    }
+                }
+                return View(model);
+        }
+
         public IActionResult Privacy()
         {
             return View();
         }
 
-        public HomeController()
+        public HomeController(UserManager<User> userManager, SignInManager<User> signManager)
         {
             _comicBookRepository = new SqlRepository<ComicBook>(_context);
+            _userManager = userManager;
+            _signManager = signManager;
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

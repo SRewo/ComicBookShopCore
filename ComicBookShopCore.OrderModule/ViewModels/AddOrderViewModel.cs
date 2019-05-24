@@ -179,7 +179,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
         {
             Order = new Order()
             {
-                Employee = GlobalVariables.LoggedEmployee,
+                Employee = GlobalVariables.LoggedUser,
                 OrderItems = new ObservableCollection<OrderItem>()
             };
             
@@ -230,7 +230,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
         {
-            return GlobalVariables.LoggedEmployee != null;
+            return GlobalVariables.LoggedUser != null;
         }
 
         public void OnNavigatedFrom(NavigationContext navigationContext)

@@ -95,7 +95,7 @@
                     <img class="card-img-top" src="~/images/ComicBooks/@Model.ViewList[i].Id/1.jpeg" alt="Card image cap">
                     <div class="card-body flex-column d-flex">
                         <h5 class="card-title" style="font-weight:bold;">@Model.ViewList[i].Title</h5>
-                        <p class="card-text">@Model.ViewList[i].ShortDescription</p>
+                        <p class="card-text" style="height: 7rem">@Model.ViewList[i].ShortDescription</p>
                         <h6><b>On Sale From:</b> @Model.ViewList[i].OnSaleDate.ToShortDateString()</h6>
                         <h6 class="price">Price: $@Model.ViewList[i].Price</h6>
                         <div class="align-self-end"><a asp-controller="Home" asp-action="ComicBookDetails" asp-route-id="@Model.ViewList[i].Id" class="btn btn-primary mt-auto align-self-end">Show Details</a></div>

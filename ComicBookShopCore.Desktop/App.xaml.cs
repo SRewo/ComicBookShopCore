@@ -12,6 +12,7 @@ using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
 using ComicBookShopCore.Desktop.Views;
+using Microsoft.AspNetCore.Identity;
 
 namespace ComicBookShopCore.Desktop
 {
@@ -30,9 +31,8 @@ namespace ComicBookShopCore.Desktop
             containerRegistry.RegisterInstance<IRepository<Series>>(new SqlRepository<Series>(context));
             containerRegistry.RegisterInstance<IRepository<ComicBook>>(new SqlRepository<ComicBook>(context));
             containerRegistry.RegisterInstance<IRepository<ComicBookArtist>>(new SqlRepository<ComicBookArtist>(context));
-            containerRegistry.RegisterInstance<IRepository<Employee>>(new SqlRepository<Employee>(context));
+            containerRegistry.RegisterInstance<IRepository<User>>(new SqlRepository<User>(context));
             containerRegistry.RegisterInstance<IRepository<Order>>(new SqlRepository<Order>(context));
-            
         }
 
         protected override Window CreateShell()

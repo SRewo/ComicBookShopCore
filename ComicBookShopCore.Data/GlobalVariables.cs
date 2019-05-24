@@ -1,9 +1,11 @@
-﻿namespace ComicBookShopCore.Data
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
+namespace ComicBookShopCore.Data
 {
     public static class GlobalVariables
     {
-        public static Employee LoggedEmployee { get; set; }
-
+        public static User LoggedUser { get; set; }
 
     }
 }
