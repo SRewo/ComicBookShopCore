@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ComicBookShopCore.Data;
+using ComicBookShopCore.Data.Interfaces;
+using ComicBookShopCore.Data.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -45,6 +47,10 @@ namespace ComicBookShopCore.Web
                 .AddEntityFrameworkStores<ShopDbEntities>()
                 .AddDefaultTokenProviders();
 
+            var dbContext = new ShopDbEntities();
+
+            services.AddSingleton<IRepository<ComicBook>>(new SqlRepository<ComicBook>(dbContext));
+            
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

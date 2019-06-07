@@ -18,8 +18,8 @@ namespace ComicBookShopCore.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ShopDbEntities _context = new ShopDbEntities();
-        private readonly IRepository<ComicBook> _comicBookRepository;
+
+        private IRepository<ComicBook> _comicBookRepository;
         private SignInManager<User> _signManager;
         private UserManager<User> _userManager;
         public IActionResult Index()
@@ -61,7 +61,6 @@ namespace ComicBookShopCore.Web.Controllers
         public async Task<IActionResult> LoginPage()
         {
             var model = new LoginPageViewModel();
-            var store = new UserStore(_context);
             var address = new Address()
                 {
                     City = "Katowice",
@@ -101,9 +100,9 @@ namespace ComicBookShopCore.Web.Controllers
             return View();
         }
 
-        public HomeController(UserManager<User> userManager, SignInManager<User> signManager)
+        public HomeController(UserManager<User> userManager, SignInManager<User> signManager, IRepository<ComicBook> comicBookRepository)
         {
-            _comicBookRepository = new SqlRepository<ComicBook>(_context);
+            _comicBookRepository = comicBookRepository;
             _userManager = userManager;
             _signManager = signManager;
         }
