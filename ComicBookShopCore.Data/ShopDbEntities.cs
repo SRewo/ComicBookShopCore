@@ -15,10 +15,6 @@ namespace ComicBookShopCore.Data
         public virtual DbSet<User> Employees { get; set; }
         public virtual DbSet<ComicBookArtist> ComicBookArtists { get; set; }
 
-        public ShopDbEntities(DbContextOptions<ShopDbEntities> options) : base(options)
-        {
-
-        }
 
         public ShopDbEntities() : base()
         {

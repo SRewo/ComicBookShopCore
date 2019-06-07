@@ -13,6 +13,9 @@ using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
 using ComicBookShopCore.Desktop.Views;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace ComicBookShopCore.Desktop
 {
@@ -23,16 +26,16 @@ namespace ComicBookShopCore.Desktop
     {
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            var context = new ShopDbEntities();
 
-            containerRegistry.RegisterInstance<IRepository<Artist>>(new SqlRepository<Artist>(context));
-            containerRegistry.RegisterInstance<IRepository<Publisher>>(
-                new SqlRepository<Publisher>(context));
-            containerRegistry.RegisterInstance<IRepository<Series>>(new SqlRepository<Series>(context));
-            containerRegistry.RegisterInstance<IRepository<ComicBook>>(new SqlRepository<ComicBook>(context));
-            containerRegistry.RegisterInstance<IRepository<ComicBookArtist>>(new SqlRepository<ComicBookArtist>(context));
-            containerRegistry.RegisterInstance<IRepository<User>>(new SqlRepository<User>(context));
-            containerRegistry.RegisterInstance<IRepository<Order>>(new SqlRepository<Order>(context));
+            containerRegistry.Register<IRepository<Artist>, SqlRepository<Artist>>();
+            containerRegistry.Register<IRepository<Publisher>, SqlRepository<Publisher>>();
+            containerRegistry.Register<IRepository<Series>, SqlRepository<Series>>();
+            containerRegistry.Register<IRepository<ComicBook>, SqlRepository<ComicBook>>();
+            containerRegistry.Register<IRepository<ComicBookArtist>, SqlRepository<ComicBookArtist>>();
+            containerRegistry.Register<IRepository<User>, SqlRepository<User>>();
+            containerRegistry.Register<IRepository<Order>, SqlRepository<Order>>();
+            containerRegistry.Register<DbContext, ShopDbEntities>();
+
         }
 
         protected override Window CreateShell()

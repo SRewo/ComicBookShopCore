@@ -47,9 +47,9 @@ namespace ComicBookShopCore.Web
                 .AddEntityFrameworkStores<ShopDbEntities>()
                 .AddDefaultTokenProviders();
 
-            var dbContext = new ShopDbEntities();
 
-            services.AddSingleton<IRepository<ComicBook>>(new SqlRepository<ComicBook>(dbContext));
+            services.AddScoped<DbContext, ShopDbEntities>();
+            services.AddScoped<IRepository<ComicBook>, SqlRepository<ComicBook>>();
             
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
