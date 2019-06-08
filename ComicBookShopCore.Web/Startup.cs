@@ -35,24 +35,20 @@ namespace ComicBookShopCore.Web
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-            services.AddMvc()
-                .AddNewtonsoftJson();
 
             services.AddDbContext<ShopDbEntities>();
 
-            services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<ShopDbEntities>()
-                .AddDefaultTokenProviders();
-
+            services.AddDefaultIdentity<User>()
+                .AddEntityFrameworkStores<ShopDbEntities>();
 
             services.AddScoped<DbContext, ShopDbEntities>();
             services.AddScoped<IRepository<ComicBook>, SqlRepository<ComicBook>>();
-            
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson();
+
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +57,7 @@ namespace ComicBookShopCore.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
             }
             else
             {
@@ -69,16 +66,14 @@ namespace ComicBookShopCore.Web
                 app.UseHsts();
             }
 
+            app.UseCookiePolicy();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            //app.UseRouting(routes =>
-            //{
-            //    routes.MapControllerRoute(
-            //        name: "default",
-            //        template: "{controller=Home}/{action=Index}/{id?}");
-            //    routes.MapRazorPages();
-            //});
 
             app.UseRouting();
 
@@ -90,10 +85,7 @@ namespace ComicBookShopCore.Web
                 endpoints.MapRazorPages();
             });
 
-            app.UseCookiePolicy();
-
-            app.UseAuthorization();
-            app.UseAuthentication();
+            
         }
     }
 }
