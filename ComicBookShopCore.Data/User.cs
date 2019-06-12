@@ -11,12 +11,20 @@ namespace ComicBookShopCore.Data
     public class User : IdentityUser
     {
         [Required]
+        [Display(Name = "First Name")]
+        [CustomValidation.NameValidation(ErrorMessage = "First name cannot contain special characters.")]
         public string FirstName { get; set; }
+
         [Required]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
+
         [Required]
         public Address Address { get; set; }
+
         [Required]
+        [Display(Name = "Date of Birth")]
+        [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
 
         public bool CheckPasswords(SecureString secureString)
