@@ -245,7 +245,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
                         new ComicBookArtist()
                         {
                             Artist = artists[0],
-                            Type = "Writter"
+                            Type = "Writer"
                         },
                         new ComicBookArtist()
                         {
@@ -266,7 +266,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
                         new ComicBookArtist()
                         {
                             Artist = artists[2],
-                            Type = "Writter"
+                            Type = "Writer"
                         },
                         new ComicBookArtist()
                         {

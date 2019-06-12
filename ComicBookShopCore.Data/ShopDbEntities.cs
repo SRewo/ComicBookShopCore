@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace ComicBookShopCore.Data
 {
-    public class ShopDbEntities : DbContext
+    public class ShopDbEntities : IdentityDbContext<User>
     {
 
         public virtual DbSet<Artist> Artists { get; set; }
@@ -11,8 +12,14 @@ namespace ComicBookShopCore.Data
         public virtual DbSet<ComicBook> ComicBooks { get; set; }
         public virtual DbSet<OrderItem> OrderItems { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
-        public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<User> Employees { get; set; }
         public virtual DbSet<ComicBookArtist> ComicBookArtists { get; set; }
+
+
+        public ShopDbEntities() : base()
+        {
+
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

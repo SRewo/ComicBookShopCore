@@ -1,6 +1,6 @@
 # ComicBookShopCore
 
-ComicBookShopCore is a simple WPF application for managing a comic book store.
+ComicBookShopCore is a simple WPF/ASP MVC core application for managing a comic book store.
 
 ## Requirements
 
@@ -10,7 +10,7 @@ ComicBookShopCore is a simple WPF application for managing a comic book store.
 
 ## Instalation
 
-After cloning project and migrating the database, create a new employee using SHA-256 encrypted password.
+After cloning project and migrating the database, create a new user using registration provided on web page (ComicBokkShopCore.Web).
 
 ## Built With
 

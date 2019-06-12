@@ -30,10 +30,10 @@ namespace ComicBookShopCore.Data
         }
 
 
-        private Employee _employee;
+        private User _employee;
 
         [Required]
-        public virtual Employee Employee
+        public virtual User Employee
         {
             get => _employee;
             set => SetProperty(ref _employee, value);

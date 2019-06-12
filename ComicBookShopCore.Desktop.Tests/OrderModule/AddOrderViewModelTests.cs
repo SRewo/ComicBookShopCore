@@ -17,7 +17,7 @@ namespace ComicBookShopCore.Desktop.Tests.OrderModule
         [Fact]
         public void CreateOrder_ValidCall()
         {
-            GlobalVariables.LoggedEmployee = new Employee()
+            GlobalVariables.LoggedUser= new User()
             {
                 FirstName = "John",
                 LastName = "Kent"
@@ -27,8 +27,8 @@ namespace ComicBookShopCore.Desktop.Tests.OrderModule
 
             Assert.NotNull(model.Order);
             Assert.NotNull(model.Order.OrderItems);
-            Assert.Equal(GlobalVariables.LoggedEmployee.FirstName, model.Order.Employee.FirstName);
-            Assert.Equal(GlobalVariables.LoggedEmployee.LastName, model.Order.Employee.LastName);
+            Assert.Equal(GlobalVariables.LoggedUser.FirstName, model.Order.Employee.FirstName);
+            Assert.Equal(GlobalVariables.LoggedUser.LastName, model.Order.Employee.LastName);
         }
 
         [Fact]
@@ -253,7 +253,7 @@ namespace ComicBookShopCore.Desktop.Tests.OrderModule
                         new ComicBookArtist()
                         {
                             Artist = artists[0],
-                            Type = "Writter"
+                            Type = "Writer"
                         },
                         new ComicBookArtist()
                         {
@@ -274,7 +274,7 @@ namespace ComicBookShopCore.Desktop.Tests.OrderModule
                         new ComicBookArtist()
                         {
                             Artist = artists[2],
-                            Type = "Writter"
+                            Type = "Writer"
                         },
                         new ComicBookArtist()
                         {
