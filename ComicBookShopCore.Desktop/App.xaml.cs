@@ -32,7 +32,7 @@ namespace ComicBookShopCore.Desktop
             containerRegistry.Register<IRepository<Series>, SqlRepository<Series>>();
             containerRegistry.Register<IRepository<ComicBook>, SqlRepository<ComicBook>>();
             containerRegistry.Register<IRepository<ComicBookArtist>, SqlRepository<ComicBookArtist>>();
-            containerRegistry.Register<IRepository<User>, SqlRepository<User>>();
+            containerRegistry.Register<IOpenable<User>, SqlRepository<User>>();
             containerRegistry.Register<IRepository<Order>, SqlRepository<Order>>();
             containerRegistry.Register<DbContext, ShopDbEntities>();
 

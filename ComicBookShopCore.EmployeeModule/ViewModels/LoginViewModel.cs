@@ -18,7 +18,7 @@ namespace ComicBookShopCore.EmployeeModule.ViewModels
     public class LoginViewModel : BindableBase
     {
         private readonly IRegionManager _regionManager;
-        private readonly IRepository<User> _userRepository;
+        private readonly IOpenable<User> _userRepository;
         private User _loggedUser;
 
         public DelegateCommand<object> SignInCommand { get; set; }
@@ -49,7 +49,7 @@ namespace ComicBookShopCore.EmployeeModule.ViewModels
 
 
 
-        public LoginViewModel(IRegionManager manager, IRepository<User> userRepository)
+        public LoginViewModel(IRegionManager manager, IOpenable<User> userRepository)
         {
 
             SignInCommand = new DelegateCommand<object>(SignIn);

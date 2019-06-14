@@ -36,7 +36,7 @@ namespace ComicBookShopCore.Desktop.Tests.EmployeeModule
         public void CheckDd_CanOpen_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<User>>().Setup(x => x.CanOpen()).Returns(true);
+            mock.Mock<IOpenable<User>>().Setup(x => x.CanOpen()).Returns(true);
             var model = mock.Create<LoginViewModel>();
             model.CheckDb();
 
@@ -51,7 +51,7 @@ namespace ComicBookShopCore.Desktop.Tests.EmployeeModule
         public void CheckUserExists_ValidCall(string login, bool expectedResult)
         {
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<User>>().Setup(x => x.GetAll()).Returns(UserSample());
+            mock.Mock<IOpenable<User>>().Setup(x => x.GetAll()).Returns(UserSample());
             var model = mock.Create<LoginViewModel>();
 
             Assert.Equal(expectedResult, model.CheckUserExists(login));
@@ -65,8 +65,8 @@ namespace ComicBookShopCore.Desktop.Tests.EmployeeModule
             SecureString securePassword = new NetworkCredential(string.Empty, password).SecurePassword;
 
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<User>>().Setup(x => x.GetAll()).Returns(UserSample());
-            mock.Mock<IRepository<User>>().Setup(x => x.CanOpen()).Returns(true);
+            mock.Mock<IOpenable<User>>().Setup(x => x.GetAll()).Returns(UserSample());
+            mock.Mock<IOpenable<User>>().Setup(x => x.CanOpen()).Returns(true);
             mock.Mock<IContainPassword>().Setup(x => x.Password).Returns(securePassword);
             var model = mock.Create<LoginViewModel>();
 
