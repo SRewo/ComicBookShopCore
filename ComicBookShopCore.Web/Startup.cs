@@ -42,8 +42,8 @@ namespace ComicBookShopCore.Web
             services.AddDefaultIdentity<User>()
                 .AddEntityFrameworkStores<ShopDbEntities>();
 
-            services.AddScoped<DbContext, ShopDbEntities>();
-            services.AddScoped<IRepository<ComicBook>, SqlRepository<ComicBook>>();
+            services.AddSingleton<DbContext, ShopDbEntities>();
+            services.AddSingleton<IRepository<ComicBook>, SqlRepository<ComicBook>>();
 
             services.AddControllersWithViews()
                 .AddNewtonsoftJson();

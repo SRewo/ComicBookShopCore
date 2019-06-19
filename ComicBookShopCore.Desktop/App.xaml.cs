@@ -27,14 +27,14 @@ namespace ComicBookShopCore.Desktop
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
 
-            containerRegistry.Register<IRepository<Artist>, SqlRepository<Artist>>();
-            containerRegistry.Register<IRepository<Publisher>, SqlRepository<Publisher>>();
-            containerRegistry.Register<IRepository<Series>, SqlRepository<Series>>();
-            containerRegistry.Register<IRepository<ComicBook>, SqlRepository<ComicBook>>();
-            containerRegistry.Register<IRepository<ComicBookArtist>, SqlRepository<ComicBookArtist>>();
-            containerRegistry.Register<IOpenable<User>, SqlRepository<User>>();
-            containerRegistry.Register<IRepository<Order>, SqlRepository<Order>>();
-            containerRegistry.Register<DbContext, ShopDbEntities>();
+            containerRegistry.RegisterSingleton<IRepository<Artist>, SqlRepository<Artist>>();
+            containerRegistry.RegisterSingleton<IRepository<Publisher>, SqlRepository<Publisher>>();
+            containerRegistry.RegisterSingleton<IRepository<Series>, SqlRepository<Series>>();
+            containerRegistry.RegisterSingleton<IRepository<ComicBook>, SqlRepository<ComicBook>>();
+            containerRegistry.RegisterSingleton<IRepository<ComicBookArtist>, SqlRepository<ComicBookArtist>>();
+            containerRegistry.RegisterSingleton<IOpenable<User>, SqlRepository<User>>();
+            containerRegistry.RegisterSingleton<IRepository<Order>, SqlRepository<Order>>();
+            containerRegistry.RegisterSingleton<DbContext, ShopDbEntities>();
 
         }
 
