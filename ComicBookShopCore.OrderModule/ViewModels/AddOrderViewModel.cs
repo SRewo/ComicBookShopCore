@@ -73,6 +73,14 @@ namespace ComicBookShopCore.OrderModule.ViewModels
             set => SetProperty(ref _order, value);
         }
 
+        private double _totalPrice;
+
+        public double TotalPrice
+        {
+            get => _totalPrice;
+            set => SetProperty(ref _totalPrice, value);
+        }
+
 
         private OrderItem _selectedOrderItem;
 
@@ -147,7 +155,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         public void AddedOrderItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            Order.TotalPrice = Order.OrderItems.Sum(x => x.Price);
+            TotalPrice = Order.TotalPrice;
             CanSave = Order.OrderItems.All(x => !x.HasErrors) && !Order.HasErrors && Order.OrderItems.Count != 0;
             ErrorMessage = string.Empty;
         }
