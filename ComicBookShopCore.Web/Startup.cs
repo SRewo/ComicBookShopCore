@@ -40,6 +40,7 @@ namespace ComicBookShopCore.Web
             services.AddDbContext<ShopDbEntities>();
 
             services.AddDefaultIdentity<User>()
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ShopDbEntities>();
 
             services.AddSingleton<DbContext, ShopDbEntities>();

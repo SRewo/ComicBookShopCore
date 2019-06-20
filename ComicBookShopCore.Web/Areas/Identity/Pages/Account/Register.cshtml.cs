@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -73,14 +74,22 @@ namespace ComicBookShopCore.Web.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            var isFirst = !_userManager.Users.Any();
+            returnUrl ??= Url.Content("~/");
             if (ModelState.IsValid)
             {
                 Input.User.UserName = Input.Username;
                 Input.User.Email = Input.Email;
                 var result = await _userManager.CreateAsync(Input.User, Input.Password);
+                
                 if (result.Succeeded)
                 {
+
+                    if (isFirst) 
+                        await _userManager.AddToRoleAsync(Input.User, "Admin");
+                    else
+                        await _userManager.AddToRoleAsync(Input.User, "User");
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(Input.User);
