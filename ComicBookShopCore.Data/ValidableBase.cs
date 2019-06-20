@@ -24,7 +24,7 @@ namespace ComicBookShopCore.Data
                 return _propErrors[propertyName];
             }
 
-                return null;
+            return null;
         }
 
         protected override bool SetProperty<T>(ref T member, T val,
@@ -67,7 +67,23 @@ namespace ComicBookShopCore.Data
                 return _propErrors[propertyName].First();
             }
 
-                return null;
+            return null;
+        }
+
+        public string GetFirstError()
+        {
+
+            return _propErrors?.FirstOrDefault().Value.FirstOrDefault();
+
+        }
+
+        public void Validate()
+        {
+            var obj = this;
+            foreach (var prop in obj.GetType().GetProperties())
+            {
+                ValidateProperty(prop.Name, prop.GetValue(obj));
+            }
         }
     }
 }

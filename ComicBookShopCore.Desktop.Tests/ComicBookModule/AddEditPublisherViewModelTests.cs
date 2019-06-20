@@ -63,7 +63,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
             model.Publisher.Name = "";
             model.Publisher_ErrorsChanged(null, null);
 
-            var expectedMessage = "Publisher name cannot be empty";
+            var expectedMessage = publisher.GetFirstError();
             var actualMessage = model.NameErrorMessage;
 
             Assert.True(model.Publisher.HasErrors);
