@@ -4,8 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ComicBookShopCore.OrderModule.Views"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="720" d:DesignWidth="1280">
     <Grid>
          <Grid.RowDefinitions>
             <RowDefinition Height="70px"/>
@@ -18,18 +21,31 @@
 
         <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" >
             <Label Content="Display:" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="16" FontWeight="Bold" />
-            <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="True"/>
+            <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding IsUserSelected}"/>
             <Label Content="Users" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="14" FontWeight="Bold" />
-            <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="True"/>
+            <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding  IsEmployeeSelected}"/>
             <Label Content="Employees" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="14" FontWeight="Bold" />
+            <Label Content="Search:" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="16" FontWeight="Bold" />
+            <TextBox Width="200px" Height="30" Text="{Binding Path=SearchWord, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,20,0" IsEnabled="{Binding IsSearchEnabled}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="TextChanged">
+                        <i:InvokeCommandAction Command="{Binding SearchWordChanged}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TextBox>
+            <Label Content="From" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="14" FontWeight="Bold" />
+            <DatePicker SelectedDate="{Binding DateFrom}"/>
+            <Label Content="To" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="14" FontWeight="Bold" />
+            <DatePicker SelectedDate="{Binding DateTo}"/>
+            <Button Content="Reset Form" VerticalAlignment="Center" Height="30px" Width="125px" Margin="0,0,10,0" Command="{Binding ResetFormCommand}"/>
         </StackPanel>
 
         <DataGrid Grid.Row="2" ItemsSource="{Binding ViewList}" IsReadOnly="True" AutoGenerateColumns="False" SelectedItem="{Binding SelectedOrder}" SelectionMode="Single" Background="#f5f5f5" Margin="40,20,40,20">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Id"/>
-                <DataGridTextColumn Header="Order Date"/>
-                <DataGridTextColumn Header="User/Employee"/>
-                <DataGridTextColumn Header="Total price"/>
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="Order Date" Binding="{Binding Date}"/>
+                <DataGridTextColumn Header="User/Employee" Binding="{Binding Employee.Name}"/>
+                <DataGridTextColumn Header="Total price" Binding="{Binding TotalPrice, StringFormat={}{0:C}}"/>
             </DataGrid.Columns>
         </DataGrid>
 

@@ -27,6 +27,8 @@ namespace ComicBookShopCore.Data
         [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
 
+        public string Name => FirstName + " " + LastName;
+
         public bool CheckPasswords(SecureString secureString)
         {
             var hasher = new PasswordHasher<User>();
