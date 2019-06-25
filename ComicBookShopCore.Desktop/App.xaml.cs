@@ -11,6 +11,7 @@ using System.Windows;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
+using ComicBookShopCore.Data.Searchers;
 using ComicBookShopCore.Desktop.Views;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -35,6 +36,7 @@ namespace ComicBookShopCore.Desktop
             containerRegistry.RegisterSingleton<IOpenable<User>, SqlRepository<User>>();
             containerRegistry.RegisterSingleton<IRepository<Order>, SqlRepository<Order>>();
             containerRegistry.RegisterSingleton<DbContext, ShopDbEntities>();
+            containerRegistry.Register<IUserEmployeeSearcherFactory, DbRoleSearcherFactory>();
 
         }
 

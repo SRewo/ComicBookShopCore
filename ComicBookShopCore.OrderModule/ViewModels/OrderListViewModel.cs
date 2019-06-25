@@ -5,8 +5,12 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
+using ComicBookShopCore.Data.Searchers;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -18,6 +22,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
     {
         private readonly IRegionManager _manager;
         private readonly IRepository<Order> _orderRepository;
+        private IUserEmployeeSearcherFactory _factory;
 
         private DateTime _dateFrom;
 
@@ -33,14 +38,16 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         private List<Order> _orders;
 
-        public OrderListViewModel(IRepository<Order> orderRepository, IRegionManager manager)
+        public OrderListViewModel(IRepository<Order> orderRepository, IRegionManager manager, IUserEmployeeSearcherFactory factory)
         {
             _orderRepository = orderRepository;
             _manager = manager;
+            _factory = factory;
             InitializeCommandsAsync();
         }
 
         public DelegateCommand ResetFormCommand { get; set; }
+        public DelegateCommand SearchCommand { get; set; }
 
         public string SearchWord
         {
@@ -89,9 +96,9 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         public async void OnNavigatedTo(NavigationContext navigationContext)
         {
-            _orders = await GetDataAsync().ConfigureAwait(true);
-            await ResetFormAsync().ConfigureAwait(true);
-            ViewList = _orders.Where(x => (x.Date <= DateTo && x.Date >= DateFrom)).ToList();
+            var tmp = await GetDataAsync().ConfigureAwait(true);
+            _orders = tmp.ToList();
+            ResetFormAsync();
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
@@ -109,6 +116,16 @@ namespace ComicBookShopCore.OrderModule.ViewModels
             DateTo = DateTime.Now; 
             DateFrom = DateTime.Now.AddDays(-14); 
             SearchWord = String.Empty;
+            ViewList = _orders.Where(x => (x.Date <= DateTo && x.Date >= DateFrom)).ToList();
+
+            return Task.CompletedTask;
+        }
+
+        public Task Search()
+        {
+            var searcher = _factory.CheckEmployeeOrUserAsync(IsEmployeeSelected, IsUserSelected).Result;
+            ViewList =_orders
+                .RoleSearchAsync(searcher).Result.ToList();
 
             return Task.CompletedTask;
         }
@@ -121,9 +138,15 @@ namespace ComicBookShopCore.OrderModule.ViewModels
                 ResetFormAsync();
             });
 
+            SearchCommand = new DelegateCommand((() => Search()));
+
             return Task.CompletedTask;
         }
 
-        public Task<List<Order>> GetDataAsync() => _orderRepository.GetAll().Include(x=> x.OrderItems).ThenInclude(x => x.ComicBook).ToListAsync();
+        
+
+        public async Task<IQueryable<Order>> GetDataAsync() =>
+             _orderRepository.GetAll().Include(x => x.OrderItems).ThenInclude(x => x.ComicBook);
     }
+
 }

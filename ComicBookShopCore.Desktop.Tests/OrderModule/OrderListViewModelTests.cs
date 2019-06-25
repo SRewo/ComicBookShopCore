@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Autofac.Extras.Moq;
+using ComicBookShopCore.Data;
+using ComicBookShopCore.Data.Interfaces;
+using ComicBookShopCore.Data.Searchers;
 using ComicBookShopCore.OrderModule.ViewModels;
 using Xunit;
 
@@ -12,12 +16,18 @@ namespace ComicBookShopCore.Desktop.Tests.OrderModule
         [Fact]
         public void ResetFormAsync_ValidCall()
         {
-            var model = new OrderListViewModel(null, null) {SearchWord = "Xd", DateTo = new DateTime(1999,01,01),DateFrom = new DateTime(1999,01,01), IsEmployeeSelected = false, IsUserSelected = false};
+            var model = new OrderListViewModel(null, null, null) {SearchWord = "Xd", DateTo = new DateTime(1999,01,01),DateFrom = new DateTime(1999,01,01), IsEmployeeSelected = false, IsUserSelected = false};
             Task.Run((async () =>
             {
                 await model.ResetFormAsync();
                 Assert.Empty(model.SearchWord);
             }));
+        }
+
+        [Fact]
+        public void Search_ValidCall()
+        {
+            var mock = AutoMock.GetLoose();
         }
 
     }

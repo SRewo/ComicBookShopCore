@@ -21,9 +21,27 @@
 
         <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" >
             <Label Content="Display:" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="16" FontWeight="Bold" />
-            <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding IsUserSelected}"/>
+            <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding IsUserSelected}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Checked">
+                        <i:InvokeCommandAction Command="{Binding SearchCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="Unchecked">
+                        <i:InvokeCommandAction Command="{Binding SearchCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </CheckBox>
             <Label Content="Users" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="14" FontWeight="Bold" />
-            <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding  IsEmployeeSelected}"/>
+            <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="{Binding  IsEmployeeSelected}" >
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Checked">
+                        <i:InvokeCommandAction Command="{Binding SearchCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="Unchecked">
+                        <i:InvokeCommandAction Command="{Binding SearchCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </CheckBox>
             <Label Content="Employees" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="14" FontWeight="Bold" />
             <Label Content="Search:" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="16" FontWeight="Bold" />
             <TextBox Width="200px" Height="30" Text="{Binding Path=SearchWord, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,20,0" IsEnabled="{Binding IsSearchEnabled}">
