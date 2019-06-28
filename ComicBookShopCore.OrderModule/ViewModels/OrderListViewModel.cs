@@ -22,7 +22,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
     {
         private readonly IRegionManager _manager;
         private readonly IRepository<Order> _orderRepository;
-        private IUserEmployeeFilterFactory _factory;
+        private readonly IUserEmployeeFilterFactory _factory;
 
         private DateTime _dateFrom;
 
@@ -96,8 +96,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         public async void OnNavigatedTo(NavigationContext navigationContext)
         {
-            var tmp = await GetDataAsync().ConfigureAwait(true);
-            _orders = tmp.ToList();
+            await GetDataAsync().ConfigureAwait(true);
             ResetFormAsync();
         }
 
@@ -123,9 +122,20 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         public Task SearchAsync()
         {
-            var searcher = _factory.CheckEmployeeOrUserAsync(IsEmployeeSelected, IsUserSelected).Result;
-            ViewList =_orders
-                .RoleSearchAsync(searcher).ToList();
+            try
+            {
+                var searcher = _factory.CheckEmployeeOrUserAsync(IsEmployeeSelected, IsUserSelected).Result;
+                ViewList = _orders
+                    .RoleFilter(searcher)
+                    .NameFilter(SearchWord)
+                    .DateFilter(DateFrom, DateTo)
+                    .ToList();
+            }
+            catch
+            {
+                MessageBox.Show("Error");
+            }
+
 
             return Task.CompletedTask;
         }
@@ -143,10 +153,13 @@ namespace ComicBookShopCore.OrderModule.ViewModels
             return Task.CompletedTask;
         }
 
-        
 
-        public async Task<IQueryable<Order>> GetDataAsync() =>
-             _orderRepository.GetAll().Include(x => x.OrderItems).ThenInclude(x => x.ComicBook);
+
+        public async Task GetDataAsync()
+        {
+            _orders = await _orderRepository.GetAll().Include(x => x.OrderItems).ThenInclude(x => x.ComicBook).ToListAsync().ConfigureAwait(true);
+        }
+              
     }
 
 }

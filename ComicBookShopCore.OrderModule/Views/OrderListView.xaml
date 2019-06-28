@@ -44,17 +44,29 @@
             </CheckBox>
             <Label Content="Employees" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="14" FontWeight="Bold" />
             <Label Content="Search:" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="16" FontWeight="Bold" />
-            <TextBox Width="200px" Height="30" Text="{Binding Path=SearchWord, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,20,0" IsEnabled="{Binding IsSearchEnabled}">
+            <TextBox Width="200px" Height="30" Text="{Binding Path=SearchWord, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,20,0">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="TextChanged">
-                        <i:InvokeCommandAction Command="{Binding SearchWordChanged}" />
+                        <i:InvokeCommandAction Command="{Binding SearchCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </TextBox>
             <Label Content="From" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="14" FontWeight="Bold" />
-            <DatePicker SelectedDate="{Binding DateFrom}"/>
+            <DatePicker SelectedDate="{Binding DateFrom}" >
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectedDateChanged">
+                        <i:InvokeCommandAction Command="{Binding SearchCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </DatePicker>
             <Label Content="To" Margin="0,0,20,0" FontFamily="Nirmala UI" FontSize="14" FontWeight="Bold" />
-            <DatePicker SelectedDate="{Binding DateTo}"/>
+            <DatePicker SelectedDate="{Binding DateTo}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectedDateChanged">
+                        <i:InvokeCommandAction Command="{Binding SearchCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </DatePicker>
             <Button Content="Reset Form" VerticalAlignment="Center" Height="30px" Width="125px" Margin="0,0,10,0" Command="{Binding ResetFormCommand}"/>
         </StackPanel>
 

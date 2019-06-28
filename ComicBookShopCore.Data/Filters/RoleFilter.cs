@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
@@ -13,18 +14,21 @@ namespace ComicBookShopCore.Data.Filters
 
     public class RoleFilter : IRoleFilter
     {
-        private UserStore<User> _userStore;
-        private readonly ShopDbEntities _context;
+        private static readonly Dictionary<string, IList<User>> _usersInRole = new Dictionary<string, IList<User>>();
         internal RoleFilter(Dictionary<string, bool> roles, ShopDbEntities context)
         {
             Roles = roles;
-            _context = context;
+            var userStore = new UserStore<User>(context);
+            foreach (var key in roles.Keys)
+            {
+                if(!_usersInRole.ContainsKey(key))
+                    _usersInRole.Add(key, Task.Run((() => userStore.GetUsersInRoleAsync(key))).Result);
+            }
         }
 
         public Dictionary<string, bool> Roles { get; }
         public async Task<bool> IsInRolesAsync(User user)
         {
-            _userStore = new UserStore<User>(_context);
             var tasks = new List<Task<bool>>();
             foreach (var role in Roles)
             {
@@ -38,7 +42,7 @@ namespace ComicBookShopCore.Data.Filters
 
         private Task<bool> CheckRoleAsync(KeyValuePair<string, bool> role, User user)
         {
-            return Task.FromResult(role.Value && _userStore.IsInRoleAsync(user, role.Key).Result);
+            return Task.FromResult(role.Value && _usersInRole[role.Key].Contains(user));
         }
     }
 }
