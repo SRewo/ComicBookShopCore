@@ -3,19 +3,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-namespace ComicBookShopCore.Data.Searchers
+namespace ComicBookShopCore.Data.Filters
 {
-    public interface IRoleSearcher
+    public interface IRoleFilter
     {
         Dictionary<string, bool> Roles { get; }
         Task<bool> IsInRolesAsync(User user);
     }
 
-    public class RoleSearcher : IRoleSearcher
+    public class RoleFilter : IRoleFilter
     {
         private UserStore<User> _userStore;
         private readonly ShopDbEntities _context;
-        internal RoleSearcher(Dictionary<string, bool> roles, ShopDbEntities context)
+        internal RoleFilter(Dictionary<string, bool> roles, ShopDbEntities context)
         {
             Roles = roles;
             _context = context;

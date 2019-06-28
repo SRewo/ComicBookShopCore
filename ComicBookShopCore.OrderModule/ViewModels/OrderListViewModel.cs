@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using ComicBookShopCore.Data;
+using ComicBookShopCore.Data.Filters;
 using ComicBookShopCore.Data.Interfaces;
-using ComicBookShopCore.Data.Searchers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
     {
         private readonly IRegionManager _manager;
         private readonly IRepository<Order> _orderRepository;
-        private IUserEmployeeSearcherFactory _factory;
+        private IUserEmployeeFilterFactory _factory;
 
         private DateTime _dateFrom;
 
@@ -38,7 +38,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         private List<Order> _orders;
 
-        public OrderListViewModel(IRepository<Order> orderRepository, IRegionManager manager, IUserEmployeeSearcherFactory factory)
+        public OrderListViewModel(IRepository<Order> orderRepository, IRegionManager manager, IUserEmployeeFilterFactory factory)
         {
             _orderRepository = orderRepository;
             _manager = manager;
@@ -121,11 +121,11 @@ namespace ComicBookShopCore.OrderModule.ViewModels
             return Task.CompletedTask;
         }
 
-        public Task Search()
+        public Task SearchAsync()
         {
             var searcher = _factory.CheckEmployeeOrUserAsync(IsEmployeeSelected, IsUserSelected).Result;
             ViewList =_orders
-                .RoleSearchAsync(searcher).Result.ToList();
+                .RoleSearchAsync(searcher).ToList();
 
             return Task.CompletedTask;
         }
@@ -138,7 +138,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
                 ResetFormAsync();
             });
 
-            SearchCommand = new DelegateCommand((() => Search()));
+            SearchCommand = new DelegateCommand((() => SearchAsync()));
 
             return Task.CompletedTask;
         }

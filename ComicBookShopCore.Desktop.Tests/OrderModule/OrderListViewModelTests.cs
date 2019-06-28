@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
-using ComicBookShopCore.Data.Searchers;
 using ComicBookShopCore.OrderModule.ViewModels;
 using Xunit;
 
