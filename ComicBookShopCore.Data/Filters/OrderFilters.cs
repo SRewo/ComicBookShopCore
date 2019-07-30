@@ -22,7 +22,7 @@ namespace ComicBookShopCore.Data.Filters
 
         public static List<Order> NameFilter(this List<Order> list, string name)
         {
-            return string.IsNullOrWhiteSpace(name) ? list : list.Where(x => x.Employee.Name.Contains(name)).ToList();
+            return string.IsNullOrWhiteSpace(name) ? list : list.Where(x => x.Employee.Name.ToLower().Contains(name.ToLower())).ToList();
         }
 
     }

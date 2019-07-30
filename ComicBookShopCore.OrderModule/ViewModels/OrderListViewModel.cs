@@ -48,6 +48,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         public DelegateCommand ResetFormCommand { get; set; }
         public DelegateCommand SearchCommand { get; set; }
+        public DelegateCommand OrderDetailsCommand { get; set; }
 
         public string SearchWord
         {
@@ -58,7 +59,11 @@ namespace ComicBookShopCore.OrderModule.ViewModels
         public Order SelectedOrder
         {
             get => _selectedOrder;
-            set => SetProperty(ref _selectedOrder, value);
+            set
+            {
+                SetProperty(ref _selectedOrder, value);
+                IsOrderSelected = _selectedOrder != null;
+            } 
         }
 
         public DateTime DateFrom
@@ -83,6 +88,14 @@ namespace ComicBookShopCore.OrderModule.ViewModels
         {
             get => _isEmployeeSelected;
             set => SetProperty(ref _isEmployeeSelected, value);
+        }
+
+        private bool _isOrderSelected;
+
+        public bool IsOrderSelected
+        {
+            get => _isOrderSelected;
+            set => SetProperty(ref _isOrderSelected, value);
         }
 
         private List<Order> _viewList;
@@ -124,9 +137,9 @@ namespace ComicBookShopCore.OrderModule.ViewModels
         {
             try
             {
-                var searcher = _factory.CheckEmployeeOrUserAsync(IsEmployeeSelected, IsUserSelected).Result;
+                var filter = _factory.CheckEmployeeOrUserAsync(IsEmployeeSelected, IsUserSelected).Result;
                 ViewList = _orders
-                    .RoleFilter(searcher)
+                    .RoleFilter(filter)
                     .NameFilter(SearchWord)
                     .DateFilter(DateFrom, DateTo)
                     .ToList();
@@ -150,10 +163,17 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
             SearchCommand = new DelegateCommand((() => SearchAsync()));
 
+            OrderDetailsCommand = new DelegateCommand((() => OpenOrderDetailsAsync()));
+
             return Task.CompletedTask;
         }
 
-
+        public Task OpenOrderDetailsAsync()
+        {
+            var parameters = new NavigationParameters {{"Order", SelectedOrder}};
+            _manager.RequestNavigate("content", "OrderDetails", parameters);
+            return Task.CompletedTask;
+        }
 
         public async Task GetDataAsync()
         {

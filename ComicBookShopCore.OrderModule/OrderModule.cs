@@ -15,6 +15,7 @@ namespace ComicBookShopCore.OrderModule
         {
             containerRegistry.RegisterForNavigation<AddOrderView>("AddOrder");
             containerRegistry.RegisterForNavigation<OrderListView>("OrderList");
+            containerRegistry.RegisterForNavigation<OrderDetailsView>("OrderDetails");
         }
     }
 }

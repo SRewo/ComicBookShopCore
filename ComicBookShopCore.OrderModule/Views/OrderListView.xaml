@@ -80,7 +80,7 @@
         </DataGrid>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Show Details" VerticalAlignment="Center" Height="30px" Width="125px" Margin="0,0,10,0" Command="{Binding OrderDetailsCommand}" IsEnabled="{Binding IsDetailsEnabled}"/>
+            <Button Content="Show Details" VerticalAlignment="Center" Height="30px" Width="125px" Margin="0,0,10,0" Command="{Binding OrderDetailsCommand}" IsEnabled="{Binding IsOrderSelected}"/>
         </StackPanel>
 
     </Grid>
