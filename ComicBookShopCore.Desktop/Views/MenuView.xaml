@@ -14,6 +14,7 @@
             <Button Content="Artists" Height="40px" Width="170px" Margin="10,10,10,10" Command="{x:Static local:ApplicationCommands.NavigateCommand}" CommandParameter="ArtistList" Background="White" BorderThickness="1px" FontSize="24" FontWeight="Bold" FontFamily="Calibri Light" Foreground="Black" BorderBrush="Black"/>
             <Button Content="Comic Books" Height="40px" Width="170px" Margin="10,10,10,10" Command="{x:Static local:ApplicationCommands.NavigateCommand}" CommandParameter="ComicBookList" Background="White" BorderThickness="1px" FontSize="24" FontWeight="Bold" FontFamily="Calibri Light" Foreground="Black" BorderBrush="#FF0A0A0A"/>
             <Button Content="Place Order" Height="40px" Width="170px" Margin="10,10,10,10" Command="{x:Static local:ApplicationCommands.NavigateCommand}" CommandParameter="AddOrder" Background="White" BorderThickness="1px" FontSize="24" FontWeight="Bold" FontFamily="Calibri Light" Foreground="Black" BorderBrush="#FF0A0A0A"/>
+            <Button Content="Order List" Height="40px" Width="170px" Margin="10,10,10,10" Command="{x:Static local:ApplicationCommands.NavigateCommand}" CommandParameter="OrderList" Background="White" BorderThickness="1px" FontSize="24" FontWeight="Bold" FontFamily="Calibri Light" Foreground="Black" BorderBrush="#FF0A0A0A"/>
         </StackPanel>
     </Grid>
 </UserControl>

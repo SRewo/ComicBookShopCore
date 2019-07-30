@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace ComicBookShopCore.Data
 {
@@ -39,16 +40,7 @@ namespace ComicBookShopCore.Data
             set => SetProperty(ref _employee, value);
         }
 
-        
-        private double _totalPrice;
-
-        [NotMapped]
-        public double TotalPrice
-        {
-            get => _totalPrice;
-            set => SetProperty(ref _totalPrice, value);
-        }
-
+        public double TotalPrice => OrderItems.Sum(x => x.Price);
 
     }
 }

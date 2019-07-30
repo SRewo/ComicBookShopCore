@@ -5,6 +5,9 @@
     <AssemblyName>ComicBookShopCore.OrderModule</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Views\OrderListView.xaml" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1038-pre" />
   </ItemGroup>
   <ItemGroup>

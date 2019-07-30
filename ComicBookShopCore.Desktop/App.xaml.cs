@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using ComicBookShopCore.Data;
+using ComicBookShopCore.Data.Filters;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
 using ComicBookShopCore.Desktop.Views;
@@ -35,6 +36,7 @@ namespace ComicBookShopCore.Desktop
             containerRegistry.RegisterSingleton<IOpenable<User>, SqlRepository<User>>();
             containerRegistry.RegisterSingleton<IRepository<Order>, SqlRepository<Order>>();
             containerRegistry.RegisterSingleton<DbContext, ShopDbEntities>();
+            containerRegistry.Register<IUserEmployeeFilterFactory, DbRoleFilterFactory>();
 
         }
 

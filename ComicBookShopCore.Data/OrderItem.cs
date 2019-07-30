@@ -44,7 +44,7 @@ namespace ComicBookShopCore.Data
         [NotMapped]
         public double Price
         {
-            get => _price;
+            get => ComicBook.Price * Quantity * (1 - Discount * 0.01);
             private set => SetProperty(ref _price, value);
         }
 
