@@ -21,9 +21,6 @@
     <Reference Include="Microsoft.Extensions.Identity.Stores">
       <HintPath>C:\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.0.0-preview3-19153-02\ref\netcoreapp3.0\Microsoft.Extensions.Identity.Stores.dll</HintPath>
     </Reference>
-    <Reference Include="PresentationFramework">
-      <HintPath>C:\Program Files\dotnet\packs\Microsoft.WindowsDesktop.App.Ref\3.0.0-preview5-27626-15\ref\netcoreapp3.0\PresentationFramework.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

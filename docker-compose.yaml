@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: ComicBookShopCore.Web
+      dockerfile: Dockerfile
+    ports:
+        - "8080:80"
+        - "8443:443"
+    volumes:
+        - /etc/ssl/certs/ssl-cert-snakeoil.pem:/app/fullchain.pem
+        - /etc/ssl/private/ssl-cert-snakeoil.key:/app/privkey.pem
