@@ -2,42 +2,20 @@
 
 namespace ComicBookShopCore.Data
 {
-    public class Series : ValidableBase
+    public class Series : ValidationClass
     {
         public int Id { get; private set; }
-        private string _name;
 
         [Required(ErrorMessage = "Series name cannot be empty")]
-        public string Name
-        {
-            get => _name;
-            set => SetProperty(ref _name,value);
-        }
-
-        private Publisher _publisher;
+        public string Name { get; set; }
 
         [Required]
-        public virtual Publisher Publisher
-        {
-            get => _publisher;
-            set => SetProperty(ref _publisher,value);
-        }
+        public virtual Publisher Publisher { get; set; }
 
-        private string _description;
+        public string Description { get; set; }
 
-        public string Description
+        internal Series()
         {
-            get => _description;
-            set => SetProperty(ref _description, value);
-        }
-
-        public Series()
-        {
-        }
-
-        public Series(int id)
-        {
-            Id = id;
         }
 
         public override string ToString()

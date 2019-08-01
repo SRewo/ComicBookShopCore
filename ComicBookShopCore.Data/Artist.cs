@@ -3,37 +3,19 @@ using static ComicBookShopCore.Data.CustomValidation;
 
 namespace ComicBookShopCore.Data
 {
-    public class Artist : ValidableBase 
+    public class Artist : ValidationClass
     {
         public int Id { get; private set; }
 
-        private string _firstName;
-
         [Required(ErrorMessage = "First name cannot be empty.")]
         [NameValidation(ErrorMessage ="First name cannot contain special characters.")]
-        public string FirstName
-        {
-            get => _firstName;
-            set => SetProperty(ref _firstName, value);
-        }
-
-        private string _lastName;
+        public string FirstName { get; set; }
 
         [Required(ErrorMessage = "Last name cannot be empty.")]
         [NameValidation(ErrorMessage = "Last name cannot contain special characters.")]
-        public string LastName
-        {
-            get => _lastName;
-            set => SetProperty(ref _lastName, value);
-        }
+        public string LastName { get; set; }
 
-        private string _description;
-
-        public string Description
-        {
-            get => _description;
-            set => SetProperty(ref _description, value);
-        }
+        public string Description { get; set; }
 
         public string Name => FirstName + " " + LastName;
 
@@ -42,14 +24,8 @@ namespace ComicBookShopCore.Data
             return Name;
         }
 
-        public Artist()
+        internal Artist()
         {
-
-        }
-
-        public Artist(int id)
-        {
-            Id = id;
         }
     }
 }

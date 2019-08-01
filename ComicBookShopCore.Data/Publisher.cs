@@ -3,56 +3,31 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ComicBookShopCore.Data
 {
-    public class Publisher : ValidableBase
+    public class Publisher : ValidationClass
     {
         
-        public int Id { get; private set; }
+        public int Id { get; }
 
-
-        private string _name;
 
         [Required(ErrorMessage = "Publisher name cannot be empty")]
         [MinLength(3, ErrorMessage = "Publisher name is too short.")]
         [MaxLength(40, ErrorMessage = "Publisher name is too long")]
-        public string Name {
-            get => _name; 
-            set => SetProperty(ref _name, value); 
-        }
+        public string Name { get; set; }
 
-        private string _description;
+        public string Description { get; set; }
 
-        public string Description
+        [CustomValidation.PublisherDateValidation]
+        public DateTime CreationDateTime { get; set; }
+
+        internal Publisher()
         {
-            get => _description;
-            set => SetProperty(ref _description, value);
-        }
-
-        private DateTime _creationDateTime;
-
-        [CustomDate]
-        public DateTime CreationDateTime
-        {
-            get => _creationDateTime;
-            set => SetProperty(ref _creationDateTime, value);
-        }
-
-        public Publisher()
-        {
-        }
-
-        public Publisher(int id)
-        {
-            Id = id;
         }
 
         public override bool Equals(object obj)
         {
-            if (obj.GetType() == typeof(Publisher))
-            {
-                var ob = obj as Publisher;
-                return this.Id == ob.Id;
-            }
-            return false;
+            if (obj != null && obj.GetType() != typeof(Publisher)) return false;
+
+            return obj is Publisher ob && Id == ob.Id;
         }
         public override int GetHashCode()
         {
@@ -60,15 +35,5 @@ namespace ComicBookShopCore.Data
         }
     }
 
-    public class CustomDateAttribute : RangeAttribute
-    {
-        public CustomDateAttribute()
-            : base(typeof(DateTime),
-                "1900-01-01",
-                DateTime.Now.AddDays(1).ToShortDateString())
-        {
-            ErrorMessage = "You have to choose a date between 01.01.1900 and today";
-        }
-    }
 
 }

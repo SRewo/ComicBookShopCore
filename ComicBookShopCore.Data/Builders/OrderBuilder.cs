@@ -77,9 +77,9 @@ namespace ComicBookShopCore.Data.Builders
             return this;
         }
 
-        public OrderDetailsBuilder Employee(User employee)
+        public OrderDetailsBuilder User(User user)
         {
-            Order.Employee = employee;
+            Order.User = user;
             return this;
         }
     }

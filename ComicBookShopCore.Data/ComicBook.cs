@@ -1,94 +1,43 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ComicBookShopCore.Data
 {
-    public class ComicBook : ValidableBase
+    public class ComicBook : ValidationClass
     {
         public int Id { get; private set; }
 
-        private string _title;
-
         [Required(ErrorMessage = "Comic book title cannot be empty.")]
-        public string Title
-        {
-            get => _title;
-            set => SetProperty(ref _title, value);
-        }
+        public string Title { get; set; }
 
-        private DateTime _onSaleDate;
-
-        public DateTime OnSaleDate
-        {
-            get => _onSaleDate;
-            set => SetProperty(ref _onSaleDate, value);
-        }
-
-        private double _price;
+        public DateTime OnSaleDate { get; set; }
 
         [Required]
-        [Range(Double.Epsilon, Double.MaxValue, ErrorMessage = "Please enter valid price.")]
-        public double Price
-        {
-            get => _price;
-            set => SetProperty(ref _price, value);
-        }
-
-        private int _quantity;
+        [Range(double.Epsilon, double.MaxValue, ErrorMessage = "Please enter valid price.")]
+        public double Price { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "Please enter valid value.")]
-        public int Quantity
-        {
-            get => _quantity;
-            set => SetProperty(ref _quantity, value);
-        }
+        public int Quantity { get; set; }
 
-        private Series _series;
+        [Required] public virtual Series Series { get; set; }
 
-        [Required]
-        public virtual Series Series
-        {
-            get => _series;
-            set => SetProperty(ref _series, value);
-        }
+        [Required] public ObservableCollection<ComicBookArtist> ComicBookArtists { get; set; }
 
-        private ObservableCollection<ComicBookArtist> _comicBookArtists;
+        [MaxLength(120)] public string ShortDescription { get; set; }
 
-        [Required]
-        public ObservableCollection<ComicBookArtist> ComicBookArtists
-        {
-            get => _comicBookArtists;
-            set => SetProperty(ref _comicBookArtists, value);
-        }
-
-        private string _shortDescription;
-
-        [MaxLength(120)]
-        public string ShortDescription
-        {
-            get => _shortDescription;
-            set => SetProperty(ref _shortDescription, value);
-        }
-
-        private string _description;
-      
-        public string Description
-        {
-            get => _description;
-            set => SetProperty(ref _description, value);
-        }
-
+        public string Description { get; set; }
 
 
         public string ShortArtistDetail => GetShortArtistDetail();
 
+        internal ComicBook()
+        {
+
+        }
 
         private string GetShortArtistDetail()
         {
-
             var n = ComicBookArtists.Count;
             var result = string.Empty;
             foreach (var artist in ComicBookArtists)
@@ -98,16 +47,6 @@ namespace ComicBookShopCore.Data
             }
 
             return result;
-        }
-
-        public ComicBook()
-        {
-
-        }
-        
-        public ComicBook(int id)
-        {
-            Id = id;
         }
     }
 }
