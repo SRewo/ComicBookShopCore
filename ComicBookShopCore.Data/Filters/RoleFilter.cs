@@ -18,7 +18,7 @@ namespace ComicBookShopCore.Data.Filters
         internal RoleFilter(Dictionary<string, bool> roles, ShopDbEntities context)
         {
             Roles = roles;
-            var userStore = new UserStore<User>(context);
+            using var userStore = new UserStore<User>(context);
             foreach (var key in roles.Keys)
             {
                 if(!_usersInRole.ContainsKey(key))

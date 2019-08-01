@@ -8,11 +8,12 @@ namespace ComicBookShopCore.Data.Builders
 {
     public class ComicBookBuilder
     {
-        protected ComicBook ComicBook = new ComicBook();
+        protected ComicBook ComicBook = new ComicBook(){ComicBookArtists = new ObservableCollection<ComicBookArtist>()};
 
         public virtual ComicBookStatusBuilder Status => new ComicBookStatusBuilder(ComicBook);
         public virtual ComicBookDescriptionBuilder Description => new ComicBookDescriptionBuilder(ComicBook);
         public virtual ComicBookDetailsBuilder Details => new ComicBookDetailsBuilder(ComicBook);
+        public virtual ComicBookArtistBuilder Artists => new ComicBookArtistBuilder(ComicBook);
 
         public ComicBook Build()
         {
@@ -98,12 +99,41 @@ namespace ComicBookShopCore.Data.Builders
             ComicBook.Series = series;
             return this;
         }
+    }
 
-        public ComicBookDetailsBuilder Artists(ObservableCollection<ComicBookArtist> artists)
+    public class ComicBookArtistBuilder : ComicBookBuilder
+    {
+        private readonly ComicBookArtist _comicArtist;
+
+        public ComicBookArtistBuilder(ComicBook comicBook)
         {
-            ComicBook.ComicBookArtists = artists;
+            ComicBook = comicBook;
+            _comicArtist = new ComicBookArtist(){ComicBook = this.ComicBook};
+        }
+
+        public ComicBookArtistBuilder Artist(Artist artist)
+        {
+            _comicArtist.Artist = artist;
             return this;
         }
+
+        public ComicBookArtistBuilder Role(string role)
+        {
+            _comicArtist.Type = role;
+            return this;
+        }
+
+        public ComicBookBuilder Add()
+        {
+            _comicArtist.Validate();
+            if (_comicArtist.HasErrors)
+                throw new ValidationException(_comicArtist.GetFirstError());
+
+            ComicBook.ComicBookArtists.Add(_comicArtist);
+
+            return this;
+        }
+
     }
 
 }

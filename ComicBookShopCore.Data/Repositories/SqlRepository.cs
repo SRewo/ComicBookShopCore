@@ -63,7 +63,7 @@ namespace ComicBookShopCore.Data.Repositories
             {
                 return _dbContext.Database.CanConnect();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return false;
             }
