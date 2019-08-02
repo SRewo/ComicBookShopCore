@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using ComicBookShopCore.Web.Models;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using ComicBookShopCore.Web.Models;
 using ComicBookShopCore.Data.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -45,15 +45,14 @@ namespace ComicBookShopCore.Web.Controllers
         {
             if (!id.HasValue )
                 return RedirectToAction("Index");
+            
+            var comicBook = _comicBookRepository.GetById(id.Value);
 
-            var comic = _comicBookRepository.GetById(id.Value);
-            if (comic == null)
+            if (comicBook == null)
                 return RedirectToAction("Index");
+            
 
-            comic = _comicBookRepository.GetAll().Include(x => x.Series).ThenInclude(x => x.Publisher)
-                .Include(x => x.ComicBookArtists).ThenInclude(x => x.Artist).First(x=> x.Id == id.Value);
-
-            var model = new ComicBookDetailsViewModel(comic);
+            var model = new ComicBookDetailsViewModel(comicBook);
             return View(model);
         }
 

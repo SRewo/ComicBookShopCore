@@ -13,7 +13,7 @@ namespace ComicBookShopCore.Data.Builders
         public virtual ComicBookStatusBuilder Status => new ComicBookStatusBuilder(ComicBook);
         public virtual ComicBookDescriptionBuilder Description => new ComicBookDescriptionBuilder(ComicBook);
         public virtual ComicBookDetailsBuilder Details => new ComicBookDetailsBuilder(ComicBook);
-        public virtual ComicBookArtistBuilder Artists => new ComicBookArtistBuilder(ComicBook);
+        public virtual ComicBookArtistBuilder AddArtist => new ComicBookArtistBuilder(ComicBook);
 
         public ComicBook Build()
         {
@@ -99,16 +99,22 @@ namespace ComicBookShopCore.Data.Builders
             ComicBook.Series = series;
             return this;
         }
+
+        public ComicBookDetailsBuilder ArtistList(ObservableCollection<ComicBookArtist> list)
+        {
+            ComicBook.ComicBookArtists = list;
+            return this;
+        }
     }
 
     public class ComicBookArtistBuilder : ComicBookBuilder
     {
-        private readonly ComicBookArtist _comicArtist;
+        private ComicBookArtist _comicArtist;
 
         public ComicBookArtistBuilder(ComicBook comicBook)
         {
             ComicBook = comicBook;
-            _comicArtist = new ComicBookArtist(){ComicBook = this.ComicBook};
+            _comicArtist = new ComicBookArtist();
         }
 
         public ComicBookArtistBuilder Artist(Artist artist)
@@ -123,6 +129,12 @@ namespace ComicBookShopCore.Data.Builders
             return this;
         }
 
+        public ComicBookArtistBuilder Artist(ComicBookArtist artist)
+        {
+            _comicArtist = artist;
+            return this;
+        }
+
         public ComicBookBuilder Add()
         {
             _comicArtist.Validate();
@@ -132,6 +144,15 @@ namespace ComicBookShopCore.Data.Builders
             ComicBook.ComicBookArtists.Add(_comicArtist);
 
             return this;
+        }
+
+        public ComicBookArtist BuildComicBookArtist()
+        {
+            _comicArtist.Validate();
+            if (_comicArtist.HasErrors)
+                throw new ValidationException(_comicArtist.GetFirstError());
+
+            return _comicArtist;
         }
 
     }

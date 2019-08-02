@@ -4,12 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using ComicBookShopCore.Data;
+using ComicBookShopCore.Data.Builders;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
+using Unity;
 
 namespace ComicBookShopCore.OrderModule.ViewModels
 {
@@ -20,6 +22,9 @@ namespace ComicBookShopCore.OrderModule.ViewModels
         private IRegionManager _regionManager;
         private IRepository<Order> _orderRepository;
         private List<ComicBook> _allComicBooks;
+        private OrderBuilder _orderBuilder = new OrderBuilder();
+        private User _user;
+        private IUnityContainer _container;
 
         public DelegateCommand AddItemCommand { get; set; }
         public DelegateCommand RemoveItemCommand { get; set; }
@@ -65,12 +70,12 @@ namespace ComicBookShopCore.OrderModule.ViewModels
         }
 
 
-        private Order _order;
+        private ObservableCollection<OrderItem> _orderItems;
 
-        public Order Order
+        public ObservableCollection<OrderItem> OrderItems
         {
-            get => _order;
-            set => SetProperty(ref _order, value);
+            get => _orderItems;
+            set => SetProperty(ref _orderItems, value);
         }
 
         private double _totalPrice;
@@ -118,13 +123,14 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
 
 
-        public AddOrderViewModel(IRegionManager manager, IRepository<ComicBook> comicBookrepository, IRepository<Publisher> publisherRepository, IRepository<Order> orderRepository)
+        public AddOrderViewModel(IRegionManager manager, IRepository<ComicBook> comicBookRepository, IRepository<Publisher> publisherRepository, IRepository<Order> orderRepository, User[] users)
         {
 
             _regionManager = manager;
-            _comicBookRepository = comicBookrepository;
+            _comicBookRepository = comicBookRepository;
             _publisherRepository = publisherRepository;
             _orderRepository = orderRepository;
+            _user = users[0];
 
             AddItemCommand = new DelegateCommand(AddItem);
             RemoveItemCommand = new DelegateCommand(RemoveItem);
@@ -137,36 +143,34 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         public void AddItem()
         {
-            if (SelectedComicBook != null && Order.OrderItems.All(x => x.ComicBook.Id != SelectedComicBook.Id))
-            {
-                OrderItem addedOrderItem = new OrderItem()
-                {
-                    ComicBook = SelectedComicBook,
-                    Discount = 0,
-                    Quantity = 1
-                };
+            if (SelectedComicBook == null || OrderItems.Any(x => x.ComicBook.Id == SelectedComicBook.Id)) return;
 
-                addedOrderItem.PropertyChanged += AddedOrderItem_PropertyChanged;
+            var addedOrderItem = _orderBuilder
+                .Item
+                    .ComicBook(SelectedComicBook)
+                    .Quantity(1)
+                    .Discount(0)
+                .BuildItem();
 
-                Order.OrderItems.Add(addedOrderItem);
-                AddedOrderItem_PropertyChanged(null,null);
-            }
+            this.PropertyChanged += AddedOrderItem_PropertyChanged;
+
+            OrderItems.Add(addedOrderItem);
+            AddedOrderItem_PropertyChanged(null,null);
         }
 
         public void AddedOrderItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            TotalPrice = Order.TotalPrice;
-            CanSave = Order.OrderItems.All(x => !x.HasErrors) && !Order.HasErrors && Order.OrderItems.Count != 0;
+            TotalPrice = OrderItems.Sum(x => x.Price);
+            CanSave = OrderItems.All(x => !x.HasErrors) && OrderItems.Count != 0;
             ErrorMessage = string.Empty;
         }
 
         public void RemoveItem()
         {
-            if (SelectedOrderItem != null)
-            {
-                Order.OrderItems.Remove(SelectedOrderItem);
-                AddedOrderItem_PropertyChanged(null, null);
-            }
+            if (SelectedOrderItem == null) return;
+
+            OrderItems.Remove(SelectedOrderItem);
+            AddedOrderItem_PropertyChanged(null, null);
         }
 
         public void GetData()
@@ -174,23 +178,13 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
             Publishers = _publisherRepository.GetAll().ToList();
 
-            if (_comicBookRepository.GetAll().Count() != 0)
-            {
-                _allComicBooks = _comicBookRepository.GetAll().Include(x => x.Series).Include(x => x.Series.Publisher).Include(x => x.ComicBookArtists).ThenInclude(z => z.Artist)
-                    .Where(x => x.Quantity > 0).ToList();
-                ComicBooks = _allComicBooks;
-            }
+            if (!_comicBookRepository.GetAll().Any()) return;
 
-        }
+            _allComicBooks = _comicBookRepository.GetAll().Include(x => x.Series).Include(x => x.Series.Publisher).Include(x => x.ComicBookArtists).ThenInclude(z => z.Artist)
+                .Where(x => x.Quantity > 0).ToList();
+            ComicBooks = _allComicBooks;
 
-        public void CreateOrder()
-        {
-            Order = new Order()
-            {
-                Employee = GlobalVariables.LoggedUser,
-                OrderItems = new ObservableCollection<OrderItem>()
-            };
-            
+            OrderItems = new ObservableCollection<OrderItem>();
         }
 
         public void Search()
@@ -208,8 +202,8 @@ namespace ComicBookShopCore.OrderModule.ViewModels
         {
             try
             {
-                Order.Date = DateTime.Now;
-                foreach (OrderItem item in Order.OrderItems)
+                
+                foreach (var item in OrderItems)
                 {
                     if (item.Quantity <= item.ComicBook.Quantity)
                     {
@@ -220,7 +214,14 @@ namespace ComicBookShopCore.OrderModule.ViewModels
                         throw new InvalidOperationException("You are trying to add an order with one of its items above the available quantity limit. Item: " + item.ComicBook.Title);
                     }
                 }
-                _orderRepository.Add(Order);
+                var order = _orderBuilder
+                    .Details
+                    .Date(DateTime.Now)
+                    .User(_user)
+                    .OrderItemList(OrderItems)
+                    .Build();
+
+                _orderRepository.Add(order);
                 GoBack();
             }catch(InvalidOperationException ex)
             {
@@ -238,7 +239,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
         {
-            return GlobalVariables.LoggedUser != null;
+            return true;
         }
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
@@ -248,9 +249,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-
             GetData();
-            CreateOrder();
             ResetSearch();
 
             CanSave = false;

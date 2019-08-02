@@ -136,12 +136,12 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             if (SelectedArtist != null && !ComicBook.ComicBookArtists.Any(x => x.Artist.Id.Equals(SelectedArtist.Id)))
             {
 
-                ComicBook.ComicBookArtists.Add(new ComicBookArtist()
-                {
-                    Artist = SelectedArtist,
-                    Type = String.Empty,
-                    ComicBook = ComicBook
-                });
+                //ComicBook.ComicBookArtists.Add(new ComicBookArtist()
+                //{
+                //    Artist = SelectedArtist,
+                //    Type = String.Empty,
+                //    ComicBook = ComicBook
+                //});
 
                 ComicBook_PropertyChanged(null, null);
 
@@ -206,12 +206,12 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             GetData();
             ResetErrorMessages();
 
-            ComicBook.PropertyChanged += ComicBook_PropertyChanged;
+            /*ComicBook.PropertyChanged += ComicBook_PropertyChanged*/;
 
             foreach (var comicBookArtist in ComicBook.ComicBookArtists)
             {
 
-                comicBookArtist.PropertyChanged += ComicBook_PropertyChanged;
+                /*comicBookArtist.PropertyChanged += ComicBook_PropertyChanged*/;
 
             }
 
@@ -246,11 +246,11 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
             CanSave = false;
 
-            ComicBook = ComicBook ?? new ComicBook()
-            {
-                OnSaleDate = DateTime.Now,
-                ComicBookArtists = new ObservableCollection<ComicBookArtist>()
-            };
+            //ComicBook = ComicBook ?? new ComicBook()
+            //{
+            //    OnSaleDate = DateTime.Now,
+            //    ComicBookArtists = new ObservableCollection<ComicBookArtist>()
+            //};
         }
     }
 }

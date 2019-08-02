@@ -16,13 +16,13 @@ namespace ComicBookShopCore.Data.Tests.Builders
             var bc = builder
                 .Details
                     .Date(new DateTime(1999, 01, 01))
-                    .Employee(employee)
-                .AddItem
+                    .User(employee)
+                .Item
                     .ComicBook(comicBook)
                     .Quantity(2)
                     .Discount(0)
                     .Add()
-                .AddItem
+                .Item
                     .ComicBook(comicBook)
                     .Quantity(3)
                     .Discount(12)
@@ -54,8 +54,8 @@ namespace ComicBookShopCore.Data.Tests.Builders
             var bc = builder
                 .Details
                 .Date(new DateTime(1999, 01, 01))
-                .Employee(employee)
-                .AddItem
+                .User(employee)
+                .Item
                 .ComicBook(comicBook)
                 .Discount(0);
 
@@ -71,8 +71,8 @@ namespace ComicBookShopCore.Data.Tests.Builders
             var bc = builder
                 .Details
                 .Date(new DateTime(1999, 01, 01))
-                .Employee(employee)
-                .AddItem
+                .User(employee)
+                .Item
                 .ComicBook(comicBook)
                 .Quantity(-1)
                 .Discount(0);

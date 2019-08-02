@@ -13,138 +13,112 @@ using Xunit;
 
 namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
 {
-    public class PublisherListViewModelTests
-    {
-        [Fact]
-        public void IsSearchEnabled_ViewListIsNull_EqualsFalse()
-        {
+    //public class PublisherListViewModelTests
+    //{
+    //    [Fact]
+    //    public void IsSearchEnabled_ViewListIsNull_EqualsFalse()
+    //    {
 
-            var model = new PublishersListViewModel(null, null)
-            {
-                ViewList = null
-            };
+    //        var model = new PublishersListViewModel(null, null)
+    //        {
+    //            ViewList = null
+    //        };
 
-            Assert.False(model.IsSearchEnabled);
+    //        Assert.False(model.IsSearchEnabled);
 
-        }
+    //    }
 
-        [Fact]
-        public void IsSearchEnabled_ViewListNotNull_EqualsTrue()
-        {
+    //    [Fact]
+    //    public void IsSearchEnabled_ViewListNotNull_EqualsTrue()
+    //    {
 
-            var model = new PublishersListViewModel(null, null)
-            {
-                ViewList = new List<Publisher>()
-            };
-            model.CanSearchCheck();
+    //        var model = new PublishersListViewModel(null, null)
+    //        {
+    //            ViewList = new List<Publisher>()
+    //        };
+    //        model.CanSearchCheck();
 
-            Assert.True(model.IsSearchEnabled);
+    //        Assert.True(model.IsSearchEnabled);
 
-        }
+    //    }
 
-        [Fact]
-        public void IsEditEnabled_SelectedPublisherIsNull_EqualsFalse()
-        {
-            var model = new PublishersListViewModel(null, null);
+    //    [Fact]
+    //    public void IsEditEnabled_SelectedPublisherIsNull_EqualsFalse()
+    //    {
+    //        var model = new PublishersListViewModel(null, null);
 
-            Assert.False(model.IsEditEnabled);
-        }
+    //        Assert.False(model.IsEditEnabled);
+    //    }
 
-        [Fact]
-        public void IsEditEnabled_SelectedPublisherNotNull_EqualsTrue()
-        {
-            var model = new PublishersListViewModel(null, null)
-            {
-                SelectedPublisher = new Publisher()
-            };
+    //    [Fact]
+    //    public void IsEditEnabled_SelectedPublisherNotNull_EqualsTrue()
+    //    {
+    //        var model = new PublishersListViewModel(null, null)
+    //        {
+    //            SelectedPublisher = new Publisher()
+    //        };
 
-            Assert.True(model.IsEditEnabled);
-        }
+    //        Assert.True(model.IsEditEnabled);
+    //    }
 
-        [Fact]
-        public void IsEditEnabled_SelectedPublisherChanged_EqualsTrue()
-        {
+    //    [Fact]
+    //    public void IsEditEnabled_SelectedPublisherChanged_EqualsTrue()
+    //    {
 
-            var model = new PublishersListViewModel(null, null);
+    //        var model = new PublishersListViewModel(null, null);
 
-            Assert.False(model.IsEditEnabled);
+    //        Assert.False(model.IsEditEnabled);
 
-            model.SelectedPublisher= new Publisher();
+    //        model.SelectedPublisher= new Publisher();
 
-            Assert.True(model.IsEditEnabled);
+    //        Assert.True(model.IsEditEnabled);
 
-        }
+    //    }
 
-        [Fact]
-        public void GetData_ValidCall()
-        {
-            using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
-            var model = mock.Create<PublishersListViewModel>();
-            model.GetData();
+    //    [Fact]
+    //    public void GetData_ValidCall()
+    //    {
+    //        using var mock = AutoMock.GetLoose();
+    //        mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
+    //        var model = mock.Create<PublishersListViewModel>();
+    //        model.GetData();
 
-            var expected = GetPublishersSample().Count();
-            var actual = model.ViewList.Count;
+    //        var expected = GetPublishersSample().Count();
+    //        var actual = model.ViewList.Count;
 
-            Assert.NotNull(model.ViewList);
-            Assert.Equal(expected, actual);
-            mock.Mock<IRepository<Publisher>>().Verify(x => x.GetAll(), Times.Exactly(1));
-        }
+    //        Assert.NotNull(model.ViewList);
+    //        Assert.Equal(expected, actual);
+    //        mock.Mock<IRepository<Publisher>>().Verify(x => x.GetAll(), Times.Exactly(1));
+    //    }
 
-        [Fact]
-        public void OpenAdd_ValidCall()
-        {
-            using var mock = AutoMock.GetLoose();
-            mock.Mock<IRegionManager>().Setup(x => x.RequestNavigate("content", "AddEditPublisher"));
-            var model = mock.Create<PublishersListViewModel>();
-            model.OpenAdd();
+    //    [Fact]
+    //    public void OpenAdd_ValidCall()
+    //    {
+    //        using var mock = AutoMock.GetLoose();
+    //        mock.Mock<IRegionManager>().Setup(x => x.RequestNavigate("content", "AddEditPublisher"));
+    //        var model = mock.Create<PublishersListViewModel>();
+    //        model.OpenAdd();
 
-            mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content", "AddEditPublisher"));
-        }
+    //        mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content", "AddEditPublisher"));
+    //    }
 
-        [Fact]
-        public void OpenEdit_ValidCall()
-        {
-            using var mock = AutoMock.GetLoose();
-            var publisher = new Publisher();
-            var parameters = new NavigationParameters()
-                {
-                    {"publisher",publisher}
-                };
+    //    [Fact]
+    //    public void OpenEdit_ValidCall()
+    //    {
+    //        using var mock = AutoMock.GetLoose();
+    //        var publisher = new Publisher();
+    //        var parameters = new NavigationParameters()
+    //            {
+    //                {"publisher",publisher}
+    //            };
 
-            mock.Mock<IRegionManager>().Setup(x => x.RequestNavigate("content", "AddEditPublisher", parameters));
-            var model = mock.Create<PublishersListViewModel>();
-            model.SelectedPublisher = publisher;
-            model.OpenEdit();
+    //        mock.Mock<IRegionManager>().Setup(x => x.RequestNavigate("content", "AddEditPublisher", parameters));
+    //        var model = mock.Create<PublishersListViewModel>();
+    //        model.SelectedPublisher = publisher;
+    //        model.OpenEdit();
 
-            mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content", "AddEditPublisher", parameters), Times.Once);
-        }
+    //        mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content", "AddEditPublisher", parameters), Times.Once);
+    //    }
 
-        private IQueryable<Publisher> GetPublishersSample()
-        {
-            var tmp = new List<Publisher>()
-            {
-                new Publisher()
-                {
-                    Name = "DC Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1934"),
-                    Description = "Some random description."
-                },
-                new Publisher()
-                {
-                    Name = "Marvel Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1939"),
-                    Description = "Another description"
-                },
-                new Publisher()
-                {
-                    Name = "Dark Horse Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1986"),
-                    Description = " American comic book and manga publisher."
-                }
-            };
-
-            return tmp.AsEnumerable().AsQueryable();
-        }
-    }
+    //}
 }

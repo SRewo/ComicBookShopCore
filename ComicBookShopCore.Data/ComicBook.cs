@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("ComicBookShopCore.Data.Tests")]
 namespace ComicBookShopCore.Data
 {
     public class ComicBook : ValidationClass

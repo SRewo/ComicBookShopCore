@@ -17,9 +17,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ComicBookShopCore.ComicBookModule\ComicBookShopCore.ComicBookModule.csproj" />
-    <ProjectReference Include="..\ComicBookShopCore.Data\ComicBookShopCore.Data.csproj" />
     <ProjectReference Include="..\ComicBookShopCore.EmployeeModule\ComicBookShopCore.EmployeeModule.csproj" />
     <ProjectReference Include="..\ComicBookShopCore.OrderModule\ComicBookShopCore.OrderModule.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ComicBookShopCore.Data">
+      <HintPath>..\ComicBookShopCore.Data\bin\Release\netcoreapp3.0\ComicBookShopCore.Data.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

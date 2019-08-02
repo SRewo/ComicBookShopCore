@@ -21,12 +21,14 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\ComicBookShopCore.Data\ComicBookShopCore.Data.csproj" />
+    <Folder Include="wwwroot\images\ComicBooks\" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <Folder Include="wwwroot\images\ComicBooks\" />
+    <Reference Include="ComicBookShopCore.Data">
+      <HintPath>..\ComicBookShopCore.Data\bin\Release\netcoreapp3.0\ComicBookShopCore.Data.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 

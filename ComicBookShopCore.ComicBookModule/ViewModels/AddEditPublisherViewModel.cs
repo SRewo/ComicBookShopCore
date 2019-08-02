@@ -75,12 +75,12 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
 
             Publisher = (Publisher)navigationContext.Parameters["publisher"];
-            Publisher ??= new Publisher()
-            {
-                CreationDateTime = DateTime.Now
-            };
+            //Publisher ??= new Publisher()
+            //{
+            //    CreationDateTime = DateTime.Now
+            //};
 
-            Publisher.PropertyChanged += CanExecuteChanged;
+            /*Publisher.PropertyChanged += CanExecuteChanged*/;
             Publisher.ErrorsChanged += Publisher_ErrorsChanged;
         }
 
@@ -113,7 +113,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             if (Publisher != null)
             {
 
-                if (Publisher.Id <= 0)
+                if (Publisher.Id == 0)
                 {
                     _publisherRepository.Add(Publisher);
                 }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
+using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 
 namespace ComicBookShopCore.Data
 {
     public class Publisher : ValidationClass
     {
-        
-        public int Id { get; }
+        public int Id { get; private set; }
 
 
         [Required(ErrorMessage = "Publisher name cannot be empty")]

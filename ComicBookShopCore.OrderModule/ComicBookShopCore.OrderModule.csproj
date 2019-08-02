@@ -8,10 +8,16 @@
     <None Remove="Views\OrderListView.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Prism.Wpf" Version="7.2.0.1038-pre" />
+    <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
+    <PackageReference Include="Prism.Wpf" Version="7.2.0.1367" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ComicBookShopCore.Data\ComicBookShopCore.Data.csproj" />
+    <Reference Include="ComicBookShopCore.Data">
+      <HintPath>..\ComicBookShopCore.Data\bin\Release\netcoreapp3.0\ComicBookShopCore.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore">
+      <HintPath>C:\Users\maoam\.nuget\packages\microsoft.entityframeworkcore\3.0.0-preview5.19227.1\lib\netstandard2.0\Microsoft.EntityFrameworkCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
 

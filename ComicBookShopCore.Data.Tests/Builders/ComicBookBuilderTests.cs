@@ -18,7 +18,7 @@ namespace ComicBookShopCore.Data.Tests.Builders
             var bc = builder
                 .Details
                     .Series(series)
-                    .Artists(artist)
+                    .ArtistList(artist)
                     .Title("Some Title")
                     .OnSaleDate(new DateTime(1999, 01, 01))
                 .Description
@@ -43,7 +43,7 @@ namespace ComicBookShopCore.Data.Tests.Builders
             var bc = builder
                 .Details
                     .Series(series)
-                    .Artists(artist)
+                    .ArtistList(artist)
                     .Title("Some Title")
                     .OnSaleDate(new DateTime(1999, 01, 01))
                 .Description
@@ -65,7 +65,7 @@ namespace ComicBookShopCore.Data.Tests.Builders
             var bc = builder
                 .Details
                     .Series(series)
-                    .Artists(artist)
+                    .ArtistList(artist)
                     .Title("Some Title")
                     .OnSaleDate(new DateTime(1999, 01, 01))
                 .Description

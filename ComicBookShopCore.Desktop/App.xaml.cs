@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Unity;
+using IContainerRegistry = Prism.Ioc.IContainerRegistry;
 
 namespace ComicBookShopCore.Desktop
 {
@@ -37,6 +39,7 @@ namespace ComicBookShopCore.Desktop
             containerRegistry.RegisterSingleton<IRepository<Order>, SqlRepository<Order>>();
             containerRegistry.RegisterSingleton<DbContext, ShopDbEntities>();
             containerRegistry.Register<IUserEmployeeFilterFactory, DbRoleFilterFactory>();
+            containerRegistry.RegisterInstance(typeof(User[]),new User[1]);
 
         }
 

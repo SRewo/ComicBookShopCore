@@ -1,6 +1,5 @@
 ﻿using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -8,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace ComicBookShopCore.ComicBookModule.ViewModels
 {

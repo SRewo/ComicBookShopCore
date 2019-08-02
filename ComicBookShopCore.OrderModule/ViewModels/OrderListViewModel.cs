@@ -9,8 +9,6 @@ using System.Windows.Documents;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Filters;
 using ComicBookShopCore.Data.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Mvvm;

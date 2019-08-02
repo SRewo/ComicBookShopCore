@@ -10,9 +10,6 @@ namespace ComicBookShopCore.Data
         [Required]
         public Artist Artist { get; set; }
 
-        [Required]
-        public ComicBook ComicBook { get; set; }
-
         public string Type { get; set; }
 
         internal ComicBookArtist()

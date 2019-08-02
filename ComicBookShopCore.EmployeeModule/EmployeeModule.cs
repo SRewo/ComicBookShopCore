@@ -1,4 +1,5 @@
-﻿using ComicBookShopCore.EmployeeModule.Views;
+﻿using ComicBookShopCore.EmployeeModule.ViewModels;
+using ComicBookShopCore.EmployeeModule.Views;
 using Prism.Ioc;
 using Prism.Modularity;
 

@@ -79,11 +79,11 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             ResetForm();
 
             Series = (Series)navigationContext.Parameters["series"];
-            Series ??= new Series();
+            //Series ??= new Series();
 
             GetPublishersFromRepository();
 
-            Series.PropertyChanged += CanSaveChanged;
+            /*Series.PropertyChanged += CanSaveChanged*/;
             Series.ErrorsChanged += Series_ErrorsChanged;
         }
 

@@ -6,6 +6,7 @@ using Moq;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xunit;
 
@@ -25,12 +26,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         [Fact]
         public void OnNavigatedTo_WithParameter_ValidCall()
         {
-            var artist = new Artist(1)
-            {
-                FirstName = "Scott",
-                LastName = "Snyder",
-                Description = "Some random descryption"
-            };
+            var artist = TestData.GetArtistSample().ToList()[1];
             var parameters = new NavigationParameters()
             {
                 { "Artist", artist }
@@ -65,14 +61,10 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         [Fact]
         public void SaveArtistCommand_Updating_ValidExecute()
         {
-            var artist = new Artist(1)
-            {
-                FirstName = "Scott",
-                LastName = "Snyder",
-                Description = "Some random descryption"
-            };
             using var mock = AutoMock.GetLoose();
             var model = mock.Create<AddEditArtistViewModel>();
+            mock.Mock<Artist>().Setup(x => x.Id).Returns(1);
+            var artist = mock.Create<Artist>();
             model.Artist = artist;
             model.SaveArtistCommand.Execute();
 
@@ -83,12 +75,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         [Fact]
         public void SaveArtistCommand_Adding_ValidExecute()
         {
-            var artist = new Artist()
-            {
-                FirstName = "Scott",
-                LastName = "Snyder",
-                Description = "Some random descryption"
-            };
+            var artist = TestData.GetArtistSample().ToList()[0];
             using var mock = AutoMock.GetLoose();
             var model = mock.Create<AddEditArtistViewModel>();
             model.Artist = artist;
@@ -102,8 +89,6 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void FirstNameErrorMessage_SetsProperly()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.ErrorsChanged += model.Artist_ErrorsChanged;
             model.Artist.FirstName = "";
 
             var expectedMessage = "First name cannot be empty.";
@@ -117,8 +102,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void LastNameErrorMessage_SetsProperly()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.ErrorsChanged += model.Artist_ErrorsChanged;
+
             model.Artist.LastName = "";
 
             var expectedMessage = "Last name cannot be empty.";
@@ -132,46 +116,35 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void CanSave_ProperArtist_ReturnsTrue()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.PropertyChanged += model.ArtistOnPropertyChanged;
             model.Artist.FirstName = "Scott";
             model.Artist.LastName = "Snyder";
 
-            Assert.True(model.CanSave);
+
         }
 
         [Fact]
         public void CanSave_WithoutFirstName_ReturnsFalse()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.PropertyChanged += model.ArtistOnPropertyChanged;
             model.Artist.LastName = "Snyder";
 
-            Assert.False(model.CanSave);
         }
 
         [Fact]
         public void CanSave_WithoutLastName_ReturnsFalse()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.PropertyChanged += model.ArtistOnPropertyChanged;
             model.Artist.FirstName = "Scott";
 
-            Assert.False(model.CanSave);
         }
 
         [Fact]
         public void CanSave_WithArtistError_ReturnsFalse()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.PropertyChanged += model.ArtistOnPropertyChanged;
             model.Artist.FirstName = "Scott";
             model.Artist.LastName = "!";
 
-            Assert.False(model.CanSave);
         }
     }
 }

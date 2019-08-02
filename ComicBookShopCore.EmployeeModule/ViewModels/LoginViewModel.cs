@@ -8,18 +8,22 @@ using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
 using ComicBookShopCore.EmployeeModule.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
+using Prism.Ioc;
 using Prism.Mvvm;
 using Prism.Regions;
+using Prism.Unity;
+using Unity;
 
 namespace ComicBookShopCore.EmployeeModule.ViewModels
 {
-    public class LoginViewModel : BindableBase
+    public class LoginViewModel : BindableBase, INavigationAware
     {
         private readonly IRegionManager _regionManager;
         private readonly IOpenable<User> _userRepository;
-        private User _loggedUser;
+        private User[] _users;
+        public User LoggedUser { get; set; }
+        private bool _loggedIn;
 
         public DelegateCommand<object> SignInCommand { get; set; }
 
@@ -48,15 +52,15 @@ namespace ComicBookShopCore.EmployeeModule.ViewModels
         }
 
 
-
-        public LoginViewModel(IRegionManager manager, IOpenable<User> userRepository)
+        public LoginViewModel(IRegionManager manager, IOpenable<User> userRepository, User[] users)
         {
 
             SignInCommand = new DelegateCommand<object>(SignIn);
 
             _userRepository = userRepository;
             _regionManager = manager;
-            
+            _users = users;
+
             CheckDb();
 
         }
@@ -67,10 +71,11 @@ namespace ComicBookShopCore.EmployeeModule.ViewModels
             if (passwordContainer != null)
             {
                 var secureString = passwordContainer.Password;
-                if (CheckUserExists(Username) && CheckPasswords(_loggedUser, secureString))
+                if (CheckUserExists(Username) && CheckPasswords(LoggedUser, secureString))
                 {
 
-                    GlobalVariables.LoggedUser = _loggedUser;
+                    _loggedIn = true;
+                    _users[0] = LoggedUser;
                     Redirect();
 
                 }
@@ -105,10 +110,10 @@ namespace ComicBookShopCore.EmployeeModule.ViewModels
         public bool CheckUserExists(string login)
         {
                 
-            _loggedUser = _userRepository.GetAll().FirstOrDefault(x => x.UserName == login);
+            LoggedUser = _userRepository.GetAll().FirstOrDefault(x => x.UserName == login);
             
 
-            return _loggedUser != null;
+            return LoggedUser != null;
 
         }
 
@@ -127,6 +132,20 @@ namespace ComicBookShopCore.EmployeeModule.ViewModels
             {
                 ErrorMessage = "Unable to connect with database. Please restart program and try again.";
             }
+
+        }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
 
         }
     }

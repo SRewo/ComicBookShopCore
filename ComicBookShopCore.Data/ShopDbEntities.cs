@@ -15,12 +15,12 @@ namespace ComicBookShopCore.Data
         }
 
         public virtual DbSet<Artist> Artists { get; set; }
-        public virtual DbSet<Publisher> Publishers { get; set; }
         public virtual DbSet<Series> Series { get; set; }
         public virtual DbSet<ComicBook> ComicBooks { get; set; }
         public virtual DbSet<OrderItem> OrderItems { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<User> Employees { get; set; }
+        public virtual DbSet<Publisher> Publishers { get; set; }
         public virtual DbSet<ComicBookArtist> ComicBookArtists { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -31,7 +31,7 @@ namespace ComicBookShopCore.Data
 
         private async Task AddRoles()
         {
-            var roleStore = new RoleStore<IdentityRole>(this);
+            using var roleStore = new RoleStore<IdentityRole>(this);
 
             if (roleStore.Roles.Any()) return;
 
