@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Prism.Mvvm;
 
 namespace ComicBookShopCore.ComicBookModule
@@ -18,7 +19,7 @@ namespace ComicBookShopCore.ComicBookModule
 
         public IEnumerable GetErrors(string propertyName)
         {
-            if (propertyName != string.Empty && _propErrors.Keys.Any(x => x== propertyName))
+            if (propertyName != String.Empty && _propErrors.Keys.Any(x => x== propertyName))
             {
                 return _propErrors[propertyName];
             }
@@ -26,33 +27,47 @@ namespace ComicBookShopCore.ComicBookModule
             return null;
         }
 
+        protected override bool SetProperty<T>(ref T member, T val,
+            [CallerMemberName] string propertyName = null)
+        {
+
+            ValidateProperty(propertyName, val);
+
+            return base.SetProperty<T>(ref member, val, propertyName);
+        }
+
         private void ValidateProperty<T>(string propertyName, T value)
         {
-            if (propertyName == string.Empty) return;
-
-            var results = new List<ValidationResult>();
-            var context = new ValidationContext(this)
+            if (propertyName != String.Empty)
             {
-                MemberName = propertyName
-            };
+                var results = new List<ValidationResult>();
+                ValidationContext context = new ValidationContext(this)
+                {
+                    MemberName = propertyName
+                };
+                Validator.TryValidateProperty(value, context, results);
 
-            Validator.TryValidateProperty(value, context, results);
+                if (results.Any())
+                {
+                    _propErrors[propertyName] = results.Select(c => c.ErrorMessage).ToList();
+                }
+                else
+                {
+                    _propErrors.Remove(propertyName);
+                }
 
-            if (results.Any())
-            {
-                _propErrors[propertyName] = results.Select(c => c.ErrorMessage).ToList();
+                ErrorsChanged(this, new DataErrorsChangedEventArgs(propertyName));
             }
-            else
-            {
-                _propErrors.Remove(propertyName);
-            }
-
-            ErrorsChanged(this, new DataErrorsChangedEventArgs(propertyName));
         }
 
         public string GetFirstError(string propertyName)
         {
-            return _propErrors.ContainsKey(propertyName) ? _propErrors[propertyName].First() : null;
+            if (_propErrors.ContainsKey(propertyName))
+            {
+                return _propErrors[propertyName].First();
+            }
+
+            return null;
         }
 
         public string GetFirstError()
@@ -62,10 +77,5 @@ namespace ComicBookShopCore.ComicBookModule
 
         }
 
-        protected override bool SetProperty<T>(ref T storage, T value, string propertyName = null)
-        {
-            ValidateProperty(propertyName, value);
-            return base.SetProperty(ref storage, value, propertyName);
-        }
     }
 }

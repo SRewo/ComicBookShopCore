@@ -1,4 +1,5 @@
-﻿using System.CodeDom;
+﻿using System;
+using System.CodeDom;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
@@ -7,12 +8,42 @@ using Prism.Mvvm;
 using Prism.Regions;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using System.Windows;
 using ComicBookShopCore.Data.Builders;
 
 namespace ComicBookShopCore.ComicBookModule.ViewModels
 {
-    public class AddEditArtistViewModel : ValidableBase, INavigationAware
+    public class InputModel : ValidableBase
+    {
+        private string _firstName;
+        [Required(ErrorMessage = "First name cannot be empty.")]
+        [CustomValidation.NameValidation(ErrorMessage = "First Name cannot contain special characters.")]
+        public string FirstName
+        {
+            get => _firstName;
+            set => SetProperty(ref _firstName, value);
+        }
+
+        private string _lastName;
+        [Required(ErrorMessage = "Last name cannot be empty.")]
+        [CustomValidation.NameValidation(ErrorMessage = "Last Name cannot contain special characters.")]
+        public string LastName
+        {
+            get => _lastName;
+            set => SetProperty(ref _lastName, value);
+        }
+
+        private string _description;
+        public string Description
+        {
+            get => _description;
+            set => SetProperty(ref _description, value);
+        }
+    }
+
+
+    public class AddEditArtistViewModel : BindableBase, INavigationAware
     {
         private readonly IRegionManager _regionManager;
         private readonly IRepository<Artist> _artistRepository;
@@ -21,37 +52,8 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         public DelegateCommand GoBackCommand { get; private set; }
         public DelegateCommand SaveArtistCommand { get; private set; }
 
-        private Artist _artist;
-
-        public Artist Artist
-        {
-            get => _artist;
-            set => SetProperty(ref _artist, value);
-        }
-
-        private string _firstName;
-        [Required]
-        public string FirstName
-        {
-            get => _firstName;
-            set => SetProperty(ref _firstName, value);
-        }
-
-        private string _lastName;
-        [Required]
-        public string LastName
-        {
-            get => _lastName;
-            set => SetProperty(ref _lastName, value);
-        }
-
-        private string _description;
-        [Required]
-        public string Description
-        {
-            get => _description;
-            set => SetProperty(ref _description, value);
-        }
+        public Artist Artist { get; private set; }
+        public InputModel InputModel { get; private set; }
 
         private string _firstNameErrorMessage;
 
@@ -69,21 +71,50 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             set => SetProperty(ref _lastNameErrorMessage, value);
         }
 
+        private bool _canSave;
+
+        public bool CanSave
+        {
+            get => _canSave;
+            set => SetProperty(ref _canSave, value);
+        }
+
         public AddEditArtistViewModel(IRegionManager manager, IRepository<Artist> artistRepository)
         {
 
             _regionManager = manager;
             GoBackCommand = new DelegateCommand(GoBack);
-            SaveArtistCommand = new DelegateCommand(SaveArtist);
+            SaveArtistCommand = new DelegateCommand((() => SaveArtistAsync()));
             _artistRepository = artistRepository;
-            
+            InputModel = new InputModel();
+        }
+
+        private void AddEditArtistViewModel_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+        {
+            if (InputModel.HasErrors)
+            {
+                CanSave = false;
+                FirstNameErrorMessage = InputModel.GetFirstError("FirstName");
+                LastNameErrorMessage = InputModel.GetFirstError("LastName");
+            }
+            else if (Artist != null && (Artist.FirstName == InputModel.FirstName && Artist.LastName == InputModel.LastName && Artist.Description == InputModel.Description))
+            {
+                CanSave = false;
+                FirstNameErrorMessage = InputModel.GetFirstError("FirstName");
+                LastNameErrorMessage = InputModel.GetFirstError("LastName");
+            }
+            else
+            {
+                CanSave = true;
+                FirstNameErrorMessage = string.Empty;
+                LastNameErrorMessage = string.Empty;
+            }
+
         }
 
         private void GoBack()
         {
-
             _regionManager.RequestNavigate("content","ArtistList");
-
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -96,36 +127,52 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             
         }
 
-        public void OnNavigatedTo(NavigationContext navigationContext)
+        public virtual Task ResetFormAsync()
         {
-
+            CanSave = false;
             Artist = null;
             FirstNameErrorMessage = string.Empty;
             LastNameErrorMessage = string.Empty;
 
-            Artist = (Artist) navigationContext.Parameters["Artist"];
-            _isEditing = Artist != null;
+            return Task.CompletedTask;
+        }
+
+        public virtual Task SetErrorMessageChangesAsync()
+        {
+            InputModel.ErrorsChanged += AddEditArtistViewModel_ErrorsChanged;
+            return Task.CompletedTask;
+        }
+
+        public virtual Task CheckPassedArtistAsync(Artist artist)
+        {
+            _isEditing = artist != null;
 
             if (!_isEditing)
             {
                 _artistBuilder = new ArtistBuilder();
-                return;
+                return Task.CompletedTask;
             }
 
-            FirstName = Artist.FirstName;
-            LastName = Artist.LastName;
-            Description = Artist.Description;
+            Artist = artist;
+            InputModel.FirstName = artist.FirstName;
+            InputModel.LastName = artist.LastName;
+            InputModel.Description = artist.Description;
+
+            return Task.CompletedTask;
         }
 
-        public void Artist_ErrorsChanged()
+        public void OnNavigatedTo(NavigationContext navigationContext)
         {
+            ResetFormAsync();
 
-            FirstNameErrorMessage = Artist.GetFirstError("FirstName");
-            LastNameErrorMessage = Artist.GetFirstError("LastName");
+            var artist = (Artist) navigationContext.Parameters["Artist"];
 
+            CheckPassedArtistAsync(artist);
+
+            SetErrorMessageChangesAsync();
         }
 
-        private void SaveArtist()
+        private Task SaveArtistAsync()
         {
             if (!_isEditing)
             {
@@ -133,15 +180,15 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
                 {
                     Artist = _artistBuilder
                         .Details
-                            .FirstName(FirstName)
-                            .LastName(LastName)
-                            .Description(Description)
+                            .FirstName(InputModel.FirstName)
+                            .LastName(InputModel.LastName)
+                            .Description(InputModel.Description)
                         .Build();
                 }
                 catch (ValidationException ex)
                 {
                     MessageBox.Show(ex.Message);
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 _artistRepository.Add(Artist);
@@ -149,21 +196,22 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             }
             else
             {
-                _artist.FirstName = FirstName;
-                _artist.LastName = LastName;
-                _artist.Description = Description;
+                Artist.FirstName = InputModel.FirstName;
+                Artist.LastName = InputModel.LastName;
+                Artist.Description = InputModel.Description;
 
                 if (Artist.HasErrors)
                 {
                     MessageBox.Show(Artist.GetFirstError());
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 _artistRepository.Update(Artist);
             }
 
             GoBack();
-
+            return Task.CompletedTask;
         }
+
     }
 }

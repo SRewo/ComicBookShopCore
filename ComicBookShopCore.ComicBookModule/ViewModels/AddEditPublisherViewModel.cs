@@ -71,7 +71,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            CanSave = false;
+            CanSave = true;
 
 
             Publisher = (Publisher)navigationContext.Parameters["publisher"];
