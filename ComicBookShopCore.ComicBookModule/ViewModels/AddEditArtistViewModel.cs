@@ -14,9 +14,10 @@ using ComicBookShopCore.Data.Builders;
 
 namespace ComicBookShopCore.ComicBookModule.ViewModels
 {
-    public class InputModel : ValidableBase
+    public class ArtistInputModel : ValidableBase
     {
         private string _firstName;
+
         [Required(ErrorMessage = "First name cannot be empty.")]
         [CustomValidation.NameValidation(ErrorMessage = "First Name cannot contain special characters.")]
         public string FirstName
@@ -48,12 +49,19 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         private readonly IRegionManager _regionManager;
         private readonly IRepository<Artist> _artistRepository;
         private ArtistBuilder _artistBuilder;
-        private bool _isEditing;
+        public bool IsEditing { get; private set; }
         public DelegateCommand GoBackCommand { get; private set; }
         public DelegateCommand SaveArtistCommand { get; private set; }
 
         public Artist Artist { get; private set; }
-        public InputModel InputModel { get; private set; }
+
+        private ArtistInputModel _inputModel;
+
+        public ArtistInputModel InputModel
+        {
+            get => _inputModel;
+            set => SetProperty(ref _inputModel, value);
+        }
 
         private string _firstNameErrorMessage;
 
@@ -86,30 +94,63 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             GoBackCommand = new DelegateCommand(GoBack);
             SaveArtistCommand = new DelegateCommand((() => SaveArtistAsync()));
             _artistRepository = artistRepository;
-            InputModel = new InputModel();
+            InputModel = new ArtistInputModel();
         }
 
-        private void AddEditArtistViewModel_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+
+        public virtual Task ResetFormAsync()
         {
-            if (InputModel.HasErrors)
+            InputModel = new ArtistInputModel();
+            CanSave = false;
+            Artist = null;
+            FirstNameErrorMessage = string.Empty;
+            LastNameErrorMessage = string.Empty;
+
+            return Task.CompletedTask;
+        }
+
+        public virtual Task SetErrorMessageChangesAsync()
+        {
+            InputModel.PropertyChanged += InputModel_PropertyChanged; 
+            return Task.CompletedTask;
+        }
+
+        private void InputModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+             
+            FirstNameErrorMessage = InputModel.GetFirstError("FirstName");
+            LastNameErrorMessage = InputModel.GetFirstError("LastName");
+            CanSave = !InputModel.HasErrors;
+
+            if (string.IsNullOrWhiteSpace(InputModel.FirstName) || string.IsNullOrWhiteSpace(InputModel.LastName))
             {
                 CanSave = false;
-                FirstNameErrorMessage = InputModel.GetFirstError("FirstName");
-                LastNameErrorMessage = InputModel.GetFirstError("LastName");
-            }
-            else if (Artist != null && (Artist.FirstName == InputModel.FirstName && Artist.LastName == InputModel.LastName && Artist.Description == InputModel.Description))
-            {
-                CanSave = false;
-                FirstNameErrorMessage = InputModel.GetFirstError("FirstName");
-                LastNameErrorMessage = InputModel.GetFirstError("LastName");
-            }
-            else
-            {
-                CanSave = true;
-                FirstNameErrorMessage = string.Empty;
-                LastNameErrorMessage = string.Empty;
+                return;
             }
 
+            if (IsEditing && (Artist.FirstName == InputModel.FirstName && Artist.LastName == InputModel.LastName &&
+                              Artist.Description == InputModel.Description))
+            {
+                CanSave = false;
+            }
+        }
+
+        public virtual Task CheckPassedArtistAsync(Artist artist)
+        {
+            IsEditing = artist != null;
+
+            if (!IsEditing)
+            {
+                _artistBuilder = new ArtistBuilder();
+                return Task.CompletedTask;
+            }
+
+            Artist = artist;
+            InputModel.FirstName = artist.FirstName;
+            InputModel.LastName = artist.LastName;
+            InputModel.Description = artist.Description;
+
+            return Task.CompletedTask;
         }
 
         private void GoBack()
@@ -127,40 +168,6 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             
         }
 
-        public virtual Task ResetFormAsync()
-        {
-            CanSave = false;
-            Artist = null;
-            FirstNameErrorMessage = string.Empty;
-            LastNameErrorMessage = string.Empty;
-
-            return Task.CompletedTask;
-        }
-
-        public virtual Task SetErrorMessageChangesAsync()
-        {
-            InputModel.ErrorsChanged += AddEditArtistViewModel_ErrorsChanged;
-            return Task.CompletedTask;
-        }
-
-        public virtual Task CheckPassedArtistAsync(Artist artist)
-        {
-            _isEditing = artist != null;
-
-            if (!_isEditing)
-            {
-                _artistBuilder = new ArtistBuilder();
-                return Task.CompletedTask;
-            }
-
-            Artist = artist;
-            InputModel.FirstName = artist.FirstName;
-            InputModel.LastName = artist.LastName;
-            InputModel.Description = artist.Description;
-
-            return Task.CompletedTask;
-        }
-
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             ResetFormAsync();
@@ -172,9 +179,11 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
             SetErrorMessageChangesAsync();
         }
 
+
         private Task SaveArtistAsync()
         {
-            if (!_isEditing)
+
+            if (!IsEditing)
             {
                 try
                 {

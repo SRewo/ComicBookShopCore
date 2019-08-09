@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Prism.Modularity;
 using Xunit;
 
 namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
@@ -72,6 +73,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
             var model = mock.Create<AddEditArtistViewModel>();
 
             model.CheckPassedArtistAsync(artist);
+            model.SetErrorMessageChangesAsync();
             model.SaveArtistCommand.Execute();
             mock.Mock<IRepository<Artist>>().Verify(x => x.Update(model.Artist), Times.Once);
         }
@@ -83,6 +85,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
             using var mock = AutoMock.GetLoose();
             var model = mock.Create<AddEditArtistViewModel>();
             model.CheckPassedArtistAsync(null);
+            model.SetErrorMessageChangesAsync();
             model.InputModel.FirstName = artist.FirstName;
             model.InputModel.LastName = artist.LastName;
             model.InputModel.Description = artist.Description;
@@ -136,6 +139,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void CanSave_WithoutFirstName_ReturnsFalse()
         {
             var model = new AddEditArtistViewModel(null, null);
+            model.SetErrorMessageChangesAsync();
             model.InputModel.LastName = "Snyder";
 
             Assert.False(model.CanSave);
@@ -145,6 +149,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void CanSave_WithoutLastName_ReturnsFalse()
         {
             var model = new AddEditArtistViewModel(null, null);
+            model.SetErrorMessageChangesAsync();
             model.InputModel.FirstName = "Scott";
 
             Assert.False(model.CanSave);
@@ -154,6 +159,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void CanSave_WithArtistError_ReturnsFalse()
         {
             var model = new AddEditArtistViewModel(null, null);
+            model.SetErrorMessageChangesAsync();
             model.InputModel.FirstName = "Scott";
             model.InputModel.LastName = "!";
 
