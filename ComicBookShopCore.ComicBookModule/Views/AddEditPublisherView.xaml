@@ -26,17 +26,17 @@
         <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Name:" FontSize="18" FontFamily="Nirmala UI"/>
         <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="30,40,30,20">
 
-            <TextBox HorizontalAlignment="Center" VerticalAlignment="Center" Width="200px" Text="{Binding Publisher.Name, UpdateSourceTrigger=PropertyChanged , Mode=TwoWay, ValidatesOnDataErrors=True}"/>
+            <TextBox HorizontalAlignment="Center" VerticalAlignment="Center" Width="200px" Text="{Binding InputModel.Name, UpdateSourceTrigger=PropertyChanged , Mode=TwoWay, ValidatesOnDataErrors=True}"/>
             <TextBlock Text="{Binding NameErrorMessage}" Width="160px" FontSize="11px" VerticalAlignment="Top" Foreground="Red" TextWrapping="Wrap" FontFamily="Nirmala UI"/>
         </StackPanel>
 
         <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Description:" FontSize="18" FontFamily="Nirmala UI" />
 
-        <TextBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200px"  Height="120px" TextWrapping="Wrap" Text="{Binding Publisher.Description, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200px"  Height="120px" TextWrapping="Wrap" Text="{Binding InputModel.Description, UpdateSourceTrigger=PropertyChanged}"/>
 
         <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Founded:" FontSize="18" FontFamily="Nirmala UI" />
         <StackPanel Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <DatePicker Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="160px" SelectedDate="{Binding Publisher.CreationDateTime , Mode=TwoWay , ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Background="White" BorderThickness="1" BorderBrush="Black" FontSize="18" FontFamily="Nirmala UI"/>
+            <DatePicker Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="160px" SelectedDate="{Binding InputModel.CreationDateTime , Mode=TwoWay , ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" Background="White" BorderThickness="1" BorderBrush="Black" FontSize="18" FontFamily="Nirmala UI"/>
             <TextBlock Text="{Binding DateErrorMessage}" Width="200px" TextWrapping="Wrap" FontSize="11px" VerticalAlignment="Top" Foreground="Red" FontFamily="Nirmala UI" />
         </StackPanel>
 
