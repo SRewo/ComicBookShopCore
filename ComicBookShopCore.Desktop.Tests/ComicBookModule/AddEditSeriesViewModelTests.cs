@@ -4,116 +4,112 @@ using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using Moq;
 using Prism.Regions;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
+using MockQueryable.Moq;
 using Xunit;
 
 namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
 {
     public class AddEditSeriesViewModelTests
     {
-        //[Fact]
-        //public void ResetForm_ValidCall()
-        //{
-        //    var model = new AddEditSeriesViewModel(null,null,null)
-        //    {
-        //        Series = new Series(),
-        //        Publishers = new List<Publisher>(),
-        //        NameErrorMessage = "Test"
-        //    };
-        //    model.ResetForm();
+        [Fact]
+        public void OnNavigatedTo_ValidCall()
+        {
+            var mock = new Mock<AddEditSeriesViewModel>(null, null, null);
+            var model = mock.Object;
 
-        //    Assert.Null(model.Series);
-        //    Assert.Null(model.Publishers);
-        //    Assert.Empty(model.NameErrorMessage);
-        //}
+            model.OnNavigatedTo(new NavigationContext(null,null));
 
-        //[Fact]
-        //public void GetPublishersFromRepository_ValidCall()
-        //{
-        //    using var mock = AutoMock.GetLoose();
-        //    mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
-        //    var model = mock.Create<AddEditSeriesViewModel>();
-        //    model.GetPublishersFromRepository();
+            mock.Verify(x => x.ResetFormAsync(), Times.Once);
+            mock.Verify(x => x.CheckPassedSeriesAsync(null), Times.Once);
+            mock.Verify(x => x.GetPublishersFromRepositoryAsync(), Times.Once);
+            mock.Verify(x => x.SetErrorsChangedEventAsync(), Times.Once);
+        }
 
-        //    mock.Mock<IRepository<Publisher>>().Verify(x => x.GetAll(), Times.Once);
-        //    Assert.NotNull(model.Publishers);
-        //    Assert.Equal(3, model.Publishers.Count);
-        //    Assert.Equal("DC Comics", model.Publishers.First().Name);
-        //}
+        [Fact]
+        public async Task GetPublishersFromRepository_ValidCall()
+        {
+            var mock = TestData.GetPublishersSample().BuildMock();
+            var mockRepository = new Mock<IRepository<Publisher>>();
+            mockRepository.Setup(x => x.GetAll()).Returns(mock.Object);
 
-        //[Fact]
-        //public void SaveSeriesCommand_Adding_ValidExecute()
-        //{
-        //    using var mock = AutoMock.GetLoose();
-        //    var model = mock.Create<AddEditSeriesViewModel>();
-        //    model.Series = new Series();
-        //    model.SaveSeriesCommand.Execute();
+            var model = new AddEditSeriesViewModel(null,mockRepository.Object,null);
+            
+            await model.GetPublishersFromRepositoryAsync().ConfigureAwait(true);
+            Assert.NotNull(model.Publishers);
+            Assert.Equal(3, model.Publishers.Count);
+        }
 
-        //    mock.Mock<IRepository<Series>>().Verify(x => x.Add(model.Series), Times.Once);
-        //}
+        [Fact]
+        public void SaveSeriesCommand_Adding_ValidExecute()
+        {
+            using var mock = AutoMock.GetLoose();
+            var model = mock.Create<AddEditSeriesViewModel>();
+            var series = TestData.GetSeriesSample().First();
+            model.CheckPassedSeriesAsync(null);
+            model.SetErrorsChangedEventAsync();
 
-        //[Fact]
-        //public void SaveSeriesCommand_Updating_ValidExecute()
-        //{
-        //    using var mock = AutoMock.GetLoose();
-        //    var model = mock.Create<AddEditSeriesViewModel>();
-        //    model.Series = new Series(1);
-        //    model.SaveSeriesCommand.Execute();
+            model.InputModel.Name = series.Name;
+            model.InputModel.Description = series.Description;
+            model.InputModel.Publisher = series.Publisher;
 
-        //    mock.Mock<IRepository<Series>>().Verify(x => x.Update(model.Series), Times.Once);
-        //}
+            model.SaveSeriesCommand.Execute();
 
-        //[Fact]
-        //public void GoBackCommand_ValidExecute()
-        //{
-        //    using var mock = AutoMock.GetLoose();
-        //    var model = mock.Create<AddEditSeriesViewModel>();
-        //    model.GoBackCommand.Execute();
+            mock.Mock<IRepository<Series>>().Verify(x => x.Add(model.Series), Times.Once);
+        }
 
-        //    mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content", "SeriesList"), Times.Once);
-        //}
+        [Fact]
+        public void SaveSeriesCommand_Updating_ValidExecute()
+        {
+            using var mock = AutoMock.GetLoose();
+            var model = mock.Create<AddEditSeriesViewModel>();
+            var series = TestData.GetSeriesSample().First();
+            model.CheckPassedSeriesAsync(series);
+            model.SetErrorsChangedEventAsync();
 
-        //[Fact]
-        //public void NameErrorMessage_SetsProperly()
-        //{
-        //    var model = new AddEditSeriesViewModel(null, null, null);
-        //    model.Series = new Series();
-        //    model.Series.ErrorsChanged += model.Series_ErrorsChanged;
-        //    model.Series.Publisher = GetPublishersSample().First();
-        //    model.Series.Name = " ";
+            model.InputModel.Name = "New Name";
 
-        //    Assert.True(model.Series.HasErrors);
-        //    Assert.Equal(model.Series.GetFirstError("Name"), model.NameErrorMessage);
-        //}
-        
-        //[Fact]
-        //public void CanSave_PublisherIsNull_ReturnsFalse()
-        //{
-        //    var model = new AddEditSeriesViewModel(null, null, null);
-        //    model.Series = new Series();
-        //    model.Series.PropertyChanged += model.CanSaveChanged;
-        //    model.Series.Name = "Random Name";
-        //    model.Series.Description = "Rand desc";
+            model.SaveSeriesCommand.Execute();
 
-        //    Assert.False(model.CanSave);
+            mock.Mock<IRepository<Series>>().Verify(x => x.Update(model.Series), Times.Once);
+        }
 
-        //}
+        [Fact]
+        public void GoBackCommand_ValidExecute()
+        {
+            using var mock = AutoMock.GetLoose();
+            var model = mock.Create<AddEditSeriesViewModel>();
+            model.GoBackCommand.Execute();
 
-        //[Fact]
-        //public void CanSave_NameIsNull_ReturnsFalse()
-        //{
-        //    var model = new AddEditSeriesViewModel(null, null, null);
-        //    model.Series = new Series();
-        //    model.Series.PropertyChanged += model.CanSaveChanged;
-        //    model.Series.Name = " ";
-        //    model.Series.Publisher = GetPublishersSample().First();
-        //    model.Series.Description = "Rand desc";
+            mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content", "SeriesList"), Times.Once);
+        }
 
-        //    Assert.False(model.CanSave);
-        //}
+        [Fact]
+        public void NameErrorMessage_SetsProperly()
+        {
+            var model = new AddEditSeriesViewModel(null, null, null);
+            model.CheckPassedSeriesAsync(null);
+            model.SetErrorsChangedEventAsync();
+            model.InputModel.Name = " ";
+
+            Assert.True(model.InputModel.HasErrors);
+            Assert.False(model.CanSave);
+            Assert.Equal(model.InputModel.GetFirstError("Name"), model.NameErrorMessage);
+        }
+
+        [Fact]
+        public void CanSave_PublisherIsNull_ReturnsFalse()
+        {
+            var model = new AddEditSeriesViewModel(null, null, null);
+            model.CheckPassedSeriesAsync(null);
+            model.SetErrorsChangedEventAsync();
+            model.InputModel.Name = "Random Name";
+            model.InputModel.Description = "Rand desc";
+
+            Assert.False(model.CanSave);
+
+        }
 
     }
 }
