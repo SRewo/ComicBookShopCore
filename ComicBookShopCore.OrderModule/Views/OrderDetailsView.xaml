@@ -23,7 +23,7 @@
         </Grid.ColumnDefinitions>
 
         <Label Grid.Row="0" Grid.Column="0" Content="User: " VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <Label Grid.Row="0" Grid.Column="1" Content="{Binding Order.Employee.Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Label Grid.Row="0" Grid.Column="1" Content="{Binding Order.User.Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         <Label Grid.Row="0" Grid.Column="2" Content="Order Date: " VerticalAlignment="Center" HorizontalAlignment="Center"/>
         <Label Grid.Row="0" Grid.Column="3" Content="{Binding Order.Date}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         <DataGrid Grid.Row="1" Grid.ColumnSpan="4" IsReadOnly="True" SelectionMode="Single" ItemsSource="{Binding Order.OrderItems}" AutoGenerateColumns="False" Margin="10,10,10,10">

@@ -72,25 +72,27 @@ namespace ComicBookShopCore.Desktop.Tests
                         .Role("Cover Variant")
                         .Add()
                     .Build(),
-                comicBookBuilder
-                    .Details
-                        .Title("Ant Man Last Days: #1")
-                        .Series(series[1])
-                        .OnSaleDate(new DateTime(2011,10,20))
-                    .Status
-                        .Quantity(15)
-                        .Price(5.99)
-                    .AddArtist
-                        .Artist(artists[2])
-                        .Role("Writer")
-                        .Add()
-                    .AddArtist
-                        .Artist(artists[1])
-                        .Role("Cover Variant")
-                        .Add()
-                    .Build(),
-
+               
             };
+	    comicBookBuilder = new ComicBookBuilder();
+
+            comicBooks.Add(comicBookBuilder
+                .Details
+                .Title("Ant Man Last Days: #1")
+                .Series(series[1])
+                .OnSaleDate(new DateTime(2011, 10, 20))
+                .Status
+                .Quantity(15)
+                .Price(5.99)
+                .AddArtist
+                .Artist(artists[2])
+                .Role("Writer")
+                .Add()
+                .AddArtist
+                .Artist(artists[1])
+                .Role("Cover Variant")
+                .Add()
+                .Build());
             return comicBooks.AsQueryable();
         }
 

@@ -24,7 +24,6 @@ namespace ComicBookShopCore.OrderModule.ViewModels
         private List<ComicBook> _allComicBooks;
         private OrderBuilder _orderBuilder = new OrderBuilder();
         private User _user;
-        private IUnityContainer _container;
 
         public DelegateCommand AddItemCommand { get; set; }
         public DelegateCommand RemoveItemCommand { get; set; }
