@@ -8,230 +8,186 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using ComicBookShopCore.Data.Builders;
+using Unity.Events;
 using Xunit;
 
 namespace ComicBookShopCore.Desktop.Tests.OrderModule
 {
     public class AddOrderViewModelTests
     {
-        //[Fact]
-        //public void CreateOrder_ValidCall()
-        //{
-        //    GlobalVariables.LoggedUser= new User()
-        //    {
-        //        FirstName = "John",
-        //        LastName = "Kent"
-        //    };
-        //    var model = new AddOrderViewModel(null, null, null, null);
-        //    model.CreateOrder();
+        
+        [Fact]
+        public void GetData_ValidCall()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IRepository<ComicBook>>().Setup(x => x.GetAll()).Returns(TestData.GetComicBooksSample);
+            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(TestData.GetPublishersSample);
+            var model = mock.Create<AddOrderViewModel>();
+            model.GetData();
 
-        //    Assert.NotNull(model.Order);
-        //    Assert.NotNull(model.Order.OrderItems);
-        //    Assert.Equal(GlobalVariables.LoggedUser.FirstName, model.Order.Employee.FirstName);
-        //    Assert.Equal(GlobalVariables.LoggedUser.LastName, model.Order.Employee.LastName);
-        //}
+            Assert.NotNull(model.ComicBooks);
+            Assert.NotNull(model.Publishers);
+            Assert.Equal(TestData.GetComicBooksSample().First().Title, model.ComicBooks.First().Title);
+            Assert.Equal(TestData.GetPublishersSample().First().Name, model.Publishers.First().Name);
+        }
 
-        //[Fact]
-        //public void GetData_ValidCall()
-        //{
-        //    using var mock = AutoMock.GetLoose();
-        //    mock.Mock<IRepository<ComicBook>>().Setup(x => x.GetAll()).Returns(GetComicBooksSample());
-        //    mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample());
-        //    var model = mock.Create<AddOrderViewModel>();
-        //    model.GetData();
+        [Fact]
+        public void AddItemCommand_WithoutErrors_ValidCall()
+        {
+            var model = new AddOrderViewModel(null, null, null, null, new User[1]);
+            model.OrderItems = new ObservableCollection<OrderItemInputModel>();
+            model.SelectedComicBook = TestData.GetComicBooksSample().First();
+            model.AddItemCommand.Execute();
 
-        //    Assert.NotNull(model.ComicBooks);
-        //    Assert.NotNull(model.Publishers);
-        //    Assert.Equal(GetComicBooksSample().First().Title, model.ComicBooks.First().Title);
-        //    Assert.Equal(GetPublishersSample().First().Name, model.Publishers.First().Name);
-        //}
+            var actualItem = model.OrderItems.First();
 
-        //[Fact]
-        //public void AddItemCommand_WithoutErrors_ValidCall()
-        //{
-        //    var model = new AddOrderViewModel(null, null, null, null);
-        //    model.Order = new Order();
-        //    model.Order.OrderItems = new ObservableCollection<OrderItem>();
-        //    model.SelectedComicBook = GetComicBooksSample().First();
-        //    model.AddItemCommand.Execute();
+            Assert.NotNull(actualItem);
+            Assert.Equal(model.SelectedComicBook, actualItem.ComicBook);
+            Assert.Equal(0, actualItem.Discount);
+            Assert.Equal(1, actualItem.Quantity);
+        }
 
-        //    var actualItem = model.Order.OrderItems.First();
+        [Fact]
+        public void AddItemCommand_SelectedComicBookIsNull_ValidCall()
+        {
+            var model = new AddOrderViewModel(null, null, null, null, new User[1]);
+            model.OrderItems = new ObservableCollection<OrderItemInputModel>();
+            model.AddItemCommand.Execute();
 
-        //    Assert.NotNull(actualItem);
-        //    Assert.Equal(model.SelectedComicBook, actualItem.ComicBook);
-        //    Assert.Equal(0, actualItem.Discount);
-        //    Assert.Equal(1, actualItem.Quantity);
-        //}
+            Assert.Empty(model.OrderItems);
+        }
 
-        //[Fact]
-        //public void AddItemCommand_SelectedComicBookIsNull_ValidCall()
-        //{
-        //    var model = new AddOrderViewModel(null, null, null, null);
-        //    model.Order = new Order();
-        //    model.Order.OrderItems = new ObservableCollection<OrderItem>();
-        //    model.AddItemCommand.Execute();
+        [Fact]
+        public void AddItemCommand_SelectedComicBookAlreadyInCollection_ValidCall()
+        {
+            var model = new AddOrderViewModel(null, null, null, null, new User[1]);
+            model.OrderItems = new ObservableCollection<OrderItemInputModel>();
+            model.SelectedComicBook = TestData.GetComicBooksSample().First();
+	    model.AddItemCommand.Execute();
+            model.SelectedComicBook = TestData.GetComicBooksSample().First();
+            model.AddItemCommand.Execute();
 
-        //    Assert.Empty(model.Order.OrderItems);
-        //}
+            Assert.Single(model.OrderItems);
+        }
 
-        //[Fact]
-        //public void AddItemCommand_SelectedComicBookAlreadyInCollection_ValidCall()
-        //{
-        //    var model = new AddOrderViewModel(null, null, null, null);
-        //    model.Order = new Order();
-        //    model.Order.OrderItems = new ObservableCollection<OrderItem>();
-        //    model.Order.OrderItems.Add(new OrderItem()
-        //    {
-        //        ComicBook = GetComicBooksSample().First(),
-        //        Discount = 0,
-        //        Quantity = 1
-        //    });
-        //    model.SelectedComicBook = GetComicBooksSample().First();
-        //    model.AddItemCommand.Execute();
+        [Fact]
+        public void RemoveItemCommand_WithoutErrors_ValidCall()
+        {
+            var model = new AddOrderViewModel(null, null, null, null, new User[1]);
+            model.OrderItems = new ObservableCollection<OrderItemInputModel>();
+            model.SelectedComicBook = TestData.GetComicBooksSample().First();
+            model.AddItemCommand.Execute();
+            model.SelectedOrderItem = model.OrderItems.First();
+            model.RemoveItemCommand.Execute();
 
+            Assert.Empty(model.OrderItems);
+        }
 
+        [Fact]
+        public void RemoveItemCommand_SelectedOrderItemIsNull_ValidCall()
+        {
+            var model = new AddOrderViewModel(null, null, null, null, new User[1]);
+            model.OrderItems = new ObservableCollection<OrderItemInputModel>();
+            model.SelectedComicBook = TestData.GetComicBooksSample().First();
+            model.AddItemCommand.Execute();
+            model.SelectedOrderItem = null;
+            model.RemoveItemCommand.Execute();
 
-        //    Assert.Single(model.Order.OrderItems);
-        //}
+            Assert.NotEmpty(model.OrderItems);
+        }
 
-        //[Fact]
-        //public void RemoveItemCommand_WithoutErrors_ValidCall()
-        //{
-        //    var model = new AddOrderViewModel(null, null, null, null);
-        //    model.Order = new Order();
-        //    model.Order.OrderItems = new ObservableCollection<OrderItem>();
-        //    model.Order.OrderItems.Add(new OrderItem()
-        //    {
-        //        ComicBook = GetComicBooksSample().First(),
-        //        Discount = 0,
-        //        Quantity = 1
-        //    });
-        //    model.SelectedOrderItem = model.Order.OrderItems.First();
-        //    model.RemoveItemCommand.Execute();
+        [Fact]
+        public void SelectedPublisherChangedCommand_WithoutSearchWord_ValidCall()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IRepository<ComicBook>>().Setup(x => x.GetAll()).Returns(TestData.GetComicBooksSample);
+            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(TestData.GetPublishersSample);
+            var model = mock.Create<AddOrderViewModel>();
+            model.SelectedPublisher = TestData.GetPublishersSample().First();
+            model.SearchWord = string.Empty;
+            model.GetData();
+            model.SelectedPublisherChangedCommand.Execute();
 
-        //    Assert.Empty(model.Order.OrderItems);
-        //}
+            Assert.Single(model.ComicBooks);
+            Assert.Equal("Dark Nights Metal: #1", model.ComicBooks.First().Title);
+        }
 
-        //[Fact]
-        //public void RemoveItemCommand_SelectedOrderItemIsNull_ValidCall()
-        //{
-        //    var model = new AddOrderViewModel(null, null, null, null);
-        //    model.Order = new Order();
-        //    model.Order.OrderItems = new ObservableCollection<OrderItem>();
-        //    model.Order.OrderItems.Add(new OrderItem()
-        //    {
-        //        ComicBook = GetComicBooksSample().First(),
-        //        Discount = 0,
-        //        Quantity = 1
-        //    });
-        //    model.SelectedOrderItem = null;
-        //    model.RemoveItemCommand.Execute();
+        [Fact]
+        public void SelectedPublisherChanged_WithSearchWord_ValidCall()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IRepository<ComicBook>>().Setup(x => x.GetAll()).Returns(TestData.GetComicBooksSample);
+            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(TestData.GetPublishersSample);
+            var model = mock.Create<AddOrderViewModel>();
+            model.SelectedPublisher = TestData.GetPublishersSample().First();
+            model.GetData();
+            model.SearchWord = "Dark";
+            model.SelectedPublisherChangedCommand.Execute();
 
-        //    Assert.NotEmpty(model.Order.OrderItems);
-        //}
+            Assert.Single(model.ComicBooks);
+            Assert.Equal("Dark Nights Metal: #1", model.ComicBooks.First().Title);
+        }
 
-        //[Fact]
-        //public void SelectedPublisherChangedCommand_WithoutSearchWord_ValidCall()
-        //{
-        //    using var mock = AutoMock.GetLoose();
-        //    mock.Mock<IRepository<ComicBook>>().Setup(x => x.GetAll()).Returns(GetComicBooksSample);
-        //    mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
-        //    var model = mock.Create<AddOrderViewModel>();
-        //    model.SelectedPublisher = GetPublishersSample().First();
-        //    model.SearchWord = string.Empty;
-        //    model.GetData();
-        //    model.SelectedPublisherChangedCommand.Execute();
+        [Fact]
+        public void SearchWordChanged_WithoutPublisher_ValidCall()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IRepository<ComicBook>>().Setup(x => x.GetAll()).Returns(TestData.GetComicBooksSample);
+            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(TestData.GetPublishersSample);
+            var model = mock.Create<AddOrderViewModel>();
+            model.GetData();
+            model.SearchWord = "Ant";
+            model.SearchWordChangedCommand.Execute();
 
-        //    Assert.Single(model.ComicBooks);
-        //    Assert.Equal("Dark Nights Metal: #1", model.ComicBooks.First().Title);
-        //}
+            Assert.Single(model.ComicBooks);
+            Assert.Equal("Ant Man Last Days: #1", model.ComicBooks.First().Title);
+        }
 
-        //[Fact]
-        //public void SelectedPublisherChanged_WithSearchWord_ValidCall()
-        //{
-        //    using var mock = AutoMock.GetLoose();
-        //    mock.Mock<IRepository<ComicBook>>().Setup(x => x.GetAll()).Returns(GetComicBooksSample);
-        //    mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
-        //    var model = mock.Create<AddOrderViewModel>();
-        //    model.SelectedPublisher = GetPublishersSample().First();
-        //    model.GetData();
-        //    model.SearchWord = "Dark";
-        //    model.SelectedPublisherChangedCommand.Execute();
+        [Fact]
+        public void SearchWordChanged_WithPublisher_ValidCall()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IRepository<ComicBook>>().Setup(x => x.GetAll()).Returns(TestData.GetComicBooksSample);
+            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(TestData.GetPublishersSample);
+            var model = mock.Create<AddOrderViewModel>();
+            model.GetData();
+            model.SearchWord = "Ant";
+            model.SelectedPublisher = TestData.GetPublishersSample().ToList()[1];
+            model.SearchWordChangedCommand.Execute();
 
-        //    Assert.Single(model.ComicBooks);
-        //    Assert.Equal("Dark Nights Metal: #1", model.ComicBooks.First().Title);
-        //}
+            Assert.Single(model.ComicBooks);
+            Assert.Equal("Ant Man Last Days: #1", model.ComicBooks.First().Title);
+        }
 
-        //[Fact]
-        //public void SearchWordChanged_WithoutPublisher_ValidCall()
-        //{
-        //    using var mock = AutoMock.GetLoose();
-        //    mock.Mock<IRepository<ComicBook>>().Setup(x => x.GetAll()).Returns(GetComicBooksSample);
-        //    mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
-        //    var model = mock.Create<AddOrderViewModel>();
-        //    model.GetData();
-        //    model.SearchWord = "Ant";
-        //    model.SearchWordChangedCommand.Execute();
+        [Fact]
+        public void SaveOrder_ValidCall()
+        {
+            using var mock = AutoMock.GetLoose();
+            var model = mock.Create<AddOrderViewModel>();
+            model.OrderItems = new ObservableCollection<OrderItemInputModel>();
+            var comicBook = TestData.GetComicBooksSample().First();
+            model.SelectedComicBook = comicBook;
+            model.AddItemCommand.Execute();
+            model.SaveOrderCommand.Execute();
 
-        //    Assert.Single(model.ComicBooks);
-        //    Assert.Equal("Ant Man Last Days: #1", model.ComicBooks.First().Title);
-        //}
+            mock.Mock<IRepository<Order>>().Verify(x => x.Add(model.Order), Times.Once);
+            Assert.Equal(TestData.GetComicBooksSample().First().Quantity -1, comicBook.Quantity);
+        }
 
-        //[Fact]
-        //public void SearchWordChanged_WithPublisher_ValidCall()
-        //{
-        //    using var mock = AutoMock.GetLoose();
-        //    mock.Mock<IRepository<ComicBook>>().Setup(x => x.GetAll()).Returns(GetComicBooksSample);
-        //    mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
-        //    var model = mock.Create<AddOrderViewModel>();
-        //    model.GetData();
-        //    model.SearchWord = "Ant";
-        //    model.SelectedPublisher = GetPublishersSample().ToList()[1];
-        //    model.SearchWordChangedCommand.Execute();
+        [Fact]
+        public void SaveOrder_QuantityIsOverLimit_ValidCall()
+        {
+            using var mock = AutoMock.GetLoose();
+            var model = mock.Create<AddOrderViewModel>();
+            model.OrderItems = new ObservableCollection<OrderItemInputModel>();
+            var comicBook = TestData.GetComicBooksSample().First();
+            model.SelectedComicBook = comicBook;
+            model.AddItemCommand.Execute();
+            model.OrderItems.First().Quantity = 211;
+            Assert.Equal(1, model.OrderItems.First().Quantity);
 
-        //    Assert.Single(model.ComicBooks);
-        //    Assert.Equal("Ant Man Last Days: #1", model.ComicBooks.First().Title);
-        //}
-
-        //[Fact]
-        //public void SaveOrder_ValidCall()
-        //{
-        //    using var mock = AutoMock.GetLoose();
-        //    var model = mock.Create<AddOrderViewModel>();
-        //    model.Order = new Order();
-        //    model.Order.OrderItems = new ObservableCollection<OrderItem>();
-        //    var comicBook = GetComicBooksSample().First();
-        //    model.Order.OrderItems.Add(new OrderItem()
-        //    {
-        //        ComicBook = comicBook,
-        //        Discount = 0,
-        //        Quantity = 1
-        //    }); ;
-        //    model.SaveOrderCommand.Execute();
-
-        //    mock.Mock<IRepository<Order>>().Verify(x => x.Add(model.Order), Times.Once);
-        //    Assert.Equal(9, comicBook.Quantity);
-        //}
-
-        //[Fact]
-        //public void SaveOrder_QuantityIsOverLimit_ValidCall()
-        //{
-        //    using var mock = AutoMock.GetLoose();
-        //    var model = mock.Create<AddOrderViewModel>();
-        //    model.Order = new Order();
-        //    model.Order.OrderItems = new ObservableCollection<OrderItem>();
-        //    var comicBook = GetComicBooksSample().First();
-        //    model.Order.OrderItems.Add(new OrderItem()
-        //    {
-        //        ComicBook = comicBook,
-        //        Discount = 0,
-        //        Quantity = 11
-        //    }); ;
-        //    model.SaveOrderCommand.Execute();
-
-        //    mock.Mock<IRepository<Order>>().Verify(x => x.Add(model.Order), Times.Never);
-        //    Assert.False(model.CanSave);
-        //}
+        }
 
 
     }

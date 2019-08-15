@@ -102,7 +102,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         {
 
                ViewList = SelectedPublisher == null ? AllComicBooks.Where(x => CheckStringEquals(x.Title, SearchWord) || CheckStringEquals(x.Series.Name, SearchWord) || x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name, SearchWord))).ToList() :
-                   AllComicBooks.Where(x =>  x.Series.Publisher.Equals(SelectedPublisher) && (CheckStringEquals(x.Title, SearchWord) || CheckStringEquals(x.Series.Name, SearchWord) || x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name, SearchWord)))).ToList();
+                   AllComicBooks.Where(x =>  x.Series.Publisher.Name.Equals(SelectedPublisher.Name) && (CheckStringEquals(x.Title, SearchWord) || CheckStringEquals(x.Series.Name, SearchWord) || x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name, SearchWord)))).ToList();
 
             
         }

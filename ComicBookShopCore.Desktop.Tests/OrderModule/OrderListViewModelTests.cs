@@ -9,60 +9,48 @@ using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Filters;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.OrderModule.ViewModels;
+using MockQueryable.Moq;
+using Prism.Regions;
 using Xunit;
 
 namespace ComicBookShopCore.Desktop.Tests.OrderModule
 {
     public class OrderListViewModelTests
     {
-        //[Fact]
-        //public void ResetFormAsync_ValidCall()
-        //{
-        //    var model = new OrderListViewModel(null, null, null)
-        //    {
-        //        SearchWord = "Xd", DateTo = new DateTime(1999, 01, 01), DateFrom = new DateTime(1999, 01, 01),
-        //        IsEmployeeSelected = false, IsUserSelected = false
-        //    };
-        //    Task.Run((async () =>
-        //    {
-        //        await model.ResetFormAsync();
-        //        Assert.Empty(model.SearchWord);
-        //    }));
-        //}
+        [Fact]
+        public void ResetFormAsync_ValidCall()
+        {
+            var model = new OrderListViewModel(null, null, null)
+            {
+                SearchWord = "Xd", DateTo = new DateTime(1999, 01, 01), DateFrom = new DateTime(1999, 01, 01),
+                IsEmployeeSelected = false, IsUserSelected = false
+            };
+            Task.Run((async () =>
+            {
+                await model.ResetFormAsync();
+                Assert.Empty(model.SearchWord);
+            }));
+        }
 
-        //[Fact]
-        //public void Search_ValidCall()
-        //{
-        //    var mock = AutoMock.GetLoose();
-        //    mock.Mock<IRepository<Order>>().Setup(x => x.GetAll()).Returns(OrderSample);
-        //    mock.Mock<IRoleFilter>().Setup(x => x.IsInRolesAsync(UserSample()[0])).Returns(new Task<bool>((() => true)));
-        //    var model = mock.Create<OrderListViewModel>();
-        //    Task.Run(async () =>
-        //    {
-        //        model.OnNavigatedTo(null);
-        //        model.SearchWord = "John";
-        //        await model.SearchAsync().ConfigureAwait(true);
-        //        Assert.Single(model.ViewList);
-        //    });
-        //}
-
-        //[Fact]
-        //public void Search_DoubleCall()
-        //{
-        //    var mock = AutoMock.GetLoose();
-        //    mock.Mock<IRepository<Order>>().Setup(x => x.GetAll()).Returns(OrderSample);
-        //    mock.Mock<IRoleFilter>().Setup(x => x.IsInRolesAsync(UserSample()[0])).Returns(new Task<bool>((() => true)));
-        //    var model = mock.Create<OrderListViewModel>();
-        //    Task.Run(async () =>
-        //    {
-        //        model.OnNavigatedTo(null);
-        //        model.SearchWord = "John";
-        //        await model.SearchAsync().ConfigureAwait(true);
-        //        model.DateFrom = new DateTime(2019, 04, 19);
-        //        await model.SearchAsync().ConfigureAwait(true);
-        //        Assert.StrictEqual(2, model.ViewList.Count());
-        //    });
-        //}
+        [Fact]
+        public async Task Search_ValidCall()
+        {
+            var mock = AutoMock.GetLoose();
+            var orderListMock = TestData.OrderSample().BuildMock();
+            mock.Mock<IRepository<Order>>().Setup(x => x.GetAll()).Returns(orderListMock.Object);
+            var taskTrue = Task.FromResult(true);
+            var taskFalse = Task.FromResult(false);
+            mock.Mock<IRoleFilter>().Setup(x => x.IsInRolesAsync(TestData.UserSample()[0])).Returns(taskTrue);
+            mock.Mock<IRoleFilter>().Setup(x => x.IsInRolesAsync(TestData.UserSample()[1])).Returns(taskFalse);
+            var model = mock.Create<OrderListViewModel>();
+            await model.GetDataAsync().ConfigureAwait(true);
+            await model.ResetFormAsync();
+            model.DateFrom = new DateTime(2019,01,01);
+	    model.DateTo = new DateTime(2019, 12,31);
+            model.SearchWord = "John";
+            await model.SearchAsync(mock.Create<IRoleFilter>()).ConfigureAwait(true);
+            Assert.Empty(model.ViewList);
+        }
 
     }
 }
