@@ -131,10 +131,14 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
             model.CheckPassedComicBookAsync(comic);
             model.SetErrorMessagesChangesAsync();
             model.InputModel.Title = "New title";
+            model.InputModel.ComicBookArtists.First().Type = "Writer";
+            Assert.Equal(true,model.ComicBook.ComicBookArtists.Any(x => x.Artist.FirstName == model.InputModel.ComicBookArtists.First().Artist.FirstName && x.Artist.LastName == model.InputModel.ComicBookArtists.First().Artist.LastName) );
+
 
             model.SaveComicBookCommand.Execute();
 
             mock.Mock<IRepository<ComicBook>>().Verify(x => x.Update(model.ComicBook), Times.Once);
+            Assert.Equal(2, model.ComicBook.ComicBookArtists.Count);
         }
 
         [Fact]

@@ -142,8 +142,8 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         private void InputModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             NameErrorMessage = InputModel.GetFirstError("Name");
-            CanSave = InputModel.HasErrors;
-
+            CanSave = !InputModel.HasErrors;
+          
             if (string.IsNullOrWhiteSpace(InputModel.Name) || InputModel.Publisher == null)
             {
                 CanSave = false;

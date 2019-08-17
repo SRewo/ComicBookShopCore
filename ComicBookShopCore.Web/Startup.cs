@@ -37,13 +37,14 @@ namespace ComicBookShopCore.Web
                 options.CheckConsentNeeded = context => true;
             });
 
-            services.AddDbContext<ShopDbEntities>();
+            var connection = @"Server=db;Database=ComicBookShopCore;User=sa;Password=@Dmin123;";
+            services.AddDbContext<ShopDbEntities>(options=> options.UseSqlServer(connection));
 
             services.AddDefaultIdentity<User>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ShopDbEntities>();
 
-            services.AddSingleton<DbContext, ShopDbEntities>();
+            services.AddSingleton<DbContext>(new ShopDbEntities(connection));
             services.AddSingleton<IRepository<ComicBook>, SqlRepository<ComicBook>>();
 
             services.AddControllersWithViews()

@@ -37,7 +37,7 @@
 
         <Label Grid.Row="2" Grid.Column="0" Content="Series:" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontFamily="Nirmala UI"/>
 
-        <ComboBox Grid.Row="2" Grid.Column="1" Width="200px" Height="30px" VerticalAlignment="Center" IsTextSearchEnabled="True" IsEditable="True" ItemsSource="{Binding SeriesList}" SelectedItem="{Binding InputModel.Series}" SelectedValue="{Binding InputModel.Series.Id, Mode=OneWay}" SelectedValuePath="Id" IsSynchronizedWithCurrentItem="True"/>
+        <ComboBox Grid.Row="2" Grid.Column="1" Width="200px" Height="30px" VerticalAlignment="Center" IsTextSearchEnabled="True" IsEditable="True" ItemsSource="{Binding SeriesList}" SelectedItem="{Binding InputModel.Series}"  SelectedValuePath="Id" IsSynchronizedWithCurrentItem="True"/>
 
         <Label Grid.Row="3" Grid.Column="0" Content="Release Date: " VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontFamily="Nirmala UI" />
         <DatePicker SelectedDate="{Binding InputModel.OnSaleDate}" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Width="200px" Height="30px" Background="White" BorderThickness="1" BorderBrush="Black" FontSize="18" FontFamily="Nirmala UI"/>
@@ -57,7 +57,7 @@
         <Label Grid.Row="6" Grid.Column="0" Content="Short Description:" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontFamily="Nirmala UI"/>
         <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding InputModel.ShortDescription}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200px" />
 
-        <Label Grid.Row="7" Grid.Column="0" Content="Short Description:" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontFamily="Nirmala UI"/>
+        <Label Grid.Row="7" Grid.Column="0" Content="Description:" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontFamily="Nirmala UI"/>
         <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding InputModel.Description}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="300px" Height="80px" TextWrapping="Wrap"/>
 
         <ComboBox Grid.Row="1" Grid.Column="3" Width="200px" Height="30px" VerticalAlignment="Center" IsTextSearchEnabled="True" ItemsSource="{Binding Artists, Mode=OneWay}" IsEditable="True" SelectedItem="{Binding SelectedArtist, Mode=TwoWay}" />

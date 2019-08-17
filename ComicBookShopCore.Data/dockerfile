@@ -1,0 +1,10 @@
+FROM microsoft/mssql-server-linux:2017-latest
+
+WORKDIR /db
+EXPOSE 1433
+COPY ComicBookShopCore.mdf ./ComicBookShopCore.mdf
+COPY ComicBookShopCore_log.ldf ./ComicBookShopCore_log.ldf
+ENV SA_PASSWORD=@Dmin123
+ENV MSSQL_PID=Enterprise
+ENV ACCEPT_EULA=Y
+HEALTHCHECK --interval=10s CMD /opt/mssql-tools/bin/sqlcmd -S . -U SA -P @Dmin123 -Q "CREATE DATABASE [ComicBookShopCore] ON (FILENAME = '/db/ComicBookShopCore.mdf'),(FILENAME = '/db/ComicBookShopCore_log.ldf') FOR ATTACH"

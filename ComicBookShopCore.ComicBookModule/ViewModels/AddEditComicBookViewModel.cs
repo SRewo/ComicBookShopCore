@@ -260,9 +260,9 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         {
             ComicBook = (ComicBook) navigationContext.Parameters["ComicBook"];
 
-            var taskList = new List<Task>(2) {CheckPassedComicBookAsync(ComicBook), GetDataAsync()};
+            await GetDataAsync().ConfigureAwait(true);
 
-            await Task.WhenAll().ConfigureAwait(true);
+            CheckPassedComicBookAsync(ComicBook);
 
             SetErrorMessagesChangesAsync();
         }
@@ -408,11 +408,12 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         public Task AddOrEditArtistAsync(ComicBookArtist artist)
         {
             if(artist == null) return Task.CompletedTask;
-            if (ComicBook.ComicBookArtists.Any(x =>  x.Artist.FirstName == artist.Artist.LastName && x.Artist.LastName == artist.Artist.LastName))
+            if (ComicBook.ComicBookArtists.Any(x =>  x.Artist.FirstName == artist.Artist.FirstName && x.Artist.LastName == artist.Artist.LastName))
             {
                 var comicArtist =
-                    ComicBook.ComicBookArtists.Single(x => x.Artist.FirstName == artist.Artist.LastName && x.Artist.LastName == artist.Artist.LastName);
+                    ComicBook.ComicBookArtists.Single(x => x.Artist.FirstName == artist.Artist.FirstName && x.Artist.LastName == artist.Artist.LastName);
                 if (comicArtist.Type != artist.Type) comicArtist.Type = artist.Type;
+
                 return Task.CompletedTask;
             }
 
@@ -423,7 +424,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         public Task CheckAndRemoveArtistsAsync(ComicBookArtist artist)
         {
-            if (!InputModel.ComicBookArtists.Any(x => x.Artist.Equals(artist.Artist)))
+            if (!InputModel.ComicBookArtists.Any(x => x.Artist.FirstName == artist.Artist.FirstName && x.Artist.LastName == artist.Artist.LastName))
                 ComicBook.ComicBookArtists.Remove(artist);
 
             return Task.CompletedTask;

@@ -28,12 +28,12 @@
             <TextBlock Text="{Binding NameErrorMessage}" Width="160px" TextWrapping="Wrap" FontSize="11px" VerticalAlignment="Top" Foreground="Red" FontFamily="Nirmala UI"/>
         </StackPanel>
         <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Publisher:" FontSize="18" FontFamily="Nirmala UI" />
-        <ComboBox Grid.Row="2" Grid.Column="1" Width="200px" Height="40px" ItemsSource="{Binding Publishers, Mode=OneWay}" SelectedItem="{Binding InputModel.Publisher, UpdateSourceTrigger=PropertyChanged}" SelectedValue="{Binding Series.Publisher.Id, Mode=OneWay}" SelectedValuePath="Id" Margin="0,0,10,0" IsSynchronizedWithCurrentItem="True" IsEnabled="{Binding IsAddingSeries}">
+        <ComboBox Grid.Row="2" Grid.Column="1" Width="200px" Height="40px" ItemsSource="{Binding Publishers, Mode=OneWay}" SelectedItem="{Binding InputModel.Publisher, UpdateSourceTrigger=PropertyChanged}" SelectedValue="{Binding InputModel.Publisher.Id, Mode=OneWay}" SelectedValuePath="Id" Margin="0,0,10,0" IsSynchronizedWithCurrentItem="True" IsEnabled="{Binding IsAddingSeries}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <Label Content="{Binding Name}"></Label>
                 </DataTemplate>
-            </ComboBox.ItemTemplate>
+            </ComboBox.ItemTemplate> 
         </ComboBox>
         <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Description:" FontSize="18" FontFamily="Nirmala UI" />
         <TextBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200px"  Height="120px" TextWrapping="Wrap" Text="{Binding InputModel.Description, UpdateSourceTrigger=PropertyChanged}"/>
