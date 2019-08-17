@@ -6,7 +6,10 @@ using Moq;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using Prism.Modularity;
 using Xunit;
 
 namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
@@ -14,42 +17,42 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
     public class AddEditArtistViewModelTests
     {
         [Fact]
-        public void OnNavigatedTo_WithoutParameters_ValidCall()
+        public void OnNavigatedTo_ValidCall()
         {
-            var model = new AddEditArtistViewModel(null, null);
+            var mock = new Mock<AddEditArtistViewModel>(null, null);
+            var model = mock.Object;
             model.OnNavigatedTo(new NavigationContext(null, null));
-
-            Assert.NotNull(model.Artist);
+            
+            mock.Verify(x => x.ResetFormAsync(),Times.Once);
+            mock.Verify(x => x.SetErrorMessageChangesAsync(), Times.Once);
+            mock.Verify(x => x.CheckPassedArtistAsync(null), Times.Once());
         }
 
         [Fact]
-        public void OnNavigatedTo_WithParameter_ValidCall()
+        public void CheckPassedArtist_WithArtist_ValidCall()
         {
-            var artist = new Artist(1)
-            {
-                FirstName = "Scott",
-                LastName = "Snyder",
-                Description = "Some random descryption"
-            };
-            var parameters = new NavigationParameters()
-            {
-                { "Artist", artist }
-            };
-            var uri = new Uri("test?name=value", UriKind.Relative);
+            var artist = TestData.GetArtistSample().ToList()[1];
             var model = new AddEditArtistViewModel(null, null);
 
-            using var mock = AutoMock.GetLoose();
-            IRegion region = new Region();
-            mock.Mock<IRegionNavigationService>().Setup(x => x.Region).Returns(region);
-            var navigationService = mock.Create<IRegionNavigationService>();
+            model.CheckPassedArtistAsync(artist);
 
-            var navigationContext = new NavigationContext(navigationService, uri, parameters);
-            model.OnNavigatedTo(navigationContext);
+            Assert.False(model.CanSave);
+            Assert.Equal(artist.FirstName, model.InputModel.FirstName);
+            Assert.Equal(artist.LastName, model.InputModel.LastName);
+            Assert.Equal(artist.Description, model.InputModel.Description);
+        }
 
-            Assert.NotNull(model.Artist);
-            Assert.Equal(artist.Id, model.Artist.Id);
-            Assert.Equal(artist.Name, model.Artist.Name);
-            Assert.Equal(artist.Description, model.Artist.Description);
+        [Fact]
+        public void CheckPassedArtist_ArtistIsNull_ValidCall()
+        {
+            var model = new AddEditArtistViewModel(null, null);
+
+            model.CheckPassedArtistAsync(null);
+
+            Assert.False(model.CanSave);
+            Assert.Null(model.InputModel.FirstName);
+            Assert.Null(model.InputModel.LastName);
+            Assert.Null(model.InputModel.Description);
         }
 
         [Fact]
@@ -65,46 +68,39 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         [Fact]
         public void SaveArtistCommand_Updating_ValidExecute()
         {
-            var artist = new Artist(1)
-            {
-                FirstName = "Scott",
-                LastName = "Snyder",
-                Description = "Some random descryption"
-            };
+            var artist = TestData.GetArtistSample().ToList()[1];
             using var mock = AutoMock.GetLoose();
             var model = mock.Create<AddEditArtistViewModel>();
-            model.Artist = artist;
-            model.SaveArtistCommand.Execute();
 
-            mock.Mock<IRepository<Artist>>().Verify(x => x.Update(artist), Times.Once);
-            mock.Mock<IRepository<Artist>>().Verify(x => x.Add(artist), Times.Never);
+            model.CheckPassedArtistAsync(artist);
+            model.SetErrorMessageChangesAsync();
+            model.SaveArtistCommand.Execute();
+            mock.Mock<IRepository<Artist>>().Verify(x => x.Update(model.Artist), Times.Once);
         }
 
         [Fact]
         public void SaveArtistCommand_Adding_ValidExecute()
         {
-            var artist = new Artist()
-            {
-                FirstName = "Scott",
-                LastName = "Snyder",
-                Description = "Some random descryption"
-            };
+            var artist = TestData.GetArtistSample().ToList()[0];
             using var mock = AutoMock.GetLoose();
             var model = mock.Create<AddEditArtistViewModel>();
-            model.Artist = artist;
+            model.CheckPassedArtistAsync(null);
+            model.SetErrorMessageChangesAsync();
+            model.InputModel.FirstName = artist.FirstName;
+            model.InputModel.LastName = artist.LastName;
+            model.InputModel.Description = artist.Description;
             model.SaveArtistCommand.Execute();
 
-            mock.Mock<IRepository<Artist>>().Verify(x => x.Update(artist), Times.Never);
-            mock.Mock<IRepository<Artist>>().Verify(x => x.Add(artist), Times.Once);
+            mock.Mock<IRepository<Artist>>().Verify(x => x.Update(model.Artist), Times.Never);
+            mock.Mock<IRepository<Artist>>().Verify(x => x.Add(model.Artist), Times.Once);
         }
 
         [Fact]
         public void FirstNameErrorMessage_SetsProperly()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.ErrorsChanged += model.Artist_ErrorsChanged;
-            model.Artist.FirstName = "";
+            model.SetErrorMessageChangesAsync();
+            model.InputModel.FirstName = "";
 
             var expectedMessage = "First name cannot be empty.";
             var actualMessage = model.FirstNameErrorMessage;
@@ -117,9 +113,9 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void LastNameErrorMessage_SetsProperly()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.ErrorsChanged += model.Artist_ErrorsChanged;
-            model.Artist.LastName = "";
+            model.SetErrorMessageChangesAsync();
+
+            model.InputModel.LastName = "";
 
             var expectedMessage = "Last name cannot be empty.";
             var actualMessage = model.LastNameErrorMessage;
@@ -132,11 +128,10 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void CanSave_ProperArtist_ReturnsTrue()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.PropertyChanged += model.ArtistOnPropertyChanged;
-            model.Artist.FirstName = "Scott";
-            model.Artist.LastName = "Snyder";
-
+            model.SetErrorMessageChangesAsync();
+            model.InputModel.FirstName = "Scott";
+            model.InputModel.LastName = "Snyder";
+            
             Assert.True(model.CanSave);
         }
 
@@ -144,9 +139,8 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void CanSave_WithoutFirstName_ReturnsFalse()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.PropertyChanged += model.ArtistOnPropertyChanged;
-            model.Artist.LastName = "Snyder";
+            model.SetErrorMessageChangesAsync();
+            model.InputModel.LastName = "Snyder";
 
             Assert.False(model.CanSave);
         }
@@ -155,9 +149,8 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void CanSave_WithoutLastName_ReturnsFalse()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.PropertyChanged += model.ArtistOnPropertyChanged;
-            model.Artist.FirstName = "Scott";
+            model.SetErrorMessageChangesAsync();
+            model.InputModel.FirstName = "Scott";
 
             Assert.False(model.CanSave);
         }
@@ -166,10 +159,25 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void CanSave_WithArtistError_ReturnsFalse()
         {
             var model = new AddEditArtistViewModel(null, null);
-            model.Artist = new Artist();
-            model.Artist.PropertyChanged += model.ArtistOnPropertyChanged;
-            model.Artist.FirstName = "Scott";
-            model.Artist.LastName = "!";
+            model.SetErrorMessageChangesAsync();
+            model.InputModel.FirstName = "Scott";
+            model.InputModel.LastName = "!";
+
+            Assert.False(model.CanSave);
+
+        }
+
+        [Fact]
+        public void CanSave_InputValuesEqualsEditedArtist_ReturnsFalse()
+        {
+            var model = new AddEditArtistViewModel(null, null);
+            var artist = TestData.GetArtistSample().ToList()[1];
+            model.SetErrorMessageChangesAsync();
+            model.CheckPassedArtistAsync(artist);
+
+            model.InputModel.FirstName = artist.FirstName;
+            model.InputModel.LastName = artist.LastName;
+            model.InputModel.Description = artist.Description;
 
             Assert.False(model.CanSave);
         }

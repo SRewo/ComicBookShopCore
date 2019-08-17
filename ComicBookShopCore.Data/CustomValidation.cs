@@ -12,20 +12,25 @@ namespace ComicBookShopCore.Data
             protected override ValidationResult IsValid(object value, ValidationContext validationContext)
             {
                 var name = value as string;
-                bool valid = true;
+                var valid = true;
                 foreach(char x in " !\"#$%&()*+,-./:;<=>?@[\\]^_{|}~")
                 {
                     if (name.Contains(x))
                         valid = false;
                 }
-                if (valid)
-                {
-                    return ValidationResult.Success;
-                }
-                else
-                {
-                    return new ValidationResult(ErrorMessage);
-                }
+
+                return valid ? ValidationResult.Success : new ValidationResult(ErrorMessage);
+            }
+        }
+
+        public sealed class PublisherDateValidation : RangeAttribute
+        {
+            public PublisherDateValidation()
+                : base(typeof(DateTime),
+                    "1900-01-01",
+                    DateTime.Now.AddDays(1).ToShortDateString())
+            {
+                ErrorMessage = "You have to choose a date between 01.01.1900 and today";
             }
         }
     }

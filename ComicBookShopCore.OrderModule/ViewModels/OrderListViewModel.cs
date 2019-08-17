@@ -9,8 +9,6 @@ using System.Windows.Documents;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Filters;
 using ComicBookShopCore.Data.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -38,9 +36,12 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         private List<Order> _orders;
 
+        private IRoleFilter _filter;
+
         public OrderListViewModel(IRepository<Order> orderRepository, IRegionManager manager, IUserEmployeeFilterFactory factory)
         {
             _orderRepository = orderRepository;
+            ViewList = new List<Order>();
             _manager = manager;
             _factory = factory;
             InitializeCommandsAsync();
@@ -122,7 +123,7 @@ namespace ComicBookShopCore.OrderModule.ViewModels
 
         public Task ResetFormAsync()
         { 
-
+            
             IsUserSelected = true; 
             IsEmployeeSelected = true;
             DateTo = DateTime.Now; 
@@ -133,22 +134,14 @@ namespace ComicBookShopCore.OrderModule.ViewModels
             return Task.CompletedTask;
         }
 
-        public Task SearchAsync()
+        public Task SearchAsync(IRoleFilter filter)
         {
-            try
-            {
-                var filter = _factory.CheckEmployeeOrUserAsync(IsEmployeeSelected, IsUserSelected).Result;
+	    
                 ViewList = _orders
                     .RoleFilter(filter)
                     .NameFilter(SearchWord)
                     .DateFilter(DateFrom, DateTo)
                     .ToList();
-            }
-            catch
-            {
-                MessageBox.Show("Error");
-            }
-
 
             return Task.CompletedTask;
         }
@@ -161,7 +154,17 @@ namespace ComicBookShopCore.OrderModule.ViewModels
                 ResetFormAsync();
             });
 
-            SearchCommand = new DelegateCommand((() => SearchAsync()));
+            
+
+            SearchCommand = new DelegateCommand((() =>
+            {
+                _filter = _factory.CheckEmployeeOrUserAsync(IsEmployeeSelected, IsUserSelected).Result;	
+                SearchAsync(_filter);
+            }));
+
+             
+
+               
 
             OrderDetailsCommand = new DelegateCommand((() => OpenOrderDetailsAsync()));
 

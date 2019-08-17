@@ -2,36 +2,52 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
 
 namespace ComicBookShopCore.Data
 {
     public class ShopDbEntities : IdentityDbContext<User>
     {
-        public ShopDbEntities() : base()
+        private readonly string _connectionString;
+
+        public ShopDbEntities()
         {
+            var builder = new SqlConnectionStringBuilder();
+            builder.InitialCatalog = "ComicBookShopCore";
+            builder.DataSource = "localhost";
+            builder.UserID = "SA";
+            builder.Password = "@Dmin123";
+            _connectionString = builder.ConnectionString;
+        }
+
+        public ShopDbEntities(string connectionString)
+        {
+            _connectionString = connectionString;
+
             AddRoles();
         }
 
+
         public virtual DbSet<Artist> Artists { get; set; }
-        public virtual DbSet<Publisher> Publishers { get; set; }
         public virtual DbSet<Series> Series { get; set; }
         public virtual DbSet<ComicBook> ComicBooks { get; set; }
         public virtual DbSet<OrderItem> OrderItems { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<User> Employees { get; set; }
+        public virtual DbSet<Publisher> Publishers { get; set; }
         public virtual DbSet<ComicBookArtist> ComicBookArtists { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(
-                @"Data Source = localhost; Initial Catalog = ComicBookShopCore; Integrated Security = true");
+            base.OnConfiguring(optionsBuilder);
+            if (_connectionString == null) return;
+            optionsBuilder.UseSqlServer(_connectionString);
         }
 
         private async Task AddRoles()
         {
-            var roleStore = new RoleStore<IdentityRole>(this);
+            using var roleStore = new RoleStore<IdentityRole>(this);
 
             if (roleStore.Roles.Any()) return;
 

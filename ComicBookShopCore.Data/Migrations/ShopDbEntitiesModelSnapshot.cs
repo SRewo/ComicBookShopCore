@@ -15,7 +15,7 @@ namespace ComicBookShopCore.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.0.0-preview5.19227.1")
+                .HasAnnotation("ProductVersion", "3.0.0-preview7.19362.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -101,7 +101,7 @@ namespace ComicBookShopCore.Data.Migrations
 
                     b.Property<int>("ArtistId");
 
-                    b.Property<int>("ComicBookId");
+                    b.Property<int?>("ComicBookId");
 
                     b.Property<string>("Type");
 
@@ -122,12 +122,12 @@ namespace ComicBookShopCore.Data.Migrations
 
                     b.Property<DateTime>("Date");
 
-                    b.Property<string>("EmployeeId")
+                    b.Property<string>("UserId")
                         .IsRequired();
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -382,18 +382,16 @@ namespace ComicBookShopCore.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ComicBookShopCore.Data.ComicBook", "ComicBook")
+                    b.HasOne("ComicBookShopCore.Data.ComicBook", null)
                         .WithMany("ComicBookArtists")
-                        .HasForeignKey("ComicBookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ComicBookId");
                 });
 
             modelBuilder.Entity("ComicBookShopCore.Data.Order", b =>
                 {
-                    b.HasOne("ComicBookShopCore.Data.User", "Employee")
+                    b.HasOne("ComicBookShopCore.Data.User", "User")
                         .WithMany()
-                        .HasForeignKey("EmployeeId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

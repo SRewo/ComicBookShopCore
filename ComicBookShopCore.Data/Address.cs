@@ -18,5 +18,6 @@ namespace ComicBookShopCore.Data
         public string Country { get; set; }
         [Required]
         public string Region { get; set; }
+
     }
 }

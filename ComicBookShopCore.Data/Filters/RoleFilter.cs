@@ -14,15 +14,15 @@ namespace ComicBookShopCore.Data.Filters
 
     public class RoleFilter : IRoleFilter
     {
-        private static readonly Dictionary<string, IList<User>> _usersInRole = new Dictionary<string, IList<User>>();
+        private static readonly Dictionary<string, IList<User>> UsersInRole = new Dictionary<string, IList<User>>();
         internal RoleFilter(Dictionary<string, bool> roles, ShopDbEntities context)
         {
             Roles = roles;
-            var userStore = new UserStore<User>(context);
+            using var userStore = new UserStore<User>(context);
             foreach (var key in roles.Keys)
             {
-                if(!_usersInRole.ContainsKey(key))
-                    _usersInRole.Add(key, Task.Run((() => userStore.GetUsersInRoleAsync(key))).Result);
+                if(!UsersInRole.ContainsKey(key))
+                    UsersInRole.Add(key, Task.Run((() => userStore.GetUsersInRoleAsync(key))).Result);
             }
         }
 
@@ -42,7 +42,7 @@ namespace ComicBookShopCore.Data.Filters
 
         private Task<bool> CheckRoleAsync(KeyValuePair<string, bool> role, User user)
         {
-            return Task.FromResult(role.Value && _usersInRole[role.Key].Contains(user));
+            return Task.FromResult(role.Value && UsersInRole[role.Key].Contains(user));
         }
     }
 }

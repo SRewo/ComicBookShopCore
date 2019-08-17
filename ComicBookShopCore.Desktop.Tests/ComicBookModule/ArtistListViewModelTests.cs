@@ -53,7 +53,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             var model = new ArtistListViewModel(null, null)
             {
-                SelectedArtist = new Artist()
+                SelectedArtist =  TestData.GetArtistSample().First()
             };
 
             Assert.True(model.IsEditEnabled);
@@ -67,7 +67,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
 
             Assert.False(model.IsEditEnabled);
 
-            model.SelectedArtist = new Artist();
+            model.SelectedArtist = TestData.GetArtistSample().First();
             
             Assert.True(model.IsEditEnabled);
 
@@ -78,11 +78,11 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
 
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Artist>>().Setup(x => x.GetAll()).Returns(GetSampleArtists());
+            mock.Mock<IRepository<Artist>>().Setup(x => x.GetAll()).Returns(TestData.GetArtistSample);
 
             var model = mock.Create<ArtistListViewModel>();
 
-            var expected = GetSampleArtists().ToList();
+            var expected = TestData.GetArtistSample().ToList();
 
             model.GetTable();
             var actual = model.ViewList;
@@ -109,7 +109,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             using var mock = AutoMock.GetLoose();
             var parameters = new NavigationParameters();
-            var artist = new Artist();
+            var artist = TestData.GetArtistSample().First(); 
             parameters.Add("Artist", artist);
 
             mock.Mock<IRegionManager>().Setup(x => x.RequestNavigate("content", "AddEditArtist", parameters));
@@ -125,16 +125,16 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void SearchWordChanged_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Artist>>().Setup(x => x.GetAll()).Returns(GetSampleArtists());
+            mock.Mock<IRepository<Artist>>().Setup(x => x.GetAll()).Returns(TestData.GetArtistSample);
 
             var model = mock.Create<ArtistListViewModel>();
 
             model.GetTable();
 
-            model.SearchWord = "John";
+            model.SearchWord = "Well";
             model.Search();
 
-            var expected = 2;
+            var expected = 1;
             var actual = model.ViewList.Count;
 
             Assert.Equal(expected, actual);
@@ -146,32 +146,6 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
             actual = model.ViewList.Count;
 
             Assert.Equal(expected, actual);
-        }
-
-        private IQueryable<Artist> GetSampleArtists()
-        {
-
-            var testsArtists = new List<Artist>
-            {
-                new Artist
-                {
-                    FirstName = "John",
-                    LastName =  "Mick"
-                },
-                new Artist
-                {
-                    FirstName = "Mark",
-                    LastName = "Well"
-                },
-                new Artist
-                {
-                    FirstName = "John",
-                    LastName = "River"
-                }
-            };
-
-            return testsArtists.AsEnumerable().AsQueryable();
-
         }
 
     }

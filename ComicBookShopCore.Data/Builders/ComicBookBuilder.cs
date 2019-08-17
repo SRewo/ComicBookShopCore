@@ -8,11 +8,12 @@ namespace ComicBookShopCore.Data.Builders
 {
     public class ComicBookBuilder
     {
-        protected ComicBook ComicBook = new ComicBook();
+        protected ComicBook ComicBook = new ComicBook(){ComicBookArtists = new ObservableCollection<ComicBookArtist>()};
 
         public virtual ComicBookStatusBuilder Status => new ComicBookStatusBuilder(ComicBook);
         public virtual ComicBookDescriptionBuilder Description => new ComicBookDescriptionBuilder(ComicBook);
         public virtual ComicBookDetailsBuilder Details => new ComicBookDetailsBuilder(ComicBook);
+        public virtual ComicBookArtistBuilder AddArtist => new ComicBookArtistBuilder(ComicBook);
 
         public ComicBook Build()
         {
@@ -99,11 +100,61 @@ namespace ComicBookShopCore.Data.Builders
             return this;
         }
 
-        public ComicBookDetailsBuilder Artists(ObservableCollection<ComicBookArtist> artists)
+        public ComicBookDetailsBuilder ArtistList(ObservableCollection<ComicBookArtist> list)
         {
-            ComicBook.ComicBookArtists = artists;
+            ComicBook.ComicBookArtists = list;
             return this;
         }
+    }
+
+    public class ComicBookArtistBuilder : ComicBookBuilder
+    {
+        private ComicBookArtist _comicArtist;
+
+        public ComicBookArtistBuilder(ComicBook comicBook)
+        {
+            ComicBook = comicBook;
+            _comicArtist = new ComicBookArtist();
+        }
+
+        public ComicBookArtistBuilder Artist(Artist artist)
+        {
+            _comicArtist.Artist = artist;
+            return this;
+        }
+
+        public ComicBookArtistBuilder Role(string role)
+        {
+            _comicArtist.Type = role;
+            return this;
+        }
+
+        public ComicBookArtistBuilder Artist(ComicBookArtist artist)
+        {
+            _comicArtist = artist;
+            return this;
+        }
+
+        public ComicBookBuilder Add()
+        {
+            _comicArtist.Validate();
+            if (_comicArtist.HasErrors)
+                throw new ValidationException(_comicArtist.GetFirstError());
+
+            ComicBook.ComicBookArtists.Add(_comicArtist);
+
+            return this;
+        }
+
+        public ComicBookArtist BuildComicBookArtist()
+        {
+            _comicArtist.Validate();
+            if (_comicArtist.HasErrors)
+                throw new ValidationException(_comicArtist.GetFirstError());
+
+            return _comicArtist;
+        }
+
     }
 
 }

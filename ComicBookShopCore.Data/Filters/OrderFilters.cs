@@ -9,7 +9,7 @@ namespace ComicBookShopCore.Data.Filters
     {
         public static List<Order> RoleFilter(this List<Order> list, IRoleFilter filter)
         {
-            return list.Where( x => Task.Run(() => filter.IsInRolesAsync(x.Employee)).Result).ToList();
+            return list.Where( x => Task.Run(() => filter.IsInRolesAsync(x.User)).Result).ToList();
         }
 
         public static List<Order> DateFilter(this List<Order> list, DateTime from, DateTime to)
@@ -22,7 +22,7 @@ namespace ComicBookShopCore.Data.Filters
 
         public static List<Order> NameFilter(this List<Order> list, string name)
         {
-            return string.IsNullOrWhiteSpace(name) ? list : list.Where(x => x.Employee.Name.ToLower().Contains(name.ToLower())).ToList();
+            return string.IsNullOrWhiteSpace(name) ? list : list.Where(x => x.User.Name.ToLower().Contains(name.ToLower())).ToList();
         }
 
     }

@@ -4,10 +4,9 @@ using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using Moq;
 using Prism.Regions;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
+using MockQueryable.Moq;
 using Xunit;
 
 namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
@@ -15,33 +14,31 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
     public class AddEditSeriesViewModelTests
     {
         [Fact]
-        public void ResetForm_ValidCall()
+        public void OnNavigatedTo_ValidCall()
         {
-            var model = new AddEditSeriesViewModel(null,null,null)
-            {
-                Series = new Series(),
-                Publishers = new List<Publisher>(),
-                NameErrorMessage = "Test"
-            };
-            model.ResetForm();
+            var mock = new Mock<AddEditSeriesViewModel>(null, null, null);
+            var model = mock.Object;
 
-            Assert.Null(model.Series);
-            Assert.Null(model.Publishers);
-            Assert.Empty(model.NameErrorMessage);
+            model.OnNavigatedTo(new NavigationContext(null,null));
+
+            mock.Verify(x => x.ResetFormAsync(), Times.Once);
+            mock.Verify(x => x.CheckPassedSeriesAsync(null), Times.Once);
+            mock.Verify(x => x.GetPublishersFromRepositoryAsync(), Times.Once);
+            mock.Verify(x => x.SetErrorsChangedEventAsync(), Times.Once);
         }
 
         [Fact]
-        public void GetPublishersFromRepository_ValidCall()
+        public async Task GetPublishersFromRepository_ValidCall()
         {
-            using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
-            var model = mock.Create<AddEditSeriesViewModel>();
-            model.GetPublishersFromRepository();
+            var mock = TestData.GetPublishersSample().BuildMock();
+            var mockRepository = new Mock<IRepository<Publisher>>();
+            mockRepository.Setup(x => x.GetAll()).Returns(mock.Object);
 
-            mock.Mock<IRepository<Publisher>>().Verify(x => x.GetAll(), Times.Once);
+            var model = new AddEditSeriesViewModel(null,mockRepository.Object,null);
+            
+            await model.GetPublishersFromRepositoryAsync().ConfigureAwait(true);
             Assert.NotNull(model.Publishers);
             Assert.Equal(3, model.Publishers.Count);
-            Assert.Equal("DC Comics", model.Publishers.First().Name);
         }
 
         [Fact]
@@ -49,7 +46,14 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             using var mock = AutoMock.GetLoose();
             var model = mock.Create<AddEditSeriesViewModel>();
-            model.Series = new Series();
+            var series = TestData.GetSeriesSample().First();
+            model.CheckPassedSeriesAsync(null);
+            model.SetErrorsChangedEventAsync();
+
+            model.InputModel.Name = series.Name;
+            model.InputModel.Description = series.Description;
+            model.InputModel.Publisher = series.Publisher;
+
             model.SaveSeriesCommand.Execute();
 
             mock.Mock<IRepository<Series>>().Verify(x => x.Add(model.Series), Times.Once);
@@ -60,7 +64,12 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             using var mock = AutoMock.GetLoose();
             var model = mock.Create<AddEditSeriesViewModel>();
-            model.Series = new Series(1);
+            var series = TestData.GetSeriesSample().First();
+            model.CheckPassedSeriesAsync(series);
+            model.SetErrorsChangedEventAsync();
+
+            model.InputModel.Name = "New Name";
+
             model.SaveSeriesCommand.Execute();
 
             mock.Mock<IRepository<Series>>().Verify(x => x.Update(model.Series), Times.Once);
@@ -80,67 +89,27 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void NameErrorMessage_SetsProperly()
         {
             var model = new AddEditSeriesViewModel(null, null, null);
-            model.Series = new Series();
-            model.Series.ErrorsChanged += model.Series_ErrorsChanged;
-            model.Series.Publisher = GetPublishersSample().First();
-            model.Series.Name = " ";
+            model.CheckPassedSeriesAsync(null);
+            model.SetErrorsChangedEventAsync();
+            model.InputModel.Name = " ";
 
-            Assert.True(model.Series.HasErrors);
-            Assert.Equal(model.Series.GetFirstError("Name"), model.NameErrorMessage);
+            Assert.True(model.InputModel.HasErrors);
+            Assert.False(model.CanSave);
+            Assert.Equal(model.InputModel.GetFirstError("Name"), model.NameErrorMessage);
         }
-        
+
         [Fact]
         public void CanSave_PublisherIsNull_ReturnsFalse()
         {
             var model = new AddEditSeriesViewModel(null, null, null);
-            model.Series = new Series();
-            model.Series.PropertyChanged += model.CanSaveChanged;
-            model.Series.Name = "Random Name";
-            model.Series.Description = "Rand desc";
+            model.CheckPassedSeriesAsync(null);
+            model.SetErrorsChangedEventAsync();
+            model.InputModel.Name = "Random Name";
+            model.InputModel.Description = "Rand desc";
 
             Assert.False(model.CanSave);
 
         }
 
-        [Fact]
-        public void CanSave_NameIsNull_ReturnsFalse()
-        {
-            var model = new AddEditSeriesViewModel(null, null, null);
-            model.Series = new Series();
-            model.Series.PropertyChanged += model.CanSaveChanged;
-            model.Series.Name = " ";
-            model.Series.Publisher = GetPublishersSample().First();
-            model.Series.Description = "Rand desc";
-
-            Assert.False(model.CanSave);
-        }
-
-
-        private IQueryable<Publisher> GetPublishersSample()
-        {
-            var tmp = new List<Publisher>()
-            {
-                new Publisher()
-                {
-                    Name = "DC Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1934"),
-                    Description = "Some random description."
-                },
-                new Publisher()
-                {
-                    Name = "Marvel Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1939"),
-                    Description = "Another description"
-                },
-                new Publisher()
-                {
-                    Name = "Dark Horse Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1986"),
-                    Description = " American comic book and manga publisher."
-                }
-            };
-
-            return tmp.AsEnumerable().AsQueryable();
-        }
     }
 }

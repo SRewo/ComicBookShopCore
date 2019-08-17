@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
 using ComicBookShopCore.Data;
 using Prism.Commands;
+using Prism.Mvvm;
 using Prism.Regions;
 
 namespace ComicBookShopCore.OrderModule.ViewModels
 {
-    public class OrderDetailsViewModel : ValidableBase, INavigationAware
+    public class OrderDetailsViewModel : BindableBase, INavigationAware
     {
         private readonly IRegionManager _manager;
 

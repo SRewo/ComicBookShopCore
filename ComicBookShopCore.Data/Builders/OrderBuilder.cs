@@ -9,7 +9,7 @@ namespace ComicBookShopCore.Data.Builders
         protected Order Order = new Order(){ OrderItems = new ObservableCollection<OrderItem>()};
 
         public OrderDetailsBuilder Details => new OrderDetailsBuilder(Order);
-        public OrderOrderItemBuilder AddItem => new OrderOrderItemBuilder(Order);
+        public OrderOrderItemBuilder Item => new OrderOrderItemBuilder(Order);
 
         public Order Build()
         {
@@ -62,6 +62,17 @@ namespace ComicBookShopCore.Data.Builders
             Order.OrderItems.Add(_item);
             return this;
         }
+
+        public OrderItem BuildItem()
+        {
+            _item.Validate();
+            if (_item.HasErrors)
+            {
+                throw new ValidationException(_item.GetFirstError());
+            }
+
+            return _item;
+        }
     }
 
     public class OrderDetailsBuilder : OrderBuilder
@@ -77,9 +88,15 @@ namespace ComicBookShopCore.Data.Builders
             return this;
         }
 
-        public OrderDetailsBuilder Employee(User employee)
+        public OrderDetailsBuilder User(User user)
         {
-            Order.Employee = employee;
+            Order.User = user;
+            return this;
+        }
+
+        public OrderDetailsBuilder OrderItemList(ObservableCollection<OrderItem> list)
+        {
+            Order.OrderItems = list;
             return this;
         }
     }

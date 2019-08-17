@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using MockQueryable.Moq;
 using Xunit;
 
 namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
@@ -18,91 +20,67 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         [Fact]
         public void AddArtistCommand_ValidExecute()
         {
-            var model = new AddEditComicBookViewModel(null, null, null, null, null);
-            model.ComicBook = new ComicBook();
-            model.ComicBook.ComicBookArtists = new ObservableCollection<ComicBookArtist>();
-            model.SelectedArtist = new Artist(1)
-            {
-                FirstName = "Scott",
-                LastName = "Snyder",
-                Description = "Some random description"
-            };
+            var model = new AddEditComicBookViewModel(null, null, null, null );
+            model.CheckPassedComicBookAsync(null);
+            model.SelectedArtist = TestData.GetArtistSample().First();
             model.AddArtistCommand.Execute();
 
-            Assert.NotEmpty(model.ComicBook.ComicBookArtists);
-            
+
+            Assert.NotEmpty(model.InputModel.ComicBookArtists);
+
         }
 
         [Fact]
         public void AddArtistCommand_AlreadyInCollection()
         {
-            var model = new AddEditComicBookViewModel(null, null, null, null, null);
-            model.ComicBook = new ComicBook();
-            model.ComicBook.ComicBookArtists = new ObservableCollection<ComicBookArtist>();
-            model.SelectedArtist = new Artist(1)
-            {
-                FirstName = "Scott",
-                LastName = "Snyder",
-                Description = "Some random description"
-            };
-            model.ComicBook.ComicBookArtists.Add(new ComicBookArtist() {
-                Artist = model.SelectedArtist,
-                ComicBook = model.ComicBook,
-                Type = "Writer"
-            });
+            var model = new AddEditComicBookViewModel(null, null, null, null);
+            model.CheckPassedComicBookAsync(null);
+            model.SelectedArtist = TestData.GetArtistSample().First();
+            model.AddArtistCommand.Execute();
+            model.SelectedArtist = TestData.GetArtistSample().First();
             model.AddArtistCommand.Execute();
 
-            Assert.NotEmpty(model.ComicBook.ComicBookArtists);
-            Assert.Single(model.ComicBook.ComicBookArtists);
-            Assert.Equal(model.SelectedArtist.Name, model.ComicBook.ComicBookArtists[0].Artist.Name);
+            Assert.NotEmpty(model.InputModel.ComicBookArtists);
+            Assert.Single(model.InputModel.ComicBookArtists);
+            Assert.Equal(model.SelectedArtist.Name, model.InputModel.ComicBookArtists[0].Artist.Name);
         }
 
         [Fact]
         public void RemoveArtist_ValidExecute()
         {
-            var model = new AddEditComicBookViewModel(null, null, null, null, null);
-            model.ComicBook = new ComicBook();
-            model.ComicBook.ComicBookArtists = new ObservableCollection<ComicBookArtist>();
-            model.SelectedArtist = new Artist(1)
-            {
-                FirstName = "Scott",
-                LastName = "Snyder",
-                Description = "Some random description"
-            };
-            model.ComicBook.ComicBookArtists.Add(new ComicBookArtist()
-            {
-                Artist = model.SelectedArtist,
-                ComicBook = model.ComicBook,
-                Type = "Writer"
-            });
-            model.SelectedComicBookArtist = model.ComicBook.ComicBookArtists[0];
+            var model = new AddEditComicBookViewModel(null, null, null, null);
+            model.CheckPassedComicBookAsync(null);
+            model.SelectedArtist = TestData.GetArtistSample().First();
+            model.AddArtistCommand.Execute();
+            model.SelectedComicBookArtist = model.InputModel.ComicBookArtists.First();
+
             model.RemoveArtistCommand.Execute();
 
-            Assert.Empty(model.ComicBook.ComicBookArtists);
+            Assert.Empty(model.InputModel.ComicBookArtists);
         }
 
         [Fact]
         public void TitleErrorMessage_DisplaysProperly()
         {
-            var model = new AddEditComicBookViewModel(null, null, null, null, null);
-            model.ComicBook = new ComicBook();
-            model.ComicBook.ErrorsChanged += model.ComicBook_ErrorsChanged;
-            model.ComicBook.Title = " ";
+            var model = new AddEditComicBookViewModel(null, null, null, null );
+            model.CheckPassedComicBookAsync(null);
+            model.SetErrorMessagesChangesAsync();
+            model.InputModel.Title = " ";
 
-            Assert.True(model.ComicBook.HasErrors);
+            Assert.True(model.InputModel.HasErrors);
             Assert.False(model.CanSave);
-            Assert.Equal("Comic book title cannot be empty.", model.TitleErrorMessage);
+            Assert.Equal(model.InputModel.GetFirstError("Title"), model.TitleErrorMessage);
         }
 
         [Fact]
         public void PriceErrorMessage_DisplaysProperly()
         {
-            var model = new AddEditComicBookViewModel(null, null, null, null, null);
-            model.ComicBook = new ComicBook();
-            model.ComicBook.ErrorsChanged += model.ComicBook_ErrorsChanged;
-            model.ComicBook.Price = -1;
+            var model = new AddEditComicBookViewModel(null, null, null, null );
+            model.CheckPassedComicBookAsync(null);
+            model.SetErrorMessagesChangesAsync();
+            model.InputModel.Price = -1;
 
-            Assert.True(model.ComicBook.HasErrors);
+            Assert.True(model.InputModel.HasErrors);
             Assert.False(model.CanSave);
             Assert.Equal("Please enter valid price.", model.PriceErrorMessage);
         }
@@ -110,12 +88,13 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         [Fact]
         public void QuantityErrorMessage_DisplaysProperly()
         {
-            var model = new AddEditComicBookViewModel(null, null, null, null, null);
-            model.ComicBook = new ComicBook();
-            model.ComicBook.ErrorsChanged += model.ComicBook_ErrorsChanged;
-            model.ComicBook.Quantity = -1;
+            var model = new AddEditComicBookViewModel(null, null, null, null );
+            model.CheckPassedComicBookAsync(null);
+            model.SetErrorMessagesChangesAsync();
 
-            Assert.True(model.ComicBook.HasErrors);
+            model.InputModel.Quantity = -1;
+
+            Assert.True(model.InputModel.HasErrors);
             Assert.False(model.CanSave);
             Assert.Equal("Please enter valid value.", model.QuantityErrorMessage);
         }
@@ -125,9 +104,21 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             using var mock = AutoMock.GetLoose();
             var model = mock.Create<AddEditComicBookViewModel>();
-            model.ComicBook = new ComicBook();
-            model.SaveComicBookCommand.Execute();
+            model.CheckPassedComicBookAsync(null);
+            model.SetErrorMessagesChangesAsync();
+            var comic = TestData.GetComicBooksSample().First();
 
+            model.InputModel.Title = comic.Title;
+            model.InputModel.Series = comic.Series;
+            model.InputModel.Price = comic.Price;
+            model.InputModel.Quantity = comic.Quantity;
+            model.InputModel.OnSaleDate = comic.OnSaleDate;
+            model.SelectedArtist = comic.ComicBookArtists.First().Artist;
+	    model.AddArtistCommand.Execute();
+
+            model.SaveComicBookCommand.Execute();
+            Assert.False(model.InputModel.HasErrors);
+            Assert.True(model.CanSave);
             mock.Mock<IRepository<ComicBook>>().Verify(x => x.Add(model.ComicBook), Times.Once);
         }
 
@@ -136,30 +127,34 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             using var mock = AutoMock.GetLoose();
             var model = mock.Create<AddEditComicBookViewModel>();
-            model.ComicBook = new ComicBook(1);
-            model.GetComicBook(null);
+            var comic = TestData.GetComicBooksSample().First();
+            model.CheckPassedComicBookAsync(comic);
+            model.SetErrorMessagesChangesAsync();
+            model.InputModel.Title = "New title";
+            model.InputModel.ComicBookArtists.First().Type = "Writer";
+            Assert.Equal(true,model.ComicBook.ComicBookArtists.Any(x => x.Artist.FirstName == model.InputModel.ComicBookArtists.First().Artist.FirstName && x.Artist.LastName == model.InputModel.ComicBookArtists.First().Artist.LastName) );
+
+
             model.SaveComicBookCommand.Execute();
 
             mock.Mock<IRepository<ComicBook>>().Verify(x => x.Update(model.ComicBook), Times.Once);
+            Assert.Equal(2, model.ComicBook.ComicBookArtists.Count);
         }
 
         [Fact]
-        public void GetData_ValidCall()
+        public async Task GetData_ValidCall()
         {
-            using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Artist>>().Setup(x => x.GetAll()).Returns(GetSampleArtists);
-            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(GetSeriesSample);
+            var mockArtistData = TestData.GetArtistSample().BuildMock();
+            var mockSeriesData = TestData.GetSeriesSample().BuildMock();
+            var mock = AutoMock.GetLoose();
+            mock.Mock<IRepository<Artist>>().Setup(x => x.GetAll()).Returns(mockArtistData.Object);
+            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(mockSeriesData.Object);
             var model = mock.Create<AddEditComicBookViewModel>();
-            model.GetData();
 
-            mock.Mock<IRepository<Artist>>().Verify(x => x.GetAll(), Times.Once);
+            await model.GetDataAsync().ConfigureAwait(true);
+            
             mock.Mock<IRepository<Series>>().Verify(x => x.GetAll(), Times.Once);
-
-            Assert.NotEmpty(model.Artists);
-            Assert.NotEmpty(model.SeriesList);
-
-            Assert.Equal(GetSampleArtists().Count(), model.Artists.Count);
-            Assert.Equal(GetSeriesSample().Count(), model.SeriesList.Count);
+            mock.Mock<IRepository<Artist>>().Verify(x => x.GetAll(), Times.Once);
         }
 
         [Fact]
@@ -167,91 +162,10 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             using var mock = AutoMock.GetLoose();
             var model = mock.Create<AddEditComicBookViewModel>();
-            model.ComicBook = new ComicBook();
-            model.ComicBook.ComicBookArtists = new ObservableCollection<ComicBookArtist>();
             model.GoBackCommand.Execute();
 
-            mock.Mock<IRepository<ComicBook>>().Verify(x => x.Reload(model.ComicBook), Times.Once);
             mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content", "ComicBookList"), Times.Once);
         }
 
-
-
-        private IQueryable<Artist> GetSampleArtists()
-        {
-
-            var testsArtists = new List<Artist>
-            {
-                new Artist
-                {
-                    FirstName = "John",
-                    LastName =  "Mick"
-                },
-                new Artist
-                {
-                    FirstName = "Mark",
-                    LastName = "Well"
-                },
-                new Artist
-                {
-                    FirstName = "John",
-                    LastName = "River"
-                }
-            };
-
-            return testsArtists.AsEnumerable().AsQueryable();
-
-        }
-
-        private IQueryable<Series> GetSeriesSample()
-        {
-            var publishers = GetPublishersSample().ToList();
-            var series = new List<Series>()
-            {
-                new Series(1)
-                {
-                    Name = "Dark Nights Metal",
-                    Description = "Series one",
-                    Publisher = publishers[0]
-                },
-                new Series(2)
-                {
-                    Name = "Ant-Man: Last Days",
-                    Description = "Ant-Man",
-                    Publisher = publishers[1]
-                }
-            };
-
-            return series.AsEnumerable().AsQueryable();
-
-        }
-
-        private IQueryable<Publisher> GetPublishersSample()
-        {
-            var tmp = new List<Publisher>()
-            {
-                new Publisher(1)
-                {
-                    Name = "DC Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1934"),
-                    Description = "Some random description."
-                },
-                new Publisher(2)
-                {
-                    Name = "Marvel Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1939"),
-                    Description = "Another description"
-                },
-                new Publisher(3)
-                {
-                    Name = "Dark Horse Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1986"),
-                    Description = " American comic book and manga publisher."
-                }
-            };
-
-            return tmp.AsEnumerable().AsQueryable();
-        }
     }
-
 }

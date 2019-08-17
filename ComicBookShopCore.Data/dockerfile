@@ -1,0 +1,11 @@
+FROM microsoft/mssql-server-linux:2017-latest
+
+WORKDIR /db
+EXPOSE 1433
+ENV SA_PASSWORD=@Dmin123
+ENV MSSQL_PID=Enterprise
+ENV ACCEPT_EULA=Y
+COPY database.sql ./database.sql
+RUN ( /opt/mssql/bin/sqlservr --accept-eula & ) | grep -q "Service Broker manager has started" \
+    && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P '@Dmin123' -i /db/database.sql \
+    && pkill sqlservr 

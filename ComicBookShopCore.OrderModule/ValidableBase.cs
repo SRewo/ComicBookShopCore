@@ -7,7 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Prism.Mvvm;
 
-namespace ComicBookShopCore.Data
+namespace ComicBookShopCore.OrderModule
 {
     public class ValidableBase : BindableBase, INotifyDataErrorInfo
     {
@@ -77,13 +77,5 @@ namespace ComicBookShopCore.Data
 
         }
 
-        public void Validate()
-        {
-            var obj = this;
-            foreach (var prop in obj.GetType().GetProperties())
-            {
-                ValidateProperty(prop.Name, prop.GetValue(obj));
-            }
-        }
     }
 }

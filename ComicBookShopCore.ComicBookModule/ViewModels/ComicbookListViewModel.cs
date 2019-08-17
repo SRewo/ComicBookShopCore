@@ -1,6 +1,5 @@
 ﻿using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -8,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace ComicBookShopCore.ComicBookModule.ViewModels
 {
@@ -102,7 +102,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         {
 
                ViewList = SelectedPublisher == null ? AllComicBooks.Where(x => CheckStringEquals(x.Title, SearchWord) || CheckStringEquals(x.Series.Name, SearchWord) || x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name, SearchWord))).ToList() :
-                   AllComicBooks.Where(x =>  x.Series.Publisher.Equals(SelectedPublisher) && (CheckStringEquals(x.Title, SearchWord) || CheckStringEquals(x.Series.Name, SearchWord) || x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name, SearchWord)))).ToList();
+                   AllComicBooks.Where(x =>  x.Series.Publisher.Name.Equals(SelectedPublisher.Name) && (CheckStringEquals(x.Title, SearchWord) || CheckStringEquals(x.Series.Name, SearchWord) || x.ComicBookArtists.Any(z => CheckStringEquals(z.Artist.Name, SearchWord)))).ToList();
 
             
         }

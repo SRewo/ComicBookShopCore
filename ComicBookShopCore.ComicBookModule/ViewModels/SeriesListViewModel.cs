@@ -98,7 +98,7 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         {
 
                 var series = SelectedPublisher == null ? _allSeries.Where(c => c.Name.ToLower().Contains(SearchWord.Trim().ToLower())) : 
-                    _allSeries.Where(c => c.Name.ToLower().Contains(SearchWord.Trim().ToLower()) && c.Publisher.Id.Equals(SelectedPublisher.Id));
+                    _allSeries.Where(c => c.Name.ToLower().Contains(SearchWord.Trim().ToLower()) && c.Publisher.Name.Equals(SelectedPublisher.Name));
 
                 ViewList = series.ToList();
 

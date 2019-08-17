@@ -27,7 +27,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             var model = new SeriesListViewModel(null, null, null)
             {
-                SelectedSeries = new Series()
+                SelectedSeries = TestData.GetSeriesSample().First()
             };
 
             Assert.True(model.IsEditEnabled);
@@ -50,7 +50,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void OpenEdit_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            var series = new Series();
+            var series = TestData.GetSeriesSample().First();
             var parameters = new NavigationParameters()
                 {
                     { "series",series }
@@ -69,7 +69,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
             var model = new SeriesListViewModel(null, null, null)
             {
                 SearchWord = "Word",
-                SelectedPublisher = new Publisher()
+                SelectedPublisher = TestData.GetPublishersSample().First()
             };
             model.ResetSearchCommand.Execute();
 
@@ -81,10 +81,10 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void GetPublisherData_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
+            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(TestData.GetPublishersSample);
             var model = mock.Create<SeriesListViewModel>();
             model.GetPublisherData();
-            var expectedCount = GetPublishersSample().Count();
+            var expectedCount = TestData.GetPublishersSample().Count();
             var actualCount = model.Publishers.Count;
 
             mock.Mock<IRepository<Publisher>>().Verify(x => x.GetAll(), Times.Once);
@@ -95,10 +95,10 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void GetSeriesData_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(GetSeriesSample);
+            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(TestData.GetSeriesSample);
             var model = mock.Create<SeriesListViewModel>();
             model.GetSeriesData();
-            var expectedCount = GetSeriesSample().Count();
+            var expectedCount = TestData.GetSeriesSample().Count();
             var actualCount = model.ViewList.Count;
 
             mock.Mock<IRepository<Series>>().Verify(x => x.GetAll(), Times.Once);
@@ -109,10 +109,10 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void Search_SelectedPublisherChanged_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(GetSeriesSample);
+            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(TestData.GetSeriesSample);
             var model = mock.Create<SeriesListViewModel>();
             model.GetSeriesData();
-            model.SelectedPublisher = GetPublishersSample().First();
+            model.SelectedPublisher = TestData.GetPublishersSample().First();
             model.SearchWord = String.Empty;
             model.Search();
             var expectedCount = 1;
@@ -128,7 +128,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void Search_SearchWordChanged_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(GetSeriesSample);
+            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(TestData.GetSeriesSample);
             var model = mock.Create<SeriesListViewModel>();
             model.GetSeriesData();
             model.SearchWord = "Ant";
@@ -146,67 +146,18 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void Search_SearchWordAndPublisherChanged_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(GetSeriesSample);
+            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(TestData.GetSeriesSample);
             var model = mock.Create<SeriesListViewModel>();
             model.GetSeriesData();
             model.SearchWord = "Ant";
             model.SearchWordChanged.Execute();
-            model.SelectedPublisher = GetPublishersSample().ToList()[2];
+            model.SelectedPublisher = TestData.GetPublishersSample().ToList()[2];
             model.SelectedPublisherChanged.Execute();
             var expectedCount = 0;
             var actualCount = model.ViewList.Count;
-
+            
             Assert.Equal(expectedCount, actualCount);
         }
 
-        private IQueryable<Series> GetSeriesSample()
-        {
-            var publishers = GetPublishersSample().ToList();
-            var series = new List<Series>()
-            {
-                new Series(1)
-                {
-                    Name = "Dark Nights Metal",
-                    Description = "Series one",
-                    Publisher = publishers[0]
-                },
-                new Series(2)
-                {
-                    Name = "Ant-Man: Last Days",
-                    Description = "Ant-Man",
-                    Publisher = publishers[1]
-                }
-            };
-
-            return series.AsEnumerable().AsQueryable();
-
-        }
-
-        private IQueryable<Publisher> GetPublishersSample()
-        {
-            var tmp = new List<Publisher>()
-            {
-                new Publisher(1)
-                {
-                    Name = "DC Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1934"),
-                    Description = "Some random description."
-                },
-                new Publisher(2)
-                {
-                    Name = "Marvel Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1939"),
-                    Description = "Another description"
-                },
-                new Publisher(3)
-                {
-                    Name = "Dark Horse Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1986"),
-                    Description = " American comic book and manga publisher."
-                }
-            };
-
-            return tmp.AsEnumerable().AsQueryable();
-        }
     }
 }

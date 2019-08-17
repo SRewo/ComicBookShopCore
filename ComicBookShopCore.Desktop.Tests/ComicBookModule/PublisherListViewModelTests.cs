@@ -55,7 +55,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             var model = new PublishersListViewModel(null, null)
             {
-                SelectedPublisher = new Publisher()
+                SelectedPublisher = TestData.GetPublishersSample().First() 
             };
 
             Assert.True(model.IsEditEnabled);
@@ -69,7 +69,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
 
             Assert.False(model.IsEditEnabled);
 
-            model.SelectedPublisher= new Publisher();
+            model.SelectedPublisher = TestData.GetPublishersSample().First(); 
 
             Assert.True(model.IsEditEnabled);
 
@@ -79,11 +79,11 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void GetData_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(GetPublishersSample);
+            mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(TestData.GetPublishersSample);
             var model = mock.Create<PublishersListViewModel>();
             model.GetData();
 
-            var expected = GetPublishersSample().Count();
+            var expected = TestData.GetPublishersSample().Count();
             var actual = model.ViewList.Count;
 
             Assert.NotNull(model.ViewList);
@@ -106,7 +106,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void OpenEdit_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            var publisher = new Publisher();
+            var publisher = TestData.GetPublishersSample().First(); 
             var parameters = new NavigationParameters()
                 {
                     {"publisher",publisher}
@@ -120,31 +120,5 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
             mock.Mock<IRegionManager>().Verify(x => x.RequestNavigate("content", "AddEditPublisher", parameters), Times.Once);
         }
 
-        private IQueryable<Publisher> GetPublishersSample()
-        {
-            var tmp = new List<Publisher>()
-            {
-                new Publisher()
-                {
-                    Name = "DC Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1934"),
-                    Description = "Some random description."
-                },
-                new Publisher()
-                {
-                    Name = "Marvel Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1939"),
-                    Description = "Another description"
-                },
-                new Publisher()
-                {
-                    Name = "Dark Horse Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1986"),
-                    Description = " American comic book and manga publisher."
-                }
-            };
-
-            return tmp.AsEnumerable().AsQueryable();
-        }
     }
 }

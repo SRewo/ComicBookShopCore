@@ -8,12 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="3.0.0-preview4-19123-01" />
-    <PackageReference Include="Prism.Core" Version="7.2.0.1233-pre" />
-    <PackageReference Include="Prism.Unity" Version="7.2.0.1038-pre" />
+    <PackageReference Include="Prism.Core" Version="7.2.0.1367" />
+    <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ComicBookShopCore.ComicBookModule\ComicBookShopCore.ComicBookModule.csproj" />
+    <ProjectReference Include="..\ComicBookShopCore.Data\ComicBookShopCore.Data.csproj" />
     <ProjectReference Include="..\ComicBookShopCore.EmployeeModule\ComicBookShopCore.EmployeeModule.csproj" />
     <ProjectReference Include="..\ComicBookShopCore.OrderModule\ComicBookShopCore.OrderModule.csproj" />
   </ItemGroup>

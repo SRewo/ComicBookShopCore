@@ -6,6 +6,7 @@ using System.Text;
 using Autofac.Extras.Moq;
 using ComicBookShopCore.ComicBookModule.ViewModels;
 using ComicBookShopCore.Data;
+using ComicBookShopCore.Data.Builders;
 using ComicBookShopCore.Data.Interfaces;
 using Moq;
 using Prism.Regions;
@@ -56,7 +57,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             var model = new ComicBookListViewModel(null, null, null)
             {
-                SelectedComicBook = new ComicBook()
+                SelectedComicBook = TestData.GetComicBooksSample().First()
             };
 
             Assert.True(model.IsEditEnabled);
@@ -70,7 +71,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
 
             Assert.False(model.IsEditEnabled);
 
-            model.SelectedComicBook = new ComicBook();
+            model.SelectedComicBook = TestData.GetComicBooksSample().First(); 
 
             Assert.True(model.IsEditEnabled);
 
@@ -91,7 +92,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void OpenEditCommand_ValidExecute()
         {
             using var mock = AutoMock.GetLoose();
-            var comicBook = new ComicBook();
+            var comicBook = TestData.GetComicBooksSample().First(); 
             var navigationParameters = new NavigationParameters()
                 {
                     {"ComicBook", comicBook }
@@ -108,7 +109,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void GetComicBooks_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            var comicBooks = GetComicBooksSample();
+            var comicBooks = TestData.GetComicBooksSample();
             mock.Mock<IRepository<ComicBook>>().Setup(x => x.GetAll()).Returns(comicBooks);
             var model = mock.Create<ComicBookListViewModel>();
             model.GetComicBooks();
@@ -127,7 +128,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         public void GetPublishers_ValidCall()
         {
             using var mock = AutoMock.GetLoose();
-            var publishers = GetPublishersSample();
+            var publishers = TestData.GetPublishersSample();
             mock.Mock<IRepository<Publisher>>().Setup(x => x.GetAll()).Returns(publishers);
             var model = mock.Create<ComicBookListViewModel>();
             model.GetPublishers();
@@ -147,7 +148,7 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             var model = new ComicBookListViewModel(null, null, null)
             {
-                AllComicBooks = GetComicBooksSample().ToList(),
+                AllComicBooks = TestData.GetComicBooksSample().ToList(),
                 SearchWord = "Ant"
             };
             model.SearchWordChanged.Execute();
@@ -162,8 +163,8 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             var model = new ComicBookListViewModel(null, null, null)
             {
-                AllComicBooks = GetComicBooksSample().ToList(),
-                SelectedPublisher = GetPublishersSample().First()
+                AllComicBooks = TestData.GetComicBooksSample().ToList(),
+                SelectedPublisher = TestData.GetPublishersSample().First()
             };
             model.SearchWord = string.Empty;
             model.SelectedPublisherChanged.Execute();
@@ -179,8 +180,8 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             var model = new ComicBookListViewModel(null, null, null)
             {
-                AllComicBooks = GetComicBooksSample().ToList(),
-                SelectedPublisher = GetPublishersSample().First()
+                AllComicBooks = TestData.GetComicBooksSample().ToList(),
+                SelectedPublisher = TestData.GetPublishersSample().First()
             };
             model.SearchWord = string.Empty;
             model.SelectedPublisherChanged.Execute();
@@ -195,11 +196,11 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             var model = new ComicBookListViewModel(null, null, null)
             {
-                AllComicBooks = GetComicBooksSample().ToList(),
+                AllComicBooks = TestData.GetComicBooksSample().ToList(),
                 SearchWord = "Ant"
             };
             model.SearchWordChanged.Execute();
-            model.SelectedPublisher = GetPublishersSample().ToList()[1];
+            model.SelectedPublisher = TestData.GetPublishersSample().ToList()[1];
             model.SelectedPublisherChanged.Execute();
 
             Assert.NotEmpty(model.ViewList);
@@ -212,11 +213,11 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         {
             var model = new ComicBookListViewModel(null, null, null)
             {
-                AllComicBooks = GetComicBooksSample().ToList(),
+                AllComicBooks = TestData.GetComicBooksSample().ToList(),
                 SearchWord = "Ant"
             };
             model.SearchWordChanged.Execute();
-            model.SelectedPublisher = GetPublishersSample().ToList()[1];
+            model.SelectedPublisher = TestData.GetPublishersSample().ToList()[1];
             model.SelectedPublisherChanged.Execute();
             model.ResetSearchCommand.Execute();
 
@@ -224,136 +225,5 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
             Assert.Empty(model.SearchWord);
             Assert.Equal(model.AllComicBooks.Count, model.ViewList.Count);
         }
-
-
-        private IQueryable<ComicBook> GetComicBooksSample()
-        {
-            var series = GetSeriesSample().ToList();
-            var artists = GetSampleArtists().ToList();
-
-            var comicBooks = new List<ComicBook>()
-            {
-                new ComicBook()
-                {
-                    Title = "Dark Nights Metal: #1",
-                    Series = series[0],
-                    Price = 9.99,
-                    Quantity = 10,
-                    OnSaleDate = new DateTime(2010,12,10),
-                    ComicBookArtists = new ObservableCollection<ComicBookArtist>()
-                    {
-                        new ComicBookArtist()
-                        {
-                            Artist = artists[0],
-                            Type = "Writer"
-                        },
-                        new ComicBookArtist()
-                        {
-                            Artist = artists[1],
-                            Type = "Cover Variant"
-                        },
-                    }
-                },
-                new ComicBook()
-                {
-                    Title = "Ant Man Last Days: #1",
-                    Series = series[1],
-                    Price = 5.99,
-                    Quantity = 15,
-                    OnSaleDate = new DateTime(2011,10,20),
-                    ComicBookArtists = new ObservableCollection<ComicBookArtist>()
-                    {
-                        new ComicBookArtist()
-                        {
-                            Artist = artists[2],
-                            Type = "Writer"
-                        },
-                        new ComicBookArtist()
-                        {
-                            Artist = artists[1],
-                            Type = "Cover Variant"
-                        },
-                    }
-                }
-            };
-            return comicBooks.AsQueryable();
-        }
-
-        private IQueryable<Series> GetSeriesSample()
-        {
-            var publishers = GetPublishersSample().ToList();
-            var series = new List<Series>()
-            {
-                new Series(1)
-                {
-                    Name = "Dark Nights Metal",
-                    Description = "Series one",
-                    Publisher = publishers[0]
-                },
-                new Series(2)
-                {
-                    Name = "Ant-Man: Last Days",
-                    Description = "Ant-Man",
-                    Publisher = publishers[1]
-                }
-            };
-
-            return series.AsQueryable();
-
-        }
-
-        private IQueryable<Publisher> GetPublishersSample()
-        {
-            var tmp = new List<Publisher>()
-            {
-                new Publisher(1)
-                {
-                    Name = "DC Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1934"),
-                    Description = "Some random description."
-                },
-                new Publisher(2)
-                {
-                    Name = "Marvel Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1939"),
-                    Description = "Another description"
-                },
-                new Publisher(3)
-                {
-                    Name = "Dark Horse Comics",
-                    CreationDateTime = DateTime.Parse("01.01.1986"),
-                    Description = " American comic book and manga publisher."
-                }
-            };
-
-            return tmp.AsEnumerable().AsQueryable();
-        }
-
-        private IQueryable<Artist> GetSampleArtists()
-        {
-
-            var testsArtists = new List<Artist>
-            {
-                new Artist
-                {
-                    FirstName = "John",
-                    LastName =  "Mick"
-                },
-                new Artist
-                {
-                    FirstName = "Mark",
-                    LastName = "Well"
-                },
-                new Artist
-                {
-                    FirstName = "John",
-                    LastName = "River"
-                }
-            };
-
-            return testsArtists.AsQueryable();
-
-        }
-
     }
 }

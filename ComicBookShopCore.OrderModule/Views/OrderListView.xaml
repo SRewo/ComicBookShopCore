@@ -72,9 +72,8 @@
 
         <DataGrid Grid.Row="2" ItemsSource="{Binding ViewList}" IsReadOnly="True" AutoGenerateColumns="False" SelectedItem="{Binding SelectedOrder}" SelectionMode="Single" Background="#f5f5f5" Margin="40,20,40,20">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
                 <DataGridTextColumn Header="Order Date" Binding="{Binding Date}"/>
-                <DataGridTextColumn Header="User/Employee" Binding="{Binding Employee.Name}"/>
+                <DataGridTextColumn Header="User/Employee" Binding="{Binding User.Name}"/>
                 <DataGridTextColumn Header="Total price" Binding="{Binding TotalPrice, StringFormat={}{0:C}}"/>
             </DataGrid.Columns>
         </DataGrid>

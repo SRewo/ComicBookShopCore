@@ -67,7 +67,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <DataGrid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="40,20,40,20" SelectedItem="{Binding SelectedOrderItem}" ItemsSource="{Binding Order.OrderItems}" AutoGenerateColumns="False" SelectionMode="Single" CanUserAddRows="False" CanUserDeleteRows="True">
+        <DataGrid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="40,20,40,20" SelectedItem="{Binding SelectedOrderItem}" ItemsSource="{Binding OrderItems}" AutoGenerateColumns="False" SelectionMode="Single" CanUserAddRows="False" CanUserDeleteRows="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding ComicBook.Title}" Header="Name" IsReadOnly="True"/>
                 <DataGridTextColumn Binding="{Binding Quantity, ValidatesOnDataErrors=True}" Header="Quantity"/>
