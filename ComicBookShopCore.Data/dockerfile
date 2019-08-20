@@ -1,7 +1,7 @@
 FROM microsoft/mssql-server-linux:2017-latest
 
 WORKDIR /db
-EXPOSE 1433
+EXPOSE 1533
 ENV SA_PASSWORD=@Dmin123
 ENV MSSQL_PID=Enterprise
 ENV ACCEPT_EULA=Y
