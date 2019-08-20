@@ -12,35 +12,29 @@ using Microsoft.Extensions.Logging;
 
 namespace ComicBookShopCore.WebAPI.Controllers
 {
-    public class ArtistInputModel{
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Description { get; set; }
-    }
-
     [ApiController]
     [Route("api/[controller]")]
     public class ArtistController : ControllerBase
     {
         private readonly ILogger<ArtistController> _logger;
-        private readonly IRepository<Artist> _artistRepository;
+        private readonly IAsyncRepository<Artist> _artistRepository;
 
-        public ArtistController(ILogger<ArtistController> logger, IRepository<Artist> artistRepository)
+        public ArtistController(ILogger<ArtistController> logger, IAsyncRepository<Artist> artistRepository)
         {
             _logger = logger;
             _artistRepository = artistRepository;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Artist>>> Get()
+        public Task<IEnumerable<Artist>> Get()
         {
-            return await _artistRepository.GetAll().ToListAsync().ConfigureAwait(true);
+            return _artistRepository.GetAllAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Artist>> GetArtist(int id)
         {
-            var item = await _artistRepository.GetAll().SingleOrDefaultAsync(x => x.Id == id).ConfigureAwait(true);
+            var item = await _artistRepository.GetByIdAsync(id).ConfigureAwait(true);
 
             if (item == null)
             {
@@ -49,35 +43,35 @@ namespace ComicBookShopCore.WebAPI.Controllers
             return item;
         }
 
-        [HttpPut]
-        public ActionResult Put([FromBody]Artist artist)
+        [HttpPost]
+        public async Task<ActionResult> Post([FromBody]Artist artist)
         {
             artist.Validate();
             if (artist.HasErrors)
                 return ValidationProblem();
 
-            _artistRepository.Add(artist);
+            await _artistRepository.AddAsync(artist).ConfigureAwait(true);
             return Created(nameof(Get), null);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var item = await _artistRepository.GetAll().SingleOrDefaultAsync(x => x.Id == id).ConfigureAwait(true);
+            var item = await _artistRepository.GetByIdAsync(id).ConfigureAwait(true);
 
             if (item == null)
             {
                 return NotFound();
             }
-            _artistRepository.Delete(item);
+            await _artistRepository.DeleteAsync(item).ConfigureAwait(true);
 
             return NoContent();
         }
 
-        [HttpPatch("{id}")]
-        public async Task<ActionResult> Patch(int id, [FromBody] Artist artist)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put(int id, [FromBody] Artist artist)
         {
-            var item = await _artistRepository.GetAll().SingleOrDefaultAsync(x => x.Id == id).ConfigureAwait(true);
+            var item = await _artistRepository.GetByIdAsync(id).ConfigureAwait(true);
             if (item == null) return NotFound();
             item.FirstName = artist.FirstName;
             item.LastName = artist.LastName;
@@ -87,7 +81,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
             {
                 return ValidationProblem();
             }
-            _artistRepository.Update(item);
+            await _artistRepository.UpdateAsync(item).ConfigureAwait(true);
 
             return Created(nameof(GetArtist), id);
         }

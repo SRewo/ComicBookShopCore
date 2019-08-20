@@ -30,9 +30,9 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         [Fact]
         public async Task GetPublishersFromRepository_ValidCall()
         {
-            var mock = TestData.GetPublishersSample().BuildMock();
+            var mock = TestData.GetPublishersSample();
             var mockRepository = new Mock<IRepository<Publisher>>();
-            mockRepository.Setup(x => x.GetAll()).Returns(mock.Object);
+            mockRepository.Setup(x => x.GetAll()).Returns(mock);
 
             var model = new AddEditSeriesViewModel(null,mockRepository.Object,null);
             

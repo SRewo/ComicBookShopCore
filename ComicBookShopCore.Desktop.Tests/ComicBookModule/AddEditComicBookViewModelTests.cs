@@ -144,11 +144,11 @@ namespace ComicBookShopCore.Desktop.Tests.ComicBookModule
         [Fact]
         public async Task GetData_ValidCall()
         {
-            var mockArtistData = TestData.GetArtistSample().BuildMock();
-            var mockSeriesData = TestData.GetSeriesSample().BuildMock();
+            var mockArtistData = TestData.GetArtistSample();
+            var mockSeriesData = TestData.GetSeriesSample();
             var mock = AutoMock.GetLoose();
-            mock.Mock<IRepository<Artist>>().Setup(x => x.GetAll()).Returns(mockArtistData.Object);
-            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(mockSeriesData.Object);
+            mock.Mock<IRepository<Artist>>().Setup(x => x.GetAll()).Returns(mockArtistData);
+            mock.Mock<IRepository<Series>>().Setup(x => x.GetAll()).Returns(mockSeriesData);
             var model = mock.Create<AddEditComicBookViewModel>();
 
             await model.GetDataAsync().ConfigureAwait(true);

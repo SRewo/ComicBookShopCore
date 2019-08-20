@@ -28,10 +28,11 @@ namespace ComicBookShopCore.WebAPI
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
+        { 
+            var connection = @"Server=db;Database=ComicBookShopCore;User=sa;Password=@Dmin123;";
             services.AddControllers();
-            services.AddSingleton<DbContext>(new ShopDbEntities());
-            services.AddSingleton<IRepository<Artist>,SqlRepository<Artist>>();
+            services.AddSingleton<DbContext>(new ShopDbEntities(connection));
+            services.AddSingleton<IAsyncRepository<Artist>,SqlAsyncRepository<Artist>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

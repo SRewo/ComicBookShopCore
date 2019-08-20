@@ -36,8 +36,8 @@ namespace ComicBookShopCore.Desktop.Tests.OrderModule
         public async Task Search_ValidCall()
         {
             var mock = AutoMock.GetLoose();
-            var orderListMock = TestData.OrderSample().BuildMock();
-            mock.Mock<IRepository<Order>>().Setup(x => x.GetAll()).Returns(orderListMock.Object);
+            var orderListMock = TestData.OrderSample();
+            mock.Mock<IRepository<Order>>().Setup(x => x.GetAll()).Returns(orderListMock);
             var taskTrue = Task.FromResult(true);
             var taskFalse = Task.FromResult(false);
             mock.Mock<IRoleFilter>().Setup(x => x.IsInRolesAsync(TestData.UserSample()[0])).Returns(taskTrue);
