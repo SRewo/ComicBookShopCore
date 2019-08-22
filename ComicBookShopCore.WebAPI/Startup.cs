@@ -24,14 +24,13 @@ namespace ComicBookShopCore.WebAPI
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         { 
-            var connection = @"Server=db;Database=ComicBookShopCore;User=sa;Password=@Dmin123;";
             services.AddControllers();
-            services.AddSingleton<DbContext>(new ShopDbEntities(connection));
+            services.AddSingleton<DbContext>(new ShopDbEntities(Configuration.GetSection("CONNECTION_STRING").Value));
             services.AddSingleton<IAsyncRepository<Artist>,SqlAsyncRepository<Artist>>();
         }
 
@@ -53,6 +52,11 @@ namespace ComicBookShopCore.WebAPI
             {
                 endpoints.MapControllers();
             });
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
+
         }
     }
 }

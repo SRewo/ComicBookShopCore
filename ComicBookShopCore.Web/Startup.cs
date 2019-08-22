@@ -26,7 +26,7 @@ namespace ComicBookShopCore.Web
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -37,7 +37,7 @@ namespace ComicBookShopCore.Web
                 options.CheckConsentNeeded = context => true;
             });
 
-            var connection = @"Server=db;Database=ComicBookShopCore;User=sa;Password=@Dmin123;";
+            var connection = Configuration.GetSection("CONNECTION_STRING").Value;
             services.AddDbContext<ShopDbEntities>(options=> options.UseSqlServer(connection));
 
             services.AddDefaultIdentity<User>()
@@ -86,7 +86,10 @@ namespace ComicBookShopCore.Web
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
-
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
             
         }
     }
