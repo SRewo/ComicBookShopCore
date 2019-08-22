@@ -1,16 +1,39 @@
 # ComicBookShopCore
 
-ComicBookShopCore is a simple WPF/ASP MVC core application for managing a comic book store.
+ComicBookShopCore is a group of .net core 3.0 apps for managing a comic book store. At the moment, the project consists of:
+* ComicBookShopCore.Data - library used for communication with database
+* ComicBookShopCore.Desktop - WPF + Prism app designed for managing data and taking in store orders
+* ComicBookShopCore.WebAPI - Asp.net web API 
+* ComicBookShopCore.Web - ASP.NET MVC website designed for taking online users orders
+* ComicBookShopCore.*.Tests - Xuit tests for listed above apps
 
-## Requirements
-
-* Visual Studio 2017/2019
-* .net Core 3.0
-* MSSQL Database
+Project created is mainly for educational purposes.
 
 ## Instalation
 
-After cloning project and migrating the database, create a new user using registration provided on web page (ComicBokkShopCore.Web).
+Project contains docker containers for db and web projects and also few make commands:
+```
+make build [APP=container] - for building all/single container
+make start [APP=container] - for starting all/single container and its dependencies
+make stop [APP=container] - for stopping all/single container
+make restart [APP=container] - for restarting all/single container
+```
+
+Docker containers:
+* ***db*** - mssql database with sample data
+  - default port: _1533_
+  - default sa password: @Dmin123 (can be changed in .env file)
+  - default asp identity credentials for loging in apps:
+```
+Login: Admin
+Password: @Dmin123
+```
+* ***web*** - container with asp.net mvc website
+  - default port: _8080_
+* ***webapi*** - container with asp.net WebAPI
+  - default port: _8081_
+  
+By default, library and WPF app are using a database provided by docker.
 
 ## Built With
 
