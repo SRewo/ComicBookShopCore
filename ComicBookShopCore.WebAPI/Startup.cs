@@ -31,7 +31,8 @@ namespace ComicBookShopCore.WebAPI
         { 
             services.AddControllers();
             services.AddSingleton<DbContext>(new ShopDbEntities(Configuration.GetSection("CONNECTION_STRING").Value));
-            services.AddSingleton<IAsyncRepository<Artist>,SqlAsyncRepository<Artist>>();
+            services.AddSingleton<Data.Interfaces.IAsyncRepository<Artist>, Data.Repositories.SqlAsyncRepository<Artist>>();
+            services.AddSingleton<IAsyncRepository<Publisher>, SqlAsyncRepository<Publisher>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
