@@ -109,11 +109,44 @@ namespace ComicBookShopCore.WebAPI.Tests.Controllers
         }
 
         [Fact]
-        public async Task Update_ValidCall_ReturnsCreatedResult()
+        public async Task Put_ValidCall_ReturnsCreatedResult()
         {
             var mock = AutoMock.GetLoose();
             var publisher = TestData.GetPublishersSample().First();
-	    
+            mock.Mock<IAsyncRepository<Publisher>>().Setup(x => x.GetByIdAsync(1)).Returns(Task.FromResult(publisher));
+
+            var controller = mock.Create<PublisherController>();
+	    publisher.Name = "DC Comics";
+            var result = await controller.Put(1, publisher).ConfigureAwait(true);
+            
+	    Assert.IsType<CreatedResult>(result);
+            mock.Mock<IAsyncRepository<Publisher>>().Verify(x=> x.UpdateAsync(publisher), Times.Once);
+        }
+
+        [Fact]
+        public async Task Put_InvalidId_ReturnsNotFoundResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<PublisherController>();
+            var publisher = TestData.GetPublishersSample().First();
+
+           var result = await controller.Put(1, publisher);
+           Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Put_InvalidPublisher_ReturnsBadRequestResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var publisher = TestData.GetPublishersSample().First();
+            mock.Mock<IAsyncRepository<Publisher>>().Setup(x => x.GetByIdAsync(1)).Returns(Task.FromResult(publisher));
+
+            var controller = mock.Create<PublisherController>();
+            publisher.Name = "";
+            var result = await controller.Put(1, publisher);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+	    mock.Mock<IAsyncRepository<Publisher>>().Verify(x => x.UpdateAsync(publisher), Times.Never);
         }
     }
 }
