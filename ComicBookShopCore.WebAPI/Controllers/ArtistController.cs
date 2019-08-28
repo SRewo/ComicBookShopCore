@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using ComicBookShopCore.Data;
-using ComicBookShopCore.Data.Interfaces;
+using ComicBookShopCore.Services.Artist;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace ComicBookShopCore.WebAPI.Controllers
 {
@@ -16,25 +15,23 @@ namespace ComicBookShopCore.WebAPI.Controllers
     [Route("api/[controller]")]
     public class ArtistController : ControllerBase
     {
-        private readonly ILogger<ArtistController> _logger;
-        private readonly IAsyncRepository<Artist> _artistRepository;
+        private readonly IArtistService _artistService;
 
-        public ArtistController(ILogger<ArtistController> logger, IAsyncRepository<Artist> artistRepository)
+        public ArtistController(IArtistService artistService)
         {
-            _logger = logger;
-            _artistRepository = artistRepository;
+            _artistService = artistService;
         }
 
         [HttpGet]
-        public Task<IEnumerable<Artist>> Get()
+        public Task<IEnumerable<ArtistDto>> Get()
         {
-            return _artistRepository.GetAllAsync();
+            return _artistService.ListAsync();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Artist>> GetArtist(int id)
+        public async Task<ActionResult<ArtistDetailsDto>> GetArtist(int id)
         {
-            var item = await _artistRepository.GetByIdAsync(id).ConfigureAwait(true);
+            var item = await _artistService.DetailsAsync(id).ConfigureAwait(true);
 
             if (item == null)
             {
@@ -44,44 +41,49 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody]Artist artist)
+        public async Task<ActionResult> Post([FromBody]ArtistDetailsDto artist)
         {
-            artist.Validate();
-            if (artist.HasErrors)
+            try
+            {
+                await _artistService.AddArtistAsync(artist).ConfigureAwait(true);
+            }
+            catch(ValidationException)
+            {
                 return ValidationProblem();
-
-            await _artistRepository.AddAsync(artist).ConfigureAwait(true);
+            }
+            
             return Created(nameof(Get), null);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var item = await _artistRepository.GetByIdAsync(id).ConfigureAwait(true);
-
-            if (item == null)
+            try
+            {
+                await _artistService.DeleteArtistAsync(id).ConfigureAwait(true);
+            }
+            catch (NullReferenceException)
             {
                 return NotFound();
             }
-            await _artistRepository.DeleteAsync(item).ConfigureAwait(true);
-
             return NoContent();
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Artist artist)
+        public async Task<ActionResult> Put(int id, [FromBody] ArtistDetailsDto artist)
         {
-            var item = await _artistRepository.GetByIdAsync(id).ConfigureAwait(true);
-            if (item == null) return NotFound();
-            item.FirstName = artist.FirstName;
-            item.LastName = artist.LastName;
-            item.Description = artist.Description;
-	    item.Validate();
-            if (item.HasErrors)
+            try
             {
-                return ValidationProblem();
+                await _artistService.UpdateArtistAsync(id, artist).ConfigureAwait(true);
             }
-            await _artistRepository.UpdateAsync(item).ConfigureAwait(true);
+            catch (NullReferenceException)
+            {
+                return NotFound();
+            }
+            catch (ValidationException ex)
+            {
+                return ValidationProblem(new ValidationProblemDetails(){Detail = ex.Message});
+            }
 
             return Created(nameof(GetArtist), id);
         }

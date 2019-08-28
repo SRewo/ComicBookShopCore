@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
+using ComicBookShopCore.Services;
+using ComicBookShopCore.Services.Artist;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -30,9 +33,16 @@ namespace ComicBookShopCore.WebAPI
         public void ConfigureServices(IServiceCollection services)
         { 
             services.AddControllers();
+            var mappingConfig = new MapperConfiguration(mc =>
+                mc.AddProfile(new MapperProfile()));
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
             services.AddSingleton<DbContext>(new ShopDbEntities(Configuration.GetSection("CONNECTION_STRING").Value));
+            services.AddSingleton<IAsyncArtistRepository, EfAsyncArtistRepository>();
             services.AddSingleton<Data.Interfaces.IAsyncRepository<Artist>, Data.Repositories.SqlAsyncRepository<Artist>>();
             services.AddSingleton<IAsyncRepository<Publisher>, SqlAsyncRepository<Publisher>>();
+            services.AddSingleton(new ShopDbEntities(Configuration.GetSection("CONNECTION_STRING").Value));
+            services.AddSingleton<IArtistService,ArtistService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
