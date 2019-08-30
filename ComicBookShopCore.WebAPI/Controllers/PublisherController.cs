@@ -1,35 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
-using ComicBookShopCore.Data.Repositories;
-using Microsoft.AspNetCore.JsonPatch;
+using ComicBookShopCore.Services.Publisher;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComicBookShopCore.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PublisherController : ControllerBase 
+    public class PublisherController : ControllerBase
     {
-        private IAsyncRepository<Publisher> _publisherRepository;
-        public PublisherController(IAsyncRepository<Publisher> publisherRepository)
+        private readonly IPublisherService _publisherService;
+
+        public PublisherController(IPublisherService publisherService)
         {
-            _publisherRepository = publisherRepository;
+            _publisherService = publisherService;
         }
 
         [HttpGet]
-        public Task<IEnumerable<Publisher>> Get()
+        public Task<IEnumerable<PublisherBasicDto>> Get()
         {
-	    return _publisherRepository.GetAllAsync();
+            return _publisherService.PublisherListAsync();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Publisher>> GetById(int id)
+        public async Task<ActionResult<PublisherDetailsDto>> GetById(int id)
         {
-            var publisher = await _publisherRepository.GetByIdAsync(id).ConfigureAwait(true);
+            var publisher = await _publisherService.PublisherDetailsAsync(id).ConfigureAwait(true);
+
             if (publisher == null)
                 return NotFound();
 
@@ -37,47 +38,50 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Publisher publisher)
+        public async Task<ActionResult> Post([FromBody] PublisherDto publisher)
         {
-	    publisher.Validate();
-            
-            if (publisher.HasErrors)
-                return ValidationProblem();
+            try
+            {
+                await _publisherService.AddPublisherAsync(publisher).ConfigureAwait(true);
+            }
+            catch (ValidationException e)
+            {
+                return ValidationProblem(new ValidationProblemDetails {Detail = e.Message});
+            }
 
-            await _publisherRepository.AddAsync(publisher).ConfigureAwait(true);
             return Created(nameof(Get), null);
-
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var publisher = await _publisherRepository.GetByIdAsync(id).ConfigureAwait(true);
-
-            if (publisher == null)
+            try
+            {
+                await _publisherService.DeletePublisherAsync(id).ConfigureAwait(true);
+            }
+            catch (NullReferenceException)
+            {
                 return NotFound();
-
-            await _publisherRepository.DeleteAsync(publisher).ConfigureAwait(true);
+            }
 
             return NoContent();
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Publisher publisher)
+        public async Task<ActionResult> Put(int id, [FromBody] PublisherDto publisher)
         {
-	    publisher.Validate();
-            if (publisher.HasErrors)
-                return ValidationProblem();
-
-            var dbPublisher = await _publisherRepository.GetByIdAsync(id).ConfigureAwait(true);
-            if (dbPublisher == null)
+            try
+            {
+                await _publisherService.UpdatePublisherAsync(id, publisher).ConfigureAwait(true);
+            }
+            catch (NullReferenceException)
+            {
                 return NotFound();
-
-            dbPublisher.Name = publisher.Name;
-            dbPublisher.CreationDateTime = publisher.CreationDateTime;
-            dbPublisher.Description = publisher.Description;
-                 
-            await _publisherRepository.UpdateAsync(dbPublisher).ConfigureAwait(true);
+            }
+            catch (ValidationException e)
+            {
+                return ValidationProblem(new ValidationProblemDetails {Detail = e.Message});
+            }
 
             return Created(nameof(GetById), id);
         }
