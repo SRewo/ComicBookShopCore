@@ -5,6 +5,7 @@ WORKDIR /build
 COPY ComicBookShopCore.sln ./ComicBookShopCore.sln
 COPY ComicBookShopCore.WebAPI ./ComicBookShopCore.WebAPI
 COPY ComicBookShopCore.Data ./ComicBookShopCore.Data
+COPY ComicBookShopCore.Services ./ComicBookShopCore.Services
 RUN dotnet restore ComicBookShopCore.WebAPI/*.csproj
 RUN dotnet publish ComicBookShopCore.WebAPI/*.csproj -c Release -o out
 
