@@ -23,8 +23,6 @@ namespace ComicBookShopCore.Data
 
         public IEnumerable<Series> SeriesList { get; set; }
 
-        public IEnumerable<ComicBook> ComicBookList { get; private set; }
-
         internal Publisher()
         {
         }

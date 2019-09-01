@@ -14,7 +14,15 @@ namespace ComicBookShopCore.Services.Series
     {
         public int Id { get; private set; }
         public string Name { get; set; }
-        public string PublisherName { get; set; }
+        public int PublisherId { get; set; }
+        public string PublisherName { get; private set; }
+    }
+
+    public class SeriesInputDto
+    {
+        public string Name { get; set; }
+        public int PublisherId { get; set; }
+        public string Description { get; set; }
     }
 
     public class SeriesDetailsDto
@@ -23,5 +31,6 @@ namespace ComicBookShopCore.Services.Series
         public string Name { get; set; }
         public PublisherBasicDto Publisher { get; private set; }
         public IEnumerable<ComicBookBasicDto> ComicBooks { get; private set; }
+        public string Description { get; set; }
     }
 }
