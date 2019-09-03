@@ -5,6 +5,7 @@ using ComicBookShopCore.Data.Repositories;
 using ComicBookShopCore.Services;
 using ComicBookShopCore.Services.Artist;
 using ComicBookShopCore.Services.Publisher;
+using ComicBookShopCore.Services.Series;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -36,9 +37,11 @@ namespace ComicBookShopCore.WebAPI
             services.AddSingleton<DbContext>(new ShopDbEntities(Configuration.GetSection("CONNECTION_STRING").Value));
             services.AddSingleton<IAsyncArtistRepository, EfAsyncArtistRepository>();
 	    services.AddSingleton<IAsyncPublisherRepository, EfAsyncPublisherRepository>();
+            services.AddSingleton<IAsyncSeriesRepository, EfAsyncSeriesRepository>();
             services.AddSingleton(new ShopDbEntities(Configuration.GetSection("CONNECTION_STRING").Value));
             services.AddSingleton<IArtistService,ArtistService>();
             services.AddSingleton<IPublisherService, PublisherService>();
+            services.AddScoped<ISeriesService, SeriesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
