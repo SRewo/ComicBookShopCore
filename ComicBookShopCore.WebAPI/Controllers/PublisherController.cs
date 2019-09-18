@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Services.Publisher;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComicBookShopCore.WebAPI.Controllers
@@ -81,6 +82,27 @@ namespace ComicBookShopCore.WebAPI.Controllers
             catch (ValidationException e)
             {
                 return ValidationProblem(new ValidationProblemDetails {Detail = e.Message});
+            }
+
+            return Created(nameof(GetById), id);
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<PublisherDto> patch)
+        {
+            var publisher = await _publisherService.PublisherToEditAsync(id);
+            if (publisher == null)
+                return NotFound();
+
+            patch.ApplyTo(publisher);
+
+            try
+            {
+                await _publisherService.UpdatePublisherAsync(id, publisher);
+            }
+            catch (ValidationException e)
+            {
+                return ValidationProblem(new ValidationProblemDetails() {Detail = e.Message});
             }
 
             return Created(nameof(GetById), id);

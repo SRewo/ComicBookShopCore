@@ -33,6 +33,13 @@ namespace ComicBookShopCore.Services.Series
             return _mapper.Map<SeriesDetailsDto>(series);
         }
 
+        public async Task<SeriesInputDto> EditSeriesAsync(int id)
+        {
+            var series = await _repository.GetByIdAsync(id).ConfigureAwait(true);
+
+            return _mapper.Map<SeriesInputDto>(series);
+        }
+
         public async Task AddSeriesAsync(SeriesInputDto seriesDto)
         {
             var series = _mapper.Map<Data.Series>(seriesDto);

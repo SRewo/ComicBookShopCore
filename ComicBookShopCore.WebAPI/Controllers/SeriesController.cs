@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Services.Series;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -90,6 +91,27 @@ namespace ComicBookShopCore.WebAPI.Controllers
             }
 
             return NoContent();
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<SeriesInputDto> patch)
+        {
+            var series = await _service.EditSeriesAsync(id).ConfigureAwait(true);
+            if (series == null) return NotFound();
+
+            patch.ApplyTo(series);
+
+            try
+            {
+                await _service.UpdateSeriesAsync(id, series);
+            }
+            catch (ValidationException e)
+            {
+                return ValidationProblem(new ValidationProblemDetails() {Detail = e.Message});
+            }
+            
+            return Created(nameof(GetById), id);
+
         }
  }
 }

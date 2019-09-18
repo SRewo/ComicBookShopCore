@@ -28,7 +28,7 @@ namespace ComicBookShopCore.WebAPI
         public void ConfigureServices(IServiceCollection services)
         { 
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             var mappingConfig = new MapperConfiguration(mc =>
                 mc.AddProfile(new MapperProfile()));
             IMapper mapper = mappingConfig.CreateMapper();

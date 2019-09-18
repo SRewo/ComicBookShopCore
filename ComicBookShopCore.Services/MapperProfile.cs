@@ -16,12 +16,14 @@ namespace ComicBookShopCore.Services
 
             CreateMap<Data.Publisher, PublisherBasicDto>();
             CreateMap<Data.Publisher, PublisherDetailsDto>();
+            CreateMap<Data.Publisher, PublisherDto>();
             CreateMap<PublisherDto, Data.Publisher>().ForMember(x => x.Id, opt => opt.Ignore());
 
             CreateMap<Data.Series, SeriesBasicDto>();
             CreateMap<Data.Series, SeriesDto>();
             CreateMap<Data.Series, SeriesDetailsDto>();	
 	    CreateMap<SeriesInputDto, Data.Series>();
+            CreateMap<Data.Series, SeriesInputDto>();
 
             CreateMap<Data.ComicBook, ComicBookBasicDto>();
         }

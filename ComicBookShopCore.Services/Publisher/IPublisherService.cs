@@ -10,5 +10,6 @@ namespace ComicBookShopCore.Services.Publisher
         Task AddPublisherAsync(PublisherDto publisher);
         Task UpdatePublisherAsync(int id, PublisherDto publisher);
         Task DeletePublisherAsync(int id);
+        Task<PublisherDto> PublisherToEditAsync(int id);
     }
 }

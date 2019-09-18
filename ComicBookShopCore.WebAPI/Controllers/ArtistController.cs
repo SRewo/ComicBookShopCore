@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ComicBookShopCore.Services.Artist;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -83,6 +84,26 @@ namespace ComicBookShopCore.WebAPI.Controllers
             catch (ValidationException ex)
             {
                 return ValidationProblem(new ValidationProblemDetails(){Detail = ex.Message});
+            }
+
+            return Created(nameof(GetArtist), id);
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<ArtistDetailsDto> patch)
+        {
+            var artist = await _artistService.DetailsAsync(id);
+            if (artist == null)
+                return NotFound();
+            
+            patch.ApplyTo(artist);
+            try
+            {
+                await _artistService.UpdateArtistAsync(id, artist);
+            }
+            catch (ValidationException e)
+            {
+                return ValidationProblem(new ValidationProblemDetails() {Detail = e.Message});
             }
 
             return Created(nameof(GetArtist), id);

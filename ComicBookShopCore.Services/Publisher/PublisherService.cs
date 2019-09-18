@@ -31,6 +31,13 @@ namespace ComicBookShopCore.Services.Publisher
             return _mapper.Map<PublisherDetailsDto>(publisher);
         }
 
+        public async Task<PublisherDto> PublisherToEditAsync(int id)
+        {
+            var publisher = await _repository.GetByIdAsync(id);
+
+            return _mapper.Map<PublisherDto>(publisher);
+        }
+
         public Task AddPublisherAsync(PublisherDto publisher)
         {
             var pub = _mapper.Map<Data.Publisher>(publisher);
