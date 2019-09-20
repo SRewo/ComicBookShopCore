@@ -9,10 +9,14 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Castle.Components.DictionaryAdapter;
 using ComicBookShopCore.Services.Artist;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Newtonsoft.Json.Serialization;
 
 namespace ComicBookShopCore.WebAPI.Tests.Controllers
 {
@@ -128,6 +132,46 @@ namespace ComicBookShopCore.WebAPI.Tests.Controllers
             var controller = mock.Create<ArtistController>();
             var result = await controller.Put(1, artist);
             Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Patch_ArtistNotFound_ReturnsNotFoundResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<ArtistController>();
+            var result = await controller.Patch(1, new JsonPatchDocument<ArtistDetailsDto>());
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Patch_ThrowsValidationException_ReturnsBadRequestResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var artist = new ArtistDetailsDto();
+
+            mock.Mock<IArtistService>().Setup(x => x.UpdateArtistAsync(1, artist)).Throws<ValidationException>();
+            mock.Mock<IArtistService>().Setup(x => x.DetailsAsync(1)).Returns(Task.FromResult(artist));
+
+            var controller = mock.Create<ArtistController>();
+            var result = await controller.Patch(1, new JsonPatchDocument<ArtistDetailsDto>());
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task Patch_ValidCall()
+        {
+            var mock = AutoMock.GetLoose();
+	    var artist = new ArtistDetailsDto();
+            var patch = mock.Create<JsonPatchDocument<ArtistDetailsDto>>();
+
+            mock.Mock<IArtistService>().Setup(x => x.DetailsAsync(1)).Returns(Task.FromResult(artist));
+
+            var controller = mock.Create<ArtistController>();
+
+            var result = await controller.Patch(1, patch);
+
+	    mock.Mock<IArtistService>().Verify(x => x.UpdateArtistAsync(1, artist), Times.Once);
+            Assert.IsType<CreatedResult>(result);
         }
     }
 }

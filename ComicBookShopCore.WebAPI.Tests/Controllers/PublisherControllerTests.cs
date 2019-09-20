@@ -8,7 +8,9 @@ using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Services.Publisher;
 using ComicBookShopCore.WebAPI.Controllers;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.NavigationExpansion.Internal;
 using Moq;
 using Xunit;
 
@@ -147,6 +149,47 @@ namespace ComicBookShopCore.WebAPI.Tests.Controllers
             var controller = mock.Create<PublisherController>();
 
             var result = await controller.Put(1, publisher);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task Patch_ValidCall()
+        {
+            var mock = AutoMock.GetLoose();
+	    var publisher = new PublisherDto();
+            mock.Mock<IPublisherService>().Setup(x => x.PublisherToEditAsync(1)).Returns(Task.FromResult(publisher));
+            var controller = mock.Create<PublisherController>();
+
+            var result = await controller.Patch(1, new JsonPatchDocument<PublisherDto>());
+            
+	    mock.Mock<IPublisherService>().Verify(x => x.UpdatePublisherAsync(1,publisher));
+            Assert.IsType<CreatedResult>(result);
+        }
+
+        [Fact]
+        public async Task Patch_PublisherIsNull_ReturnsNotFoundResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<PublisherController>();
+
+            var result = await controller.Patch(1, new JsonPatchDocument<PublisherDto>());
+
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Patch_UpdateThrowsException_ReturnsBadRequestObjectResult()
+        {
+            var mock = AutoMock.GetLoose();
+	    var publisher = new PublisherDto();
+            mock.Mock<IPublisherService>().Setup(x => x.PublisherToEditAsync(1)).Returns(Task.FromResult(publisher));
+            mock.Mock<IPublisherService>().Setup(x => x.UpdatePublisherAsync(1, publisher))
+                .Throws(new ValidationException("message"));
+
+            var controller = mock.Create<PublisherController>();
+
+            var result = await controller.Patch(1, new JsonPatchDocument<PublisherDto>());
 
             Assert.IsType<BadRequestObjectResult>(result);
         }
