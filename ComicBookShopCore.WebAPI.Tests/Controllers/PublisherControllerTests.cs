@@ -4,13 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
-using ComicBookShopCore.Data;
-using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Services.Publisher;
 using ComicBookShopCore.WebAPI.Controllers;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Query.NavigationExpansion.Internal;
 using Moq;
 using Xunit;
 
