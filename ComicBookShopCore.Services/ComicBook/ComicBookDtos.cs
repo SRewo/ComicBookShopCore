@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace ComicBookShopCore.Services.ComicBook
@@ -12,9 +13,7 @@ namespace ComicBookShopCore.Services.ComicBook
 
     public class ComicBookListDto : ComicBookBasicDto
     {
-        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy")]
         public DateTime OnSaleDate { get; set; }     
-        [DisplayFormat(DataFormatString = "{0:C}")]
         public double Price { get; set; }
         public int Quantity { get; set; }  
         public int SeriesId { get; set; }
@@ -39,7 +38,7 @@ namespace ComicBookShopCore.Services.ComicBook
         public string ShortDescription { get; set; }
         public string Description { get; set; }
         public int SeriesId { get; set; }
-        public IEnumerable<ComicBookArtistInputDto> ArtistList { get; set; }
+        public ObservableCollection<ComicBookArtistInputDto> ArtistList { get; set; }
     }
 
     public class ComicBookArtistInputDto
@@ -50,8 +49,8 @@ namespace ComicBookShopCore.Services.ComicBook
 
     public class ComicBookArtistDto
     {
-	public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public int ArtistId { get; set; }
+        public string Name { get; set; }
         public string Role { get; set; }
     }
 }

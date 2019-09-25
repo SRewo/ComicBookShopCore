@@ -47,8 +47,6 @@ namespace ComicBookShopCore.Services.Series
 
 	    if(publisher == null)
 	        throw new ValidationException("Invalid publisher id.");
-
-            series.Publisher = publisher;
             
 	    series.Validate();
 
@@ -64,16 +62,6 @@ namespace ComicBookShopCore.Services.Series
 
             if (dbSeries == null)
                 throw new NullReferenceException();
-
-            if (dbSeries.Publisher.Id != seriesDto.PublisherId && seriesDto.PublisherId > 0)
-            {
-                var publisher = await _publisherRepository.GetByIdAsync(seriesDto.PublisherId).ConfigureAwait(true);
-
-		if(publisher == null)
-                    throw new ValidationException("Invalid publisher id.");
-
-                dbSeries.Publisher = publisher;
-            }
 
             _mapper.Map(seriesDto, dbSeries);
             dbSeries.Validate();

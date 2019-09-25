@@ -44,6 +44,7 @@ namespace ComicBookShopCore.Services.ComicBook
 
         public Task DeleteAsync(Data.ComicBook comic)
         {
+            _context.RemoveRange(comic.ComicBookArtists);
             _context.Remove(comic);
 	    return _context.SaveChangesAsync();
         }
