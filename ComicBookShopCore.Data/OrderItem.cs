@@ -9,9 +9,9 @@ namespace ComicBookShopCore.Data
         public int Id { get; private set; }
 
 
-        [Required(ErrorMessage = "Comic Book can't be null or empty.")]
         public virtual ComicBook ComicBook { get; set; }
 
+        public int ComicBookId { get; set; }
 
         [Required]
         [Range(1,int.MaxValue, ErrorMessage = "Please enter valid value.")]
@@ -20,6 +20,8 @@ namespace ComicBookShopCore.Data
 
         [Range(0,100, ErrorMessage = "Please enter valid value.")]
         public int Discount { get; set; }
+
+        public int OrderId { get; set; }
 
         internal OrderItem()
         {
