@@ -16,12 +16,10 @@ namespace ComicBookShopCore.WebAPI.Controllers
     [Route("/api/[controller]")]
     public class SeriesController : ControllerBase
     {
-        private readonly ShopDbEntities _context;
         private readonly ISeriesService _service;
 
-        public SeriesController( ShopDbEntities context, ISeriesService service)
+        public SeriesController(ISeriesService service)
         {
-            _context = context;
             _service = service;
         }
 

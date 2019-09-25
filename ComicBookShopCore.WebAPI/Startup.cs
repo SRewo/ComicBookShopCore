@@ -1,9 +1,11 @@
 using AutoMapper;
+using AutoMapper.EquivalencyExpression;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Data.Repositories;
 using ComicBookShopCore.Services;
 using ComicBookShopCore.Services.Artist;
+using ComicBookShopCore.Services.ComicBook;
 using ComicBookShopCore.Services.Publisher;
 using ComicBookShopCore.Services.Series;
 using Microsoft.AspNetCore.Builder;
@@ -30,7 +32,11 @@ namespace ComicBookShopCore.WebAPI
 
             services.AddControllers().AddNewtonsoftJson();
             var mappingConfig = new MapperConfiguration(mc =>
-                mc.AddProfile(new MapperProfile()));
+            {
+                mc.AddProfile(new MapperProfile());
+                mc.AddCollectionMappers();
+            });
+               
             IMapper mapper = mappingConfig.CreateMapper();
 
             services.AddSingleton(mapper);
@@ -38,10 +44,12 @@ namespace ComicBookShopCore.WebAPI
             services.AddSingleton<IAsyncArtistRepository, EfAsyncArtistRepository>();
 	    services.AddSingleton<IAsyncPublisherRepository, EfAsyncPublisherRepository>();
             services.AddSingleton<IAsyncSeriesRepository, EfAsyncSeriesRepository>();
+            services.AddSingleton<IComicBookRepositoryAsync, EfComicBookRepositoryAsync>();
             services.AddSingleton(new ShopDbEntities(Configuration.GetSection("CONNECTION_STRING").Value));
             services.AddSingleton<IArtistService,ArtistService>();
             services.AddSingleton<IPublisherService, PublisherService>();
             services.AddScoped<ISeriesService, SeriesService>();
+            services.AddSingleton<IComicBookService, ComicBookService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
