@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using ComicBookShopCore.Services.Artist;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -24,12 +26,14 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public Task<IEnumerable<ArtistDto>> Get()
         {
             return _artistService.ListAsync();
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ArtistDetailsDto>> GetArtist(int id)
         {
             var item = await _artistService.DetailsAsync(id).ConfigureAwait(true);
@@ -42,6 +46,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Post([FromBody]ArtistDetailsDto artist)
         {
             try
@@ -57,6 +62,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Delete(int id)
         {
             try
@@ -71,6 +77,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Put(int id, [FromBody] ArtistDetailsDto artist)
         {
             try
@@ -90,6 +97,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<ArtistDetailsDto> patch)
         {
             var artist = await _artistService.DetailsAsync(id);

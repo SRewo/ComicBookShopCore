@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Services.Publisher;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,12 +24,14 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public Task<IEnumerable<PublisherBasicDto>> Get()
         {
             return _publisherService.PublisherListAsync();
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<PublisherDetailsDto>> GetById(int id)
         {
             var publisher = await _publisherService.PublisherDetailsAsync(id).ConfigureAwait(true);
@@ -39,6 +43,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Post([FromBody] PublisherDto publisher)
         {
             try
@@ -54,6 +59,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Delete(int id)
         {
             try
@@ -69,6 +75,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Put(int id, [FromBody] PublisherDto publisher)
         {
             try
@@ -88,6 +95,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<PublisherDto> patch)
         {
             var publisher = await _publisherService.PublisherToEditAsync(id);

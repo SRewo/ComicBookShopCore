@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using ComicBookShopCore.Services.ComicBook;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +23,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ComicBookListDto>>> Get()
         {
             var list = await _service.ComicListAsync();
@@ -31,6 +34,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ComicBookDetailsDto>> Get(int id)
         {
             var comic = await _service.ComicDetailsAsync(id);
@@ -43,6 +47,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
         
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Post([FromBody] ComicBookInputDto comicDto)
         {
             try
@@ -58,6 +63,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Put(int id,[FromBody] ComicBookInputDto comicDto)
         {
             try
@@ -77,6 +83,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Patch(int id, JsonPatchDocument<ComicBookInputDto> patch)
         {
             var comic = await _service.ComicToEditAsync(id);
@@ -99,6 +106,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Delete(int id)
         {
             try

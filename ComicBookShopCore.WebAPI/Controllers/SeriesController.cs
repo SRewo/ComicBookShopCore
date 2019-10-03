@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Services.Series;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +27,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<SeriesDto>>> Get()
         {
             var seriesList = await _service.SeriesListAsync().ConfigureAwait(true);
@@ -32,6 +36,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<SeriesDetailsDto>> GetById(int id)
         {
             var series = await _service.DetailsAsync(id).ConfigureAwait(true);
@@ -43,6 +48,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Post(SeriesInputDto seriesDto)
         {
             try
@@ -57,7 +63,8 @@ namespace ComicBookShopCore.WebAPI.Controllers
             return Created(nameof(Get), null);
         }
 
-	[HttpPut("{id}")]
+	    [HttpPut("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Put(int id, SeriesInputDto seriesDto)
         {
             try
@@ -77,6 +84,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Delete(int id)
         {
             try
@@ -92,6 +100,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<SeriesInputDto> patch)
         {
             var series = await _service.EditSeriesAsync(id).ConfigureAwait(true);
