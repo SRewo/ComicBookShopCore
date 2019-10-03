@@ -62,6 +62,8 @@ namespace ComicBookShopCore.Services
                 .EqualityComparison((x, z) => x.ComicBookId == z.ComicBookId);
 
             CreateMap<Data.User, UserTokenDto>().ForMember(x => x.Login, opt => opt.MapFrom(z => z.UserName)).ForPath(x => x.Role, opt => opt.Ignore());
+            CreateMap<UserAddressDto, Data.Address>();
+            CreateMap<UserRegisterDto, Data.User>();
         }
     }
 }

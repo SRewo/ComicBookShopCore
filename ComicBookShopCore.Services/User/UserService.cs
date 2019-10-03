@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ComicBookShopCore.Services.User
 {
@@ -36,21 +37,37 @@ namespace ComicBookShopCore.Services.User
             return dto;
         }
 
-        public async Task Register(UserRegisterDto userDto)
+        public async Task<IDictionary<string,string>> Register(UserRegisterDto userDto)
         {
+            var errors = new Dictionary<string, string>();
             if (userDto.Password != userDto.ConfirmPassword)
-                throw new ValidationException("The password and confirmation password do not match.");
+                return new Dictionary<string, string>{{"Password","The password and confirmation password do not match."}};
+
+            if(userDto.Address == null)
+                return new Dictionary<string, string>{{"Address","Address cannot be null"}};
 
             var user = _mapper.Map<Data.User>(userDto);
 
+            var contextUser = new ValidationContext(user);
+            var contextAddress = new ValidationContext(user.Address);
+
+            var validationResults = new List<ValidationResult>();
+
+            var isUserValid = Validator.TryValidateObject(user, contextUser, validationResults);
+            var isAddressValid = Validator.TryValidateObject(user.Address, contextAddress, validationResults);
+
+            if (!isUserValid || !isAddressValid)
+            {
+                foreach (var identityError in validationResults) errors.Add(identityError.MemberNames.First(),identityError.ErrorMessage);
+                return errors;
+            }
+
             var result = await _manager.CreateAsync(user, userDto.Password);
 
-            if (!result.Succeeded)
-            {
-                var errors = new StringBuilder();
-                foreach (var identityError in result.Errors) errors.AppendLine(identityError.Description);
-                throw new ValidationException(errors.ToString());
-            }
+            if (result.Succeeded) return null;
+
+            foreach (var identityError in result.Errors) errors.Add(identityError.Code, identityError.Description);
+            return errors;
         }
 
     }

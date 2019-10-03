@@ -15,6 +15,14 @@ namespace ComicBookShopCore.Services.Tests.User
 {
     public class UserServiceTests
     {
+       
+        private UserRegisterDto GetValidUser()
+        {
+            var validAddress = new UserAddressDto(){City = "Test", Country = "Poland", PostalCode = "43-200", Region = "Sląskie",StreetName = "Test Street 21"};
+            var userDto = new UserRegisterDto() {UserName = "Admin",Password = "123", ConfirmPassword = "123", Email = "mail@mail.com", FirstName = "test", LastName = "adam", Address = validAddress};
+            return userDto;
+        }
+
         [Fact]
         public async Task Login_ValidCall()
         {
@@ -73,7 +81,7 @@ namespace ComicBookShopCore.Services.Tests.User
             var userStore = new Mock<IUserStore<Data.User>>();
             var managerMock =
                 new Mock<UserManager<Data.User>>(userStore.Object, null, null, null, null, null, null, null, null);
-            var userDto = new UserRegisterDto() {UserName = "Test", Password = "123", ConfirmPassword = "123"};
+            var userDto = GetValidUser();
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             managerMock.Setup(x => x.CreateAsync(It.IsAny<Data.User>(), userDto.Password)).ReturnsAsync(IdentityResult.Success);
             var service = new UserService(managerMock.Object, mapper);
@@ -93,42 +101,103 @@ namespace ComicBookShopCore.Services.Tests.User
             var mapper = new Mock<IMapper>();
             var service = new UserService(managerMock.Object, mapper.Object );
 
-           var result = await Assert.ThrowsAsync<ValidationException>(() => service.Register(userDto));
-           Assert.Equal("The password and confirmation password do not match.", result.Message);
+           var result = await service.Register(userDto);
+           Assert.Equal("The password and confirmation password do not match.", result.First().Value);
+           Assert.Equal("Password", result.First().Key);
         }
 
         [Fact]
-        public async Task Register_InvalidUserSingleError_ThrowsValidationException()
+        public async Task Register_InvalidUserSingleError_ReturnsProperDictionary()
         {
             var userStore = new Mock<IUserStore<Data.User>>();
             var managerMock =
                 new Mock<UserManager<Data.User>>(userStore.Object, null, null, null, null, null, null, null, null);
-            var userDto = new UserRegisterDto() {Password = "123", ConfirmPassword = "123"};
+            var userDto = GetValidUser(); 
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
-            var errors = new [] {new IdentityError{Description = "Password is too short."}};
+            var errors = new [] {new IdentityError{Code = "Password",Description = "Password is too short."}};
             managerMock.Setup(x => x.CreateAsync(It.IsAny<Data.User>(), userDto.Password))
                 .ReturnsAsync(IdentityResult.Failed(errors));
             var service = new UserService(managerMock.Object, mapper);
 
-            var result = await Assert.ThrowsAsync<ValidationException>(() => service.Register(userDto));
-            Assert.Equal(errors.First().Description + "\r\n", result.Message);
+            var result = await service.Register(userDto);
+
+            Assert.Single(result);
+            Assert.Equal(errors.First().Description, result.Values.First());
+            Assert.Equal(errors.First().Code, result.Keys.First());
         }
 
         [Fact]
-        public async Task Register_InvalidUserMultipleErrors_DisplaysProperErrorMessage()
+        public async Task Register_InvalidUserMultipleErrors_ReturnsProperDictionary()
         {
             var userStore = new Mock<IUserStore<Data.User>>();
             var managerMock =
                 new Mock<UserManager<Data.User>>(userStore.Object, null, null, null, null, null, null, null, null);
-            var userDto = new UserRegisterDto() {Password = "123", ConfirmPassword = "123"};
+            var userDto = GetValidUser();
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
-            var errors = new [] {new IdentityError{Description = "Password is too short."}, new IdentityError {Description = "UserName is already taken."} };
+            var errors = new [] {new IdentityError{Code = "Password", Description = "Password is too short."}, new IdentityError {Code = "UserName", Description = "UserName is already taken."} };
             managerMock.Setup(x => x.CreateAsync(It.IsAny<Data.User>(), userDto.Password))
                 .ReturnsAsync(IdentityResult.Failed(errors));
             var service = new UserService(managerMock.Object, mapper);
 
-            var result = await Assert.ThrowsAsync<ValidationException>(() => service.Register(userDto));
-            Assert.Equal(errors[0].Description + "\r\n" + errors[1].Description + "\r\n", result.Message);
+            var result = await service.Register(userDto);
+
+            Assert.Equal(2, result.Count);
+            Assert.Equal(errors[0].Code, result.First().Key);
+            Assert.Equal(errors[1].Description, result[errors[1].Code]);
+        }
+
+        [Fact]
+        public async Task Register_InvalidUser_ReturnsProperDictionary()
+        {
+            var userStore = new Mock<IUserStore<Data.User>>();
+            var managerMock =
+                new Mock<UserManager<Data.User>>(userStore.Object, null, null, null, null, null, null, null, null);
+            var userDto = GetValidUser();
+            userDto.FirstName = string.Empty;
+            var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
+            var service = new UserService(managerMock.Object, mapper);
+
+            var result = await service.Register(userDto);
+
+            Assert.Single(result);
+            Assert.Equal("FirstName", result.First().Key);
+            Assert.Equal("The First Name field is required.", result.First().Value);
+        }
+
+        [Fact]
+        public async Task Register_InvalidAddress_ReturnsProperDictionary()
+        {
+            var userStore = new Mock<IUserStore<Data.User>>();
+            var managerMock =
+                new Mock<UserManager<Data.User>>(userStore.Object, null, null, null, null, null, null, null, null);
+            var userDto = GetValidUser();
+            userDto.Address.City = string.Empty;
+            var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
+            var service = new UserService(managerMock.Object, mapper);
+
+            var result = await service.Register(userDto);
+
+            Assert.Single(result);
+            Assert.Equal("City", result.First().Key);
+            Assert.Equal("The City field is required.", result.First().Value);
+        }
+
+        [Fact]
+        public async Task Register_AddressIsNull_ReturnsProperDictionary()
+        {
+            var userStore = new Mock<IUserStore<Data.User>>();
+            var managerMock =
+                new Mock<UserManager<Data.User>>(userStore.Object, null, null, null, null, null, null, null, null);
+            var userDto = GetValidUser();
+            userDto.Address = null;
+            var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
+            var service = new UserService(managerMock.Object, mapper);
+
+            var result = await service.Register(userDto);
+
+            Assert.Single(result);
+            Assert.Equal("Address", result.First().Key);
+            Assert.Equal("Address cannot be null", result.First().Value);
         }
     }
 }
