@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using ComicBookShopCore.Services.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ComicBookShopCore.WebAPI.Controllers
@@ -44,6 +46,26 @@ namespace ComicBookShopCore.WebAPI.Controllers
             };
             var token = tokenHandler.CreateToken(tokenDesc);
             return tokenHandler.WriteToken(token);
+        }
+
+        [HttpPost]
+        [Route("api/register")]
+        [AllowAnonymous]
+        public async Task<ActionResult> RegisterUser([FromBody] UserRegisterDto user)
+        {
+            if (user == null)
+                return BadRequest();
+
+            var result = await _service.Register(user);
+
+            if (result == null)
+                return Ok();
+
+            var state = new ModelStateDictionary();
+
+            foreach (var error in result) state.AddModelError(error.Key, error.Value);
+
+            return ValidationProblem(new ValidationProblemDetails(state));
         }
     }
 }
