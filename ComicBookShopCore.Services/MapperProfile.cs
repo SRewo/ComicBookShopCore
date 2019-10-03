@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Dynamic;
 using AutoMapper.EquivalencyExpression;
 using ComicBookShopCore.Services.Artist;
 using ComicBookShopCore.Services.ComicBook;
+using ComicBookShopCore.Services.Order;
 using ComicBookShopCore.Services.Publisher;
 using ComicBookShopCore.Services.Series;
+using ComicBookShopCore.Services.User;
 
 namespace ComicBookShopCore.Services
 {
@@ -50,6 +53,15 @@ namespace ComicBookShopCore.Services
             CreateMap<ComicBookArtistInputDto, Data.ComicBookArtist>()
 		.ForMember(x => x.Type, opt => opt.MapFrom(z => z.Role))
                 .EqualityComparison((x,z) => x.ArtistId == z.ArtistId);
+
+            CreateMap<Data.Order, OrderBasicDto>();
+            CreateMap<Data.OrderItem, OrderItemDto>();
+            CreateMap<Data.Order, OrderDetailsDto>();
+            CreateMap<OrderInputDto, Data.Order>();
+            CreateMap<OrderItemInputDto, Data.OrderItem>()
+                .EqualityComparison((x, z) => x.ComicBookId == z.ComicBookId);
+
+            CreateMap<Data.User, UserTokenDto>().ForMember(x => x.Login, opt => opt.MapFrom(z => z.UserName)).ForPath(x => x.Role, opt => opt.Ignore());
         }
     }
 }
