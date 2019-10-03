@@ -15,7 +15,7 @@ namespace ComicBookShopCore.Data
         {
             var builder = new SqlConnectionStringBuilder();
             builder.InitialCatalog = "ComicBookShopCore";
-            builder.DataSource = "localhost";
+            builder.DataSource = @"localhost,1533\sqlexpress";
             builder.UserID = "SA";
             builder.Password = "@Dmin123";
             _connectionString = builder.ConnectionString;

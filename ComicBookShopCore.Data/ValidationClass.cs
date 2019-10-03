@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace ComicBookShopCore.Data
 {
@@ -12,6 +14,7 @@ namespace ComicBookShopCore.Data
     {
         private readonly Dictionary<string, List<string>> _propErrors = new Dictionary<string, List<string>>();
 
+        [JsonIgnore]
         public bool HasErrors => _propErrors.Any();
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged = delegate{};

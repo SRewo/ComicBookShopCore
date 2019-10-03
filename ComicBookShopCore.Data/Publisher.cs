@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
@@ -19,6 +20,8 @@ namespace ComicBookShopCore.Data
 
         [CustomValidation.PublisherDateValidation]
         public DateTime CreationDateTime { get; set; }
+
+        public IEnumerable<Series> SeriesList { get; set; }
 
         internal Publisher()
         {

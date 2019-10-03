@@ -5,7 +5,7 @@ namespace ComicBookShopCore.Data
 {
     public class Artist : ValidationClass
     {
-        public int Id { get; private set; }
+        public virtual int Id { get; private set; }
 
         [Required(ErrorMessage = "First name cannot be empty.")]
         [NameValidation(ErrorMessage ="First name cannot contain special characters.")]

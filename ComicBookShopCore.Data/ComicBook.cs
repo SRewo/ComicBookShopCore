@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 [assembly: InternalsVisibleTo("ComicBookShopCore.Data.Tests")]
 namespace ComicBookShopCore.Data
@@ -30,7 +32,6 @@ namespace ComicBookShopCore.Data
 
         public string Description { get; set; }
 
-
         public string ShortArtistDetail => GetShortArtistDetail();
 
         internal ComicBook()
@@ -44,7 +45,8 @@ namespace ComicBookShopCore.Data
             var result = string.Empty;
             foreach (var artist in ComicBookArtists)
             {
-                result += n == 1 ? artist.Artist.Name : artist.Artist.Name + ", ";
+                if(artist.Artist != null)
+                    result += n == 1 ? artist.Artist.Name : artist.Artist.Name + ", ";
                 n--;
             }
 

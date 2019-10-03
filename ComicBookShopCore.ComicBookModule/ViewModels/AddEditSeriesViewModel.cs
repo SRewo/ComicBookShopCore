@@ -194,9 +194,10 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
 
         }
 
-        public virtual async Task GetPublishersFromRepositoryAsync()
+        public virtual  Task GetPublishersFromRepositoryAsync()
         {
-            Publishers = await _publisherRepository.GetAll().ToListAsync().ConfigureAwait(true);
+            Publishers =  _publisherRepository.GetAll().ToList();
+            return Task.CompletedTask;
         }
 
         private Task SaveSeriesAsync()

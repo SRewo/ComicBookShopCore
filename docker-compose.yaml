@@ -18,4 +18,16 @@ services:
       context: ./ComicBookShopCore.Data/
       dockerfile: Dockerfile
     ports:
-      - "1433:1433"
+      - "1533:1433"
+  webapi:
+    build:
+      context: ./
+      dockerfile: ./ComicBookShopCore.WebAPI/Dockerfile
+    ports:
+      - "8081:80"
+      - "8434:433"
+    volumes:
+    - /etc/ssl/certs/ssl-cert-snakeoil.pem:/app/fullchain.pem
+    - /etc/ssl/private/ssl-cert-snakeoil.key:/app/privkey.pem
+    depends_on:
+      - db

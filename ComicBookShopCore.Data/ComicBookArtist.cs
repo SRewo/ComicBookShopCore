@@ -7,7 +7,8 @@ namespace ComicBookShopCore.Data
     {
         public int Id { get; private set; }
 
-        [Required]
+	public int ArtistId { get; set; }
+        
         public Artist Artist { get; set; }
 
         public string Type { get; set; }

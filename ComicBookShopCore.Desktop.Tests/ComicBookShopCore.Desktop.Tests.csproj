@@ -12,6 +12,7 @@
     <PackageReference Include="MockQueryable.Moq" Version="1.1.0" />
     <PackageReference Include="Moq" Version="4.12.0" />
     <PackageReference Include="Moq.EntityFrameworkCore" Version="2.2.1" />
+    <PackageReference Include="System.Interactive.Async" Version="3.2.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
       <PrivateAssets>all</PrivateAssets>
@@ -21,14 +22,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ComicBookShopCore.ComicBookModule\ComicBookShopCore.ComicBookModule.csproj" />
+    <ProjectReference Include="..\ComicBookShopCore.Data\ComicBookShopCore.Data.csproj" />
     <ProjectReference Include="..\ComicBookShopCore.EmployeeModule\ComicBookShopCore.EmployeeModule.csproj" />
     <ProjectReference Include="..\ComicBookShopCore.OrderModule\ComicBookShopCore.OrderModule.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="ComicBookShopCore.Data">
-      <HintPath>..\ComicBookShopCore.Data\bin\Release\netcoreapp3.0\ComicBookShopCore.Data.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

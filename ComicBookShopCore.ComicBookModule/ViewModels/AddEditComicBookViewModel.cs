@@ -371,10 +371,11 @@ namespace ComicBookShopCore.ComicBookModule.ViewModels
         }
 
 
-        public virtual async Task GetDataAsync()
+        public virtual Task GetDataAsync()
         {
-            Artists = await _artistRepository.GetAll().ToListAsync().ConfigureAwait(true);
-            SeriesList = await _seriesRepository.GetAll().ToListAsync().ConfigureAwait(true);
+            Artists =  _artistRepository.GetAll().ToList();
+            SeriesList =  _seriesRepository.GetAll().ToList();
+            return Task.CompletedTask;
         }
 
         public virtual Task CheckPassedComicBookAsync(ComicBook comic)

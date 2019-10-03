@@ -178,9 +178,10 @@ namespace ComicBookShopCore.OrderModule.ViewModels
             return Task.CompletedTask;
         }
 
-        public async Task GetDataAsync()
+        public Task GetDataAsync()
         {
-            _orders = await _orderRepository.GetAll().Include(x => x.OrderItems).ThenInclude(x => x.ComicBook).ToListAsync().ConfigureAwait(true);
+            _orders = _orderRepository.GetAll().Include(x => x.OrderItems).ThenInclude(x => x.ComicBook).ToList();
+            return Task.CompletedTask;
         }
               
     }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ComicBookShopCore.Data
 {
@@ -8,11 +9,14 @@ namespace ComicBookShopCore.Data
 
         [Required(ErrorMessage = "Series name cannot be empty")]
         public string Name { get; set; }
+    
+        public int PublisherId { get; set; }
 
-        [Required]
         public virtual Publisher Publisher { get; set; }
 
         public string Description { get; set; }
+
+	public virtual IEnumerable<ComicBook> ComicBooks { get; private set; }
 
         internal Series()
         {
