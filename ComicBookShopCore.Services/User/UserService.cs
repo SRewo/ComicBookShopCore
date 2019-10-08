@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ComicBookShopCore.Services.User
@@ -39,7 +40,6 @@ namespace ComicBookShopCore.Services.User
 
         public async Task<IDictionary<string,string>> Register(UserRegisterDto userDto, string role = "User")
         {
-            var errors = new Dictionary<string, string>();
             if (userDto.Password != userDto.ConfirmPassword)
                 return new Dictionary<string, string>{{"Password","The password and confirmation password do not match."}};
 
@@ -47,6 +47,100 @@ namespace ComicBookShopCore.Services.User
                 return new Dictionary<string, string>{{"Address","Address cannot be null"}};
 
             var user = _mapper.Map<Data.User>(userDto);
+
+            var userErrors = await ValidateUser(user);
+
+            if (userErrors.Any())
+                return userErrors;
+
+            var result = await _manager.CreateAsync(user, userDto.Password);
+
+            if (result.Succeeded)
+            {
+                await _manager.AddToRoleAsync(user, role);
+                return null;
+            }
+
+            var errors = new Dictionary<string, string>();
+            foreach (var identityError in result.Errors) errors.Add(identityError.Code, identityError.Description);
+            return errors; 
+        }
+
+        public async Task<IEnumerable<UserDto>> UserList()
+        {
+            var users = await _manager.GetUsersInRoleAsync("User");
+            var result = _mapper.ProjectTo<UserDto>(users.AsQueryable());
+            return result.AsEnumerable();
+        }
+
+        public async Task<UserDto> FindUserById(string id)
+        {
+            var user = await _manager.FindByIdAsync(id);
+            var result = _mapper.Map<UserDto>(user);
+            return result;
+        }
+
+        public async Task<UserDto> FindUserByUserName(string userName)
+        {
+            var user = await _manager.FindByNameAsync(userName);
+            var result = _mapper.Map<UserDto>(user);
+            return result;
+        }
+
+        public async Task<UserUpdateDto> UserForUpdate(string id)
+        {
+            var user = await _manager.FindByIdAsync(id);
+            var result = _mapper.Map<UserUpdateDto>(user);
+            return result;
+        }
+
+        public async Task<IDictionary<string, string>> UpdateUserInfo(string id, UserUpdateDto userDto)
+        {
+            var user = await _manager.FindByIdAsync(id);
+
+            if(user == null)
+                return new Dictionary<string, string>(){{"Id", "User with provided id was not found."}};
+
+            _mapper.Map(userDto, user);
+
+            var userErrors = await ValidateUser(user);
+
+            if (userErrors.Any())
+                return userErrors;
+
+            var result = await _manager.UpdateAsync(user);
+
+            if (result.Succeeded)
+                return null; 
+            
+            var errors = new Dictionary<string, string>();
+            foreach (var identityError in result.Errors) errors.Add(identityError.Code, identityError.Description);
+            return errors; 
+
+        }
+
+        public async Task<IDictionary<string, string>> UpdatePassword(string id, ChangePasswordDto passwordDto)
+        {
+            if (passwordDto.NewPassword != passwordDto.NewPasswordConfirm)
+                return new Dictionary<string, string>{{"Password","The password and confirmation password do not match."}};
+
+            var user = await _manager.FindByIdAsync(id);
+            if (user == null)
+                return new Dictionary<string, string>(){{"Id", "User with provided id was not found."}};
+
+            var result =
+                await _manager.ChangePasswordAsync(user, passwordDto.OldPassword, passwordDto.NewPassword);
+
+            if (result.Succeeded)
+                return null;
+            var errors = new Dictionary<string, string>();
+            foreach (var identityError in result.Errors) errors.Add(identityError.Code, identityError.Description);
+            return errors; 
+        }
+
+        private Task<Dictionary<string, string>> ValidateUser(Data.User user)
+        {
+            var errors = new Dictionary<string, string>();
 
             var contextUser = new ValidationContext(user);
             var contextAddress = new ValidationContext(user.Address);
@@ -57,22 +151,10 @@ namespace ComicBookShopCore.Services.User
             var isAddressValid = Validator.TryValidateObject(user.Address, contextAddress, validationResults);
 
             if (!isUserValid || !isAddressValid)
-            {
-                foreach (var identityError in validationResults) errors.Add(identityError.MemberNames.First(),identityError.ErrorMessage);
-                return errors;
-            }
+                foreach (var identityError in validationResults)
+                    errors.Add(identityError.MemberNames.First(), identityError.ErrorMessage);
 
-            var result = await _manager.CreateAsync(user, userDto.Password);
-
-            if (result.Succeeded)
-            {
-                await _manager.AddToRoleAsync(user, role);
-                return null;
-            }
-
-            foreach (var identityError in result.Errors) errors.Add(identityError.Code, identityError.Description);
-            return errors;
+            return Task.FromResult(errors);
         }
-
     }
 }

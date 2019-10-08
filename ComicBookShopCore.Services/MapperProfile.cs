@@ -64,6 +64,7 @@ namespace ComicBookShopCore.Services
             CreateMap<Data.User, UserTokenDto>().ForMember(x => x.Login, opt => opt.MapFrom(z => z.UserName)).ForPath(x => x.Role, opt => opt.Ignore());
             CreateMap<UserAddressDto, Data.Address>();
             CreateMap<UserRegisterDto, Data.User>();
+            CreateMap<Data.User, UserDto>().ForMember(x => x.Name, opt => opt.MapFrom(z => z.Name));
         }
     }
 }
