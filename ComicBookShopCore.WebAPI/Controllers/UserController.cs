@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using ComicBookShopCore.Services.User;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -27,9 +28,14 @@ namespace ComicBookShopCore.WebAPI.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<string>> GetToken([FromBody] UserLoginDto user)
         {
+            if (string.IsNullOrEmpty(user.Login) || string.IsNullOrEmpty(user.Password) )
+                return BadRequest("Login/password cannot be null or empty");
+
             var userDto = await _service.Login(user.Login, user.Password);
+
             if (userDto == null)
                 return BadRequest("Invalid login/password.");
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("TX0BudRrGZ37Ymwi7mnf");
             var tokenDesc = new SecurityTokenDescriptor
@@ -45,7 +51,8 @@ namespace ComicBookShopCore.WebAPI.Controllers
                     SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDesc);
-            return tokenHandler.WriteToken(token);
+
+            return Ok(tokenHandler.WriteToken(token));
         }
 
         [HttpPost]
@@ -56,14 +63,36 @@ namespace ComicBookShopCore.WebAPI.Controllers
             if (user == null)
                 return BadRequest();
 
-            var result = await _service.Register(user);
+            var result = await _service.Register(user, "User");
 
             if (result == null)
                 return Ok();
 
             var state = new ModelStateDictionary();
 
-            foreach (var error in result) state.AddModelError(error.Key, error.Value);
+            foreach (var (key, value) in result) state.AddModelError(key, value);
+
+            return ValidationProblem(new ValidationProblemDetails(state));
+        }
+
+        [HttpPost]
+        [Route("api/employees/register")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
+        public async Task<ActionResult> RegisterEmployee([FromBody] UserRegisterDto user)
+        {
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            var result = await _service.Register(user, "Employee");
+
+            if (result == null)
+                return Ok();
+
+            var state = new ModelStateDictionary();
+
+            foreach (var (key, value) in result) state.AddModelError(key, value);
 
             return ValidationProblem(new ValidationProblemDetails(state));
         }

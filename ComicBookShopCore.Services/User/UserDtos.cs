@@ -17,7 +17,7 @@ namespace ComicBookShopCore.Services.User
 
     public class UserTokenDto
     {
-        public string Id { get; private set; }
+        public string Id { get; set; }
         public string Login { get; set; }
         public string Role { get; set; }
     }

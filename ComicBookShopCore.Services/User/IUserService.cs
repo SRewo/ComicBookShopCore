@@ -6,6 +6,6 @@ namespace ComicBookShopCore.Services.User
     public interface IUserService
     {
         Task<UserTokenDto> Login(string username, string password);
-        Task<IDictionary<string,string>> Register(UserRegisterDto userDto);
+        Task<IDictionary<string,string>> Register(UserRegisterDto userDto, string role);
     }
 }

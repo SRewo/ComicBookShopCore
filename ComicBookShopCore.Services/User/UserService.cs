@@ -33,11 +33,11 @@ namespace ComicBookShopCore.Services.User
 
             var dto = _mapper.Map<UserTokenDto>(user);
             var roles = await _manager.GetRolesAsync(user);
-            dto.Role = roles.First();
+            dto.Role = roles.FirstOrDefault() ?? string.Empty;
             return dto;
         }
 
-        public async Task<IDictionary<string,string>> Register(UserRegisterDto userDto)
+        public async Task<IDictionary<string,string>> Register(UserRegisterDto userDto, string role = "User")
         {
             var errors = new Dictionary<string, string>();
             if (userDto.Password != userDto.ConfirmPassword)
@@ -64,7 +64,11 @@ namespace ComicBookShopCore.Services.User
 
             var result = await _manager.CreateAsync(user, userDto.Password);
 
-            if (result.Succeeded) return null;
+            if (result.Succeeded)
+            {
+                await _manager.AddToRoleAsync(user, role);
+                return null;
+            }
 
             foreach (var identityError in result.Errors) errors.Add(identityError.Code, identityError.Description);
             return errors;
