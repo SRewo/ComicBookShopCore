@@ -75,6 +75,9 @@ namespace ComicBookShopCore.Services.User
 
         public async Task<UserDto> FindUserById(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                return null;
+
             var user = await _manager.FindByIdAsync(id);
             var result = _mapper.Map<UserDto>(user);
             return result;
@@ -82,6 +85,9 @@ namespace ComicBookShopCore.Services.User
 
         public async Task<UserDto> FindUserByUserName(string userName)
         {
+            if (string.IsNullOrWhiteSpace(userName))
+                return null;
+
             var user = await _manager.FindByNameAsync(userName);
             var result = _mapper.Map<UserDto>(user);
             return result;
@@ -89,6 +95,9 @@ namespace ComicBookShopCore.Services.User
 
         public async Task<UserUpdateDto> UserForUpdate(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                return null;
+
             var user = await _manager.FindByIdAsync(id);
             var result = _mapper.Map<UserUpdateDto>(user);
             return result;
