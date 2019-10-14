@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Security;
@@ -18,6 +19,8 @@ namespace ComicBookShopCore.Data
         public string LastName { get; set; }
 
         [Required] public Address Address { get; set; }
+
+        public IEnumerable<IdentityRole> Roles { get; set;}
 
         [Required]
         [Display(Name = "Date of Birth")]

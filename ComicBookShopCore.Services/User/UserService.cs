@@ -66,11 +66,11 @@ namespace ComicBookShopCore.Services.User
             return errors; 
         }
 
-        public async Task<IEnumerable<UserDto>> UserList()
+        public Task<IEnumerable<UserDto>> UserList()
         {
-            var users = await _manager.GetUsersInRoleAsync("User");
+            var users = _manager.Users.Include(x => x.Address).Where(x => x.Roles.Any(z => z.Name == "User"));
             var result = _mapper.ProjectTo<UserDto>(users.AsQueryable());
-            return result.AsEnumerable();
+            return Task.FromResult(result.AsEnumerable());
         }
 
         public async Task<UserDto> FindUserById(string id)
@@ -78,7 +78,7 @@ namespace ComicBookShopCore.Services.User
             if (string.IsNullOrWhiteSpace(id))
                 return null;
 
-            var user = await _manager.FindByIdAsync(id);
+            var user = await _manager.Users.Include(x => x.Address).SingleOrDefaultAsync(x => x.Id == id);
             var result = _mapper.Map<UserDto>(user);
             return result;
         }
@@ -88,7 +88,7 @@ namespace ComicBookShopCore.Services.User
             if (string.IsNullOrWhiteSpace(userName))
                 return null;
 
-            var user = await _manager.FindByNameAsync(userName);
+            var user = await _manager.Users.Include(x => x.Address).SingleOrDefaultAsync(x => x.UserName == userName);
             var result = _mapper.Map<UserDto>(user);
             return result;
         }
@@ -98,14 +98,14 @@ namespace ComicBookShopCore.Services.User
             if (string.IsNullOrWhiteSpace(id))
                 return null;
 
-            var user = await _manager.FindByIdAsync(id);
+            var user = await _manager.Users.Include(x => x.Address).SingleOrDefaultAsync(x => x.Id == id);
             var result = _mapper.Map<UserUpdateDto>(user);
             return result;
         }
 
         public async Task<IDictionary<string, string>> UpdateUserInfo(string id, UserUpdateDto userDto)
         {
-            var user = await _manager.FindByIdAsync(id);
+            var user = await _manager.Users.Include(x => x.Address).SingleOrDefaultAsync(x => x.Id == id);
 
             if(user == null)
                 return new Dictionary<string, string>(){{"Id", "User with provided id was not found."}};

@@ -12,6 +12,7 @@ using AutoMapper;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Services.User;
 using Microsoft.AspNetCore.Identity;
+using MockQueryable.Moq;
 using Moq;
 using Xunit;
 
@@ -30,7 +31,7 @@ namespace ComicBookShopCore.Services.Tests.User
         private Data.User GetValidUser()
         {
             var validAddress = new Address{City = "Test", Country = "Poland", PostalCode = "43-200", Region = "Sląskie",StreetName = "Test Street 21"};
-            var user = new Data.User() {UserName = "Admin", Email = "mail@mail.com", FirstName = "test", LastName = "adam", Address = validAddress};
+            var user = new Data.User() {Id = "Admin", UserName = "Admin", Email = "mail@mail.com", FirstName = "test", LastName = "adam", Address = validAddress};
             return user;
         }
 
@@ -210,15 +211,18 @@ namespace ComicBookShopCore.Services.Tests.User
         {
             var userStore = new Mock<IUserStore<Data.User>>();
             var managerMock = new Mock<UserManager<Data.User>>(userStore.Object, null, null, null, null, null, null, null, null);
-            var users = new List<Data.User>(){new Data.User(){UserName = "Admin", FirstName = "Adam", Address = new Address()}, new Data.User(){UserName = "Test123", FirstName = "Marek" ,LastName = "Testowy", Address = new Address()}};
-            managerMock.Setup(x => x.GetUsersInRoleAsync("User")).ReturnsAsync(users);
+            var users = new List<Data.User>
+            {
+                new Data.User(){UserName = "Admin", FirstName = "Adam", Address = new Address(), Roles = new [] {new IdentityRole("User")}},
+                new Data.User{UserName = "Test123", FirstName = "Marek" ,LastName = "Testowy", Address = new Address(), Roles = new [] {new IdentityRole("User"), }}
+            }.AsQueryable();
+            managerMock.Setup(x => x.Users).Returns(users);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);
 
             var result = await service.UserList();
 
             Assert.NotNull(result);
-            managerMock.Verify(x => x.GetUsersInRoleAsync("User"), Times.Once);
             Assert.Equal(2, result.Count());
             Assert.Equal("Admin", result.First().UserName);
             Assert.Equal("Marek Testowy", result.Last().Name);
@@ -228,8 +232,10 @@ namespace ComicBookShopCore.Services.Tests.User
         public async Task FindUserById_ValidCall()
         {
             var managerMock = GetUserManagerMock();
-            var user = new Data.User {UserName = "Admin", Email = "admin@op.pl"};
-            managerMock.Setup(x => x.FindByIdAsync("Admin")).ReturnsAsync(user);
+            var user = GetValidUser();
+            var userList = new List<Data.User> {user};
+            var listMock = userList.AsQueryable().BuildMock();
+            managerMock.Setup(x => x.Users).Returns(listMock.Object);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);
 
@@ -238,7 +244,8 @@ namespace ComicBookShopCore.Services.Tests.User
             Assert.NotNull(result);
             Assert.IsType<UserDto>(result);
             Assert.Equal("Admin", result.UserName);
-            Assert.Equal("admin@op.pl", result.Email);
+            Assert.Equal(user.Email, result.Email);
+            Assert.NotNull(result.Address);
         }
 
         [Fact]
@@ -246,11 +253,13 @@ namespace ComicBookShopCore.Services.Tests.User
         {
             var managerMock = GetUserManagerMock();
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
+            var list = new List<Data.User>();
+            var listMock = list.AsQueryable().BuildMock();
+            managerMock.Setup(x => x.Users).Returns(listMock.Object);
             var service = new UserService(managerMock.Object, mapper);
 
             var result = await service.FindUserById("Admin");
 
-            managerMock.Verify(x => x.FindByIdAsync("Admin"), Times.Once);
             Assert.Null(result);
         }
 
@@ -274,29 +283,29 @@ namespace ComicBookShopCore.Services.Tests.User
         public async Task FindUserByUserName_ValidCall()
         {
             var managerMock = GetUserManagerMock();
-            var user = new Data.User {UserName = "Admin", FirstName = "Adam", LastName = "Testowy"};
-            managerMock.Setup(x => x.FindByNameAsync("Admin")).ReturnsAsync(user);
+            var userList = new List<Data.User> {GetValidUser()}.AsQueryable().BuildMock();
+            managerMock.Setup(x => x.Users).Returns(userList.Object);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);
 
             var result = await service.FindUserByUserName("Admin");
 
-            managerMock.Verify(x => x.FindByNameAsync("Admin"), Times.Once);
             Assert.NotNull(result);
             Assert.Equal("Admin", result.UserName);
-            Assert.Equal("Adam Testowy", result.Name);
+            Assert.Equal("test adam", result.Name);
         }
 
         [Fact]
         public async Task FindUserByUserName_UserNotFound_ReturnsNull()
         {
             var managerMock = GetUserManagerMock();
+            var list = new List<Data.User>().AsQueryable().BuildMock();
+            managerMock.Setup(x => x.Users).Returns(list.Object);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);
 
             var result = await service.FindUserByUserName("Admin");
 
-            managerMock.Verify(x => x.FindByNameAsync("Admin"), Times.Once);
             Assert.Null(result);
         }
 
@@ -320,28 +329,29 @@ namespace ComicBookShopCore.Services.Tests.User
         public async Task UserForUpdate_ValidCall()
         {
             var managerMock = GetUserManagerMock();
-            var user = new Data.User {FirstName = "Adam"};
-            managerMock.Setup(x => x.FindByIdAsync("Admin")).ReturnsAsync(user);
+            var user = GetValidUser();
+            var list = new List<Data.User> {user}.AsQueryable().BuildMock();
+            managerMock.Setup(x => x.Users).Returns(list.Object);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);
 
             var result = await service.UserForUpdate("Admin");
 
-            managerMock.Verify(x => x.FindByIdAsync("Admin"), Times.Once);
             Assert.NotNull(result);
-            Assert.Equal("Adam", result.FirstName);
+            Assert.Equal("test", result.FirstName);
         }
 
         [Fact]
         public async Task UserForUpdate_UserNotFound_ReturnsNull()
         {
             var managerMock = GetUserManagerMock();
+            var list = new List<Data.User>().AsQueryable().BuildMock();
+            managerMock.Setup(x => x.Users).Returns(list.Object);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);
 
             var result = await service.UserForUpdate("Admin");
 
-            managerMock.Verify(x => x.FindByIdAsync("Admin"), Times.Once);
             Assert.Null(result);
         }
 
@@ -366,9 +376,10 @@ namespace ComicBookShopCore.Services.Tests.User
         {
             var managerMock = GetUserManagerMock();
             var user = GetValidUser();
+            var list = new List<Data.User> {user}.AsQueryable().BuildMock();
             var userUpdateDto = GetValidUserUpdateDto();
             userUpdateDto.FirstName = "John";
-            managerMock.Setup(x => x.FindByIdAsync("Admin")).ReturnsAsync(user);
+            managerMock.Setup(x => x.Users).Returns(list.Object);
             managerMock.Setup(x => x.UpdateAsync(It.IsAny<Data.User>())).ReturnsAsync(IdentityResult.Success);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);
@@ -386,12 +397,13 @@ namespace ComicBookShopCore.Services.Tests.User
         {
             var managerMock = GetUserManagerMock();
             var userUpdateDto = GetValidUserUpdateDto();
+            var list = new List<Data.User>().AsQueryable().BuildMock();
+            managerMock.Setup(x => x.Users).Returns(list.Object);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);
 
             var result = await service.UpdateUserInfo("Admin", userUpdateDto);
 
-            managerMock.Verify(x => x.FindByIdAsync("Admin"), Times.Once);
             managerMock.Verify(x => x.UpdateAsync(It.IsAny<Data.User>()), Times.Never);
             Assert.NotNull(result);
             Assert.Single(result);
@@ -404,9 +416,10 @@ namespace ComicBookShopCore.Services.Tests.User
         {
             var managerMock = GetUserManagerMock();
             var user = GetValidUser();
+            var list = new[] {user}.AsQueryable().BuildMock();
             var userUpdateDto = GetValidUserUpdateDto();
             userUpdateDto.FirstName = "";
-            managerMock.Setup(x => x.FindByIdAsync("Admin")).ReturnsAsync(user);
+            managerMock.Setup(x => x.Users).Returns(list.Object);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);
 
@@ -422,9 +435,10 @@ namespace ComicBookShopCore.Services.Tests.User
         {
             var managerMock = GetUserManagerMock();
             var user = GetValidUser();
+            var list = new[] {user}.AsQueryable().BuildMock();
             var userUpdateDto = GetValidUserUpdateDto();
             userUpdateDto.Address.Country = "";
-            managerMock.Setup(x => x.FindByIdAsync("Admin")).ReturnsAsync(user);
+            managerMock.Setup(x => x.Users).Returns(list.Object);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);
 
@@ -440,10 +454,11 @@ namespace ComicBookShopCore.Services.Tests.User
         {
             var managerMock = GetUserManagerMock();
             var user = GetValidUser();
+            var list = new[] {user}.AsQueryable().BuildMock();
             var userUpdateDto = GetValidUserUpdateDto();
             userUpdateDto.FirstName = "";
             userUpdateDto.Address.City = "";
-            managerMock.Setup(x => x.FindByIdAsync("Admin")).ReturnsAsync(user);
+            managerMock.Setup(x => x.Users).Returns(list.Object);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);
 
@@ -460,9 +475,10 @@ namespace ComicBookShopCore.Services.Tests.User
         {
             var managerMock = GetUserManagerMock();
             var user = GetValidUser();
+            var list = new[] {user}.AsQueryable().BuildMock();
             var userUpdateDto = GetValidUserUpdateDto();
             var errors = new [] {new IdentityError(){Code = "Email", Description = "Invalid email"}};
-            managerMock.Setup(x => x.FindByIdAsync("Admin")).ReturnsAsync(user);
+            managerMock.Setup(x => x.Users).Returns(list.Object);
             managerMock.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Failed(errors));
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();
             var service = new UserService(managerMock.Object, mapper);

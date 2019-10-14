@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
+using AutoMapper;
 using AutoMapper.EquivalencyExpression;
 using ComicBookShopCore.Services.Artist;
 using ComicBookShopCore.Services.ComicBook;
@@ -18,7 +19,7 @@ namespace ComicBookShopCore.Services
 	    
             CreateMap<Data.Artist, ArtistDto>();
             CreateMap<Data.Artist, ArtistDetailsDto>();
-	    CreateMap<ArtistDto, Data.Artist>().ForMember(x => x.Id, opt => opt.Ignore());
+	        CreateMap<ArtistDto, Data.Artist>().ForMember(x => x.Id, opt => opt.Ignore());
             CreateMap<ArtistDetailsDto, Data.Artist>().ForMember(x => x.Id, opt => opt.Ignore());
 
             CreateMap<Data.Publisher, PublisherBasicDto>();
@@ -29,7 +30,7 @@ namespace ComicBookShopCore.Services
             CreateMap<Data.Series, SeriesBasicDto>();
             CreateMap<Data.Series, SeriesDto>();
             CreateMap<Data.Series, SeriesDetailsDto>();	
-	    CreateMap<SeriesInputDto, Data.Series>();
+	        CreateMap<SeriesInputDto, Data.Series>();
             CreateMap<Data.Series, SeriesInputDto>();
 
             CreateMap<Data.ComicBook, ComicBookBasicDto>();
@@ -67,7 +68,7 @@ namespace ComicBookShopCore.Services
             CreateMap<Data.User, UserUpdateDto>();
             CreateMap<UserUpdateDto, Data.User>();
             CreateMap<UserRegisterDto, Data.User>();
-            CreateMap<Data.User, UserDto>().ForMember(x => x.Name, opt => opt.MapFrom(z => z.Name));
+            CreateMap<Data.User, UserDto>().ForMember(x => x.Name, opt => opt.MapFrom(z => z.Name)).ForMember(x => x.Address, opt => opt.MapFrom(z => z.Address));
         }
     }
 }
