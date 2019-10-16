@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +15,8 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ComicBookShopCore.WebAPI.Controllers
 {
+    //TODO: User Update/Change password
+    //TODO: Find user by id/username
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -21,6 +25,37 @@ namespace ComicBookShopCore.WebAPI.Controllers
         public UserController(IUserService service)
         {
             _service = service;
+        }
+
+        [HttpGet]
+        [Route("api/userList")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
+        public async Task<ActionResult<IQueryable<UserDto>>> GetUserList()
+        {
+            var result = await _service.UserList();
+
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("api/user")]
+        [Authorize]
+        public async Task<ActionResult<UserDto>> GetLoggedUserInfo()
+        {
+            var idClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.PrimarySid);
+
+            if (idClaim == null)
+                return BadRequest();
+
+            var user = await _service.FindUserById(idClaim.Value);
+
+            if (user == null)
+                return NotFound();
+
+            return Ok(user);
         }
 
         [HttpPost]

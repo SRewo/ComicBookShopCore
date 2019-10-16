@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using ComicBookShopCore.Services.User;
 using ComicBookShopCore.WebAPI.Controllers;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -13,6 +16,80 @@ namespace ComicBookShopCore.WebAPI.Tests.Controllers
 {
     public class UserControllerTests
     {
+        [Fact]
+        public async Task GetUserList_ValidCall()
+        {
+            var mock = AutoMock.GetLoose();
+            var list = new List<UserDto>(){new UserDto(){Name = "Adam Test", UserName = "Admin"}};
+            mock.Mock<IUserService>().Setup(x => x.UserList()).ReturnsAsync(list);
+            var controller = mock.Create<UserController>();
+
+            var result = await controller.GetUserList();
+
+            var response = Assert.IsType<OkObjectResult>(result.Result);
+            Assert.NotNull(response.Value);
+        }
+
+        [Fact]
+        public async Task GetUserList_ListReturnsNull_ReturnsNotFoundResult()
+        {
+            var mock = AutoMock.GetLoose();
+            mock.Mock<IUserService>().Setup(x => x.UserList()).ReturnsAsync((IEnumerable<UserDto>)null);
+            var controller = mock.Create<UserController>();
+
+            var result = await controller.GetUserList();
+
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task GetUserInfo_ValidCall()
+        {
+            var mock = AutoMock.GetLoose();
+            var userData = new UserDto(){Email = "random@email.pl", Address = new UserAddressDto(){City = "Krakow", Country = "Poland"}, DateOfBirth = new DateTime(1999,01,01)};
+            mock.Mock<IUserService>().Setup(x => x.FindUserById("admin")).ReturnsAsync(userData);
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext {HttpContext = new DefaultHttpContext()};
+            var claims = new ClaimsPrincipal();
+            claims.AddIdentity(new ClaimsIdentity(new List<Claim>{new Claim(ClaimTypes.PrimarySid, "admin")}));
+            controller.ControllerContext.HttpContext.User = claims;
+
+            var result = await controller.GetLoggedUserInfo();
+
+            var resultValue = Assert.IsType<OkObjectResult>(result.Result);
+            Assert.NotNull(resultValue.Value);
+            var loggedUserInfo = Assert.IsType<UserDto>(resultValue.Value);
+            Assert.Equal(userData.Email, loggedUserInfo.Email);
+            Assert.Equal(userData.DateOfBirth, loggedUserInfo.DateOfBirth);
+            Assert.Equal(userData.Address.City, loggedUserInfo.Address.City);
+        }
+
+        [Fact]
+        public async Task GetUserInfo_UserNotFound_ReturnsNotFoundResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext{HttpContext = new DefaultHttpContext()};
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[] {new Claim(ClaimTypes.PrimarySid, "admin")}));
+            controller.ControllerContext.HttpContext.User = user;
+
+            var result = await controller.GetLoggedUserInfo();
+
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task GetUserInfo_IdIsNull_ReturnsBadRequestResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext{HttpContext = new DefaultHttpContext()};
+
+            var result = await controller.GetLoggedUserInfo();
+
+            Assert.IsType<BadRequestResult>(result.Result);
+        }
+
         [Fact]
         public async Task GetToken_ValidCall()
         {

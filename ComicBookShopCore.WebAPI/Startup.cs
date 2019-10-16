@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using AutoMapper.EquivalencyExpression;
@@ -80,8 +81,8 @@ namespace ComicBookShopCore.WebAPI
 
             services.AddAuthorization(opt =>
             {
-                opt.AddPolicy("Admin", policy => policy.RequireClaim("Role", "Admin"));
-                opt.AddPolicy("Employee", policy => policy.RequireClaim("Role", "Admin", "Employee"));
+                opt.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
+                opt.AddPolicy("Employee", policy => policy.RequireClaim(ClaimTypes.Role, "Admin", "Employee"));
             });
 
             services.AddMvcCore();

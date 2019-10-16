@@ -213,8 +213,8 @@ namespace ComicBookShopCore.Services.Tests.User
             var managerMock = new Mock<UserManager<Data.User>>(userStore.Object, null, null, null, null, null, null, null, null);
             var users = new List<Data.User>
             {
-                new Data.User(){UserName = "Admin", FirstName = "Adam", Address = new Address(), Roles = new [] {new IdentityRole("User")}},
-                new Data.User{UserName = "Test123", FirstName = "Marek" ,LastName = "Testowy", Address = new Address(), Roles = new [] {new IdentityRole("User"), }}
+                new Data.User(){UserName = "Admin", FirstName = "Adam", Address = new Address()},
+                new Data.User{UserName = "Test123", FirstName = "Marek" ,LastName = "Testowy", Address = new Address(),} 
             }.AsQueryable();
             managerMock.Setup(x => x.Users).Returns(users);
             var mapper = new MapperConfiguration(mc => mc.AddProfile(new MapperProfile())).CreateMapper();

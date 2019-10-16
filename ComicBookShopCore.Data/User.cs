@@ -20,8 +20,6 @@ namespace ComicBookShopCore.Data
 
         [Required] public Address Address { get; set; }
 
-        public IEnumerable<IdentityRole> Roles { get; set;}
-
         [Required]
         [Display(Name = "Date of Birth")]
         [DataType(DataType.Date)]

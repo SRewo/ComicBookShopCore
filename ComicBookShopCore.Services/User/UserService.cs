@@ -68,7 +68,7 @@ namespace ComicBookShopCore.Services.User
 
         public Task<IEnumerable<UserDto>> UserList()
         {
-            var users = _manager.Users.Include(x => x.Address).Where(x => x.Roles.Any(z => z.Name == "User"));
+            var users = _manager.Users.Include(x => x.Address);
             var result = _mapper.ProjectTo<UserDto>(users.AsQueryable());
             return Task.FromResult(result.AsEnumerable());
         }
