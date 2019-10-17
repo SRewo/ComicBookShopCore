@@ -16,7 +16,6 @@ using Microsoft.IdentityModel.Tokens;
 namespace ComicBookShopCore.WebAPI.Controllers
 {
     //TODO: User Update/Change password
-    //TODO: Find user by id/username
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -51,6 +50,38 @@ namespace ComicBookShopCore.WebAPI.Controllers
                 return BadRequest();
 
             var user = await _service.FindUserById(idClaim.Value);
+
+            if (user == null)
+                return NotFound();
+
+            return Ok(user);
+        }
+
+        [HttpGet]
+        [Route("api/user/id/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
+        public async Task<ActionResult<UserDto>> GetUserById(string id)
+        {
+            if (id == null)
+                return BadRequest();
+
+            var user = await _service.FindUserById(id);
+
+            if (user == null)
+                return NotFound();
+
+            return Ok(user);
+        }
+
+        [HttpGet]
+        [Route("api/user/{userName}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
+        public async Task<ActionResult<UserDto>> GetUserByUserName(string userName)
+        {
+            if (userName == null)
+                return BadRequest();
+
+            var user = await _service.FindUserByUserName(userName);
 
             if (user == null)
                 return NotFound();

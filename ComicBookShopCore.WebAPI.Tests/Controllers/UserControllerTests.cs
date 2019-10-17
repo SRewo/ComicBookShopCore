@@ -91,6 +91,82 @@ namespace ComicBookShopCore.WebAPI.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetUserById_ValidCall()
+        {
+            var mock = AutoMock.GetLoose();
+            var user = new UserDto{UserName = "Admin", Id = "id"};
+            mock.Mock<IUserService>().Setup(x => x.FindUserById("id")).ReturnsAsync(user);
+            var controller = mock.Create<UserController>();
+
+            var result = await controller.GetUserById("id");
+
+            var ok = Assert.IsType<OkObjectResult>(result.Result);
+            var userValue = Assert.IsType<UserDto>(ok.Value);
+            Assert.Equal(user.Id, userValue.Id);
+            Assert.Equal(user.UserName, userValue.UserName);
+        }
+
+        [Fact]
+        public async Task GetUserById_IdIsNull_ReturnsBadRequestResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+
+            var result = await controller.GetUserById(null);
+
+            Assert.IsType<BadRequestResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task GetUserById_UserNotFound_ReturnsNotFoundResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+
+            var result = await controller.GetUserById("id");
+
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task GetUserByUserName_ValidCall()
+        {
+            var mock = AutoMock.GetLoose();
+            var user = new UserDto{UserName = "Admin", Id = "id"};
+            mock.Mock<IUserService>().Setup(x => x.FindUserByUserName("Admin")).ReturnsAsync(user);
+            var controller = mock.Create<UserController>();
+
+            var result = await controller.GetUserByUserName("Admin");
+
+            var ok = Assert.IsType<OkObjectResult>(result.Result);
+            var userValue = Assert.IsType<UserDto>(ok.Value);
+            Assert.Equal(user.Id, userValue.Id);
+            Assert.Equal(user.UserName, userValue.UserName);
+        }
+
+        [Fact]
+        public async Task GetUserByUserName_UserNameIsNull_ReturnsBadRequestResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+
+            var result = await controller.GetUserByUserName(null);
+
+            Assert.IsType<BadRequestResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task GetUserByUserName_UserNotFound_ReturnsNotFoundResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+
+            var result = await controller.GetUserByUserName("Admin");
+
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
         public async Task GetToken_ValidCall()
         {
             var mock = AutoMock.GetLoose();
