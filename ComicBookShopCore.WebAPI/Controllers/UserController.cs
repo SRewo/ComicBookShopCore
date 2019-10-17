@@ -162,5 +162,32 @@ namespace ComicBookShopCore.WebAPI.Controllers
 
             return ValidationProblem(new ValidationProblemDetails(state));
         }
+
+        [HttpPost]
+        [Route("api/user/changePassword")]
+        [Authorize]
+        public async Task<ActionResult> ChangePassword(ChangePasswordDto passwordDto)
+        {
+            if (passwordDto == null)
+                return BadRequest();
+
+            var currentUserClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.PrimarySid);
+
+            if (currentUserClaim == null)
+                return BadRequest();
+
+            var id = currentUserClaim.Value;
+
+            var result = await _service.UpdatePassword(id, passwordDto);
+
+            if (result == null)
+                return Ok();
+
+            var state = new ModelStateDictionary();
+
+            foreach (var (key, value) in result) state.AddModelError(key, value);
+
+            return ValidationProblem(new ValidationProblemDetails(state));
+        }
     }
 }

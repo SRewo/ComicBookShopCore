@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
@@ -285,6 +286,64 @@ namespace ComicBookShopCore.WebAPI.Tests.Controllers
             var result = await controller.RegisterEmployee(userDto);
 
             Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task ChangePassword_ValidCall()
+        {
+            var mock = AutoMock.GetLoose();
+            var changePasswordDto = new ChangePasswordDto();
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext{HttpContext = new DefaultHttpContext()};
+            var claims = new ClaimsPrincipal();
+            claims.AddIdentity(new ClaimsIdentity(new [] {new Claim(ClaimTypes.PrimarySid, "id")}));
+            controller.ControllerContext.HttpContext.User = claims;
+
+            var result = await controller.ChangePassword(changePasswordDto);
+
+            Assert.IsType<OkResult>(result);
+        }
+
+        [Fact]
+        public async Task ChangePassword_DtoIsNull_ReturnsBadRequestResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+
+            var result = await controller.ChangePassword(null);
+
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task ChangePassword_IdIsNull_ReturnsBadRequestResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext {HttpContext = new DefaultHttpContext()};
+            var passwordDto = new ChangePasswordDto();
+
+            var result = await controller.ChangePassword(passwordDto);
+
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task ChangePasswords_ServiceReturnsErrors_ReturnsBadRequestObjectResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var changePasswordDto = new ChangePasswordDto();
+            var errors = new Dictionary<string, string>{{"Password", "Invalid current password"}};
+            mock.Mock<IUserService>().Setup(x => x.UpdatePassword("id", changePasswordDto)).ReturnsAsync(errors);
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext{HttpContext = new DefaultHttpContext()};
+            var claims = new ClaimsPrincipal();
+            claims.AddIdentity(new ClaimsIdentity(new [] {new Claim(ClaimTypes.PrimarySid, "id")}));
+            controller.ControllerContext.HttpContext.User = claims;
+
+            var result = await controller.ChangePassword(changePasswordDto);
+
+            var resultErrors = Assert.IsType<BadRequestObjectResult>(result);
         }
     }
 }
