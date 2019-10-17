@@ -9,6 +9,7 @@ using ComicBookShopCore.Services.User;
 using ComicBookShopCore.WebAPI.Controllers;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -345,5 +346,139 @@ namespace ComicBookShopCore.WebAPI.Tests.Controllers
 
             var resultErrors = Assert.IsType<BadRequestObjectResult>(result);
         }
+
+        [Fact]
+        public async Task UpdateUser_ValidCall()
+        {
+            var mock = AutoMock.GetLoose();
+            var user = new UserUpdateDto();
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext{HttpContext = new DefaultHttpContext()};
+            var claims = new ClaimsPrincipal();
+            claims.AddIdentity(new ClaimsIdentity(new [] {new Claim(ClaimTypes.PrimarySid, "id")}));
+            controller.ControllerContext.HttpContext.User = claims;
+
+            var result = await controller.UpdateUser(user);
+
+            Assert.IsType<OkResult>(result);
+        }
+
+        [Fact]
+        public async Task UpdateUser_UserUpdateDtoIsNull_ReturnsBadRequestResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+
+            var result = await controller.UpdateUser(null);
+
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task UpdateUser_IdIsNull_ReturnsBadRequestResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext {HttpContext = new DefaultHttpContext()};
+            var user = new UserUpdateDto();
+
+            var result = await controller.UpdateUser(user);
+
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task UpdateUser_ServiceReturnsErrors_ReturnsBadRequestObjectResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var user = new UserUpdateDto();
+            var errors = new Dictionary<string, string>{{"Address", "Address cannot be null"}};
+            mock.Mock<IUserService>().Setup(x => x.UpdateUserInfo("id", user )).ReturnsAsync(errors);
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext{HttpContext = new DefaultHttpContext()};
+            var claims = new ClaimsPrincipal();
+            claims.AddIdentity(new ClaimsIdentity(new [] {new Claim(ClaimTypes.PrimarySid, "id")}));
+            controller.ControllerContext.HttpContext.User = claims;
+
+            var result = await controller.UpdateUser(user);
+
+            var resultErrors = Assert.IsType<BadRequestObjectResult>(result);
+        } 
+        
+        [Fact]
+        public async Task PatchUser_ValidCall()
+        {
+            var mock = AutoMock.GetLoose();
+            var user = new UserUpdateDto();
+            mock.Mock<IUserService>().Setup(x => x.UserForUpdate("id")).ReturnsAsync(user);
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext{HttpContext = new DefaultHttpContext()};
+            var claims = new ClaimsPrincipal();
+            claims.AddIdentity(new ClaimsIdentity(new [] {new Claim(ClaimTypes.PrimarySid, "id")}));
+            controller.ControllerContext.HttpContext.User = claims;
+
+            var result = await controller.PatchUser(new JsonPatchDocument<UserUpdateDto>());
+
+            Assert.IsType<OkResult>(result);
+        }
+
+        [Fact]
+        public async Task PatchUser_PatchIsNull_ReturnsBadRequestResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+
+            var result = await controller.PatchUser(null);
+
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task PatchUser_IdIsNull_ReturnsBadRequestResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext {HttpContext = new DefaultHttpContext()};
+            var user = new UserUpdateDto();
+
+            var result = await controller.PatchUser(new JsonPatchDocument<UserUpdateDto>());
+
+            Assert.IsType<BadRequestResult>(result);
+        }
+        
+        [Fact]
+        public async Task PatchUser_UserNotFound_ReturnsNotFoundResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var user = new UserUpdateDto();
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext{HttpContext = new DefaultHttpContext()};
+            var claims = new ClaimsPrincipal();
+            claims.AddIdentity(new ClaimsIdentity(new [] {new Claim(ClaimTypes.PrimarySid, "id")}));
+            controller.ControllerContext.HttpContext.User = claims;
+
+            var result = await controller.PatchUser(new JsonPatchDocument<UserUpdateDto>());
+
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task PatchUser_ServiceReturnsErrors_ReturnsBadRequestObjectResult()
+        {
+            var mock = AutoMock.GetLoose();
+            var user = new UserUpdateDto();
+            var errors = new Dictionary<string, string>{{"Address", "Address cannot be null"}};
+            mock.Mock<IUserService>().Setup(x => x.UserForUpdate("id")).ReturnsAsync(user);
+            mock.Mock<IUserService>().Setup(x => x.UpdateUserInfo("id", user )).ReturnsAsync(errors);
+            var controller = mock.Create<UserController>();
+            controller.ControllerContext = new ControllerContext{HttpContext = new DefaultHttpContext()};
+            var claims = new ClaimsPrincipal();
+            claims.AddIdentity(new ClaimsIdentity(new [] {new Claim(ClaimTypes.PrimarySid, "id")}));
+            controller.ControllerContext.HttpContext.User = claims;
+
+            var result = await controller.PatchUser(new JsonPatchDocument<UserUpdateDto>());
+
+            var resultErrors = Assert.IsType<BadRequestObjectResult>(result);
+        } 
     }
 }

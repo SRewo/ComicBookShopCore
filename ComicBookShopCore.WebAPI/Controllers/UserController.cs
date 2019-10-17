@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 using ComicBookShopCore.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ComicBookShopCore.WebAPI.Controllers
 {
-    //TODO: User Update/Change password
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -179,6 +179,63 @@ namespace ComicBookShopCore.WebAPI.Controllers
             var id = currentUserClaim.Value;
 
             var result = await _service.UpdatePassword(id, passwordDto);
+
+            if (result == null)
+                return Ok();
+
+            var state = new ModelStateDictionary();
+
+            foreach (var (key, value) in result) state.AddModelError(key, value);
+
+            return ValidationProblem(new ValidationProblemDetails(state));
+        }
+
+        [HttpPost]
+        [Route("api/users/update")]
+        [Authorize]
+        public async Task<ActionResult> UpdateUser(UserUpdateDto user)
+        {
+            if (user == null)
+                return BadRequest();
+
+            var currentUserClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.PrimarySid);
+
+            if (currentUserClaim == null)
+                return BadRequest();
+
+            var result = await _service.UpdateUserInfo(currentUserClaim.Value, user);
+
+            if (result == null)
+                return Ok();
+
+            var state = new ModelStateDictionary();
+
+            foreach (var (key, value) in result) state.AddModelError(key, value);
+
+            return ValidationProblem(new ValidationProblemDetails(state));
+        }
+
+        [HttpPatch]
+        [Route("api/users/update")]
+        [Authorize]
+        public async Task<ActionResult> PatchUser(JsonPatchDocument<UserUpdateDto> patch)
+        {
+            if (patch == null)
+                return BadRequest();
+
+            var currentUserClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.PrimarySid);
+
+            if (currentUserClaim == null)
+                return BadRequest();
+
+            var user = await _service.UserForUpdate(currentUserClaim.Value);
+
+            if (user == null)
+                return NotFound();
+
+            patch.ApplyTo(user);
+
+            var result = await _service.UpdateUserInfo(currentUserClaim.Value, user);
 
             if (result == null)
                 return Ok();
