@@ -7,6 +7,7 @@ using ComicBookShopCore.Data;
 using ComicBookShopCore.Services;
 using ComicBookShopCore.Services.Artist;
 using ComicBookShopCore.Services.ComicBook;
+using ComicBookShopCore.Services.Order;
 using ComicBookShopCore.Services.Publisher;
 using ComicBookShopCore.Services.Series;
 using ComicBookShopCore.Services.User;
@@ -58,6 +59,8 @@ namespace ComicBookShopCore.WebAPI
             services.AddScoped<ISeriesService, SeriesService>();
             services.AddSingleton<IComicBookService, ComicBookService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IOrderRepositoryAsync, EfOrderRepositoryAsync>();
+            services.AddScoped<IOrderService, OrderService>();
             services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrameworkStores<ShopDbEntities>()
                 .AddDefaultTokenProviders();
 
