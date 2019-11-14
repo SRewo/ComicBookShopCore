@@ -29,6 +29,11 @@ namespace ComicBookShopCore.Data
             return null;
         }
 
+        public Dictionary<string, List<string>> GetErrors()
+        {
+            return _propErrors;
+        }
+
         private void ValidateProperty<T>(string propertyName, T value)
         {
             if (propertyName == string.Empty) return;

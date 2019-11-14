@@ -7,7 +7,7 @@ namespace ComicBookShopCore.Services.Order
     {
         Task<IEnumerable<OrderBasicDto>> OrderListAsync();
         Task<OrderDetailsDto> OrderDetailsAsync(int id);
-        Task AddOrderAsync(OrderInputDto order);
+        Task<Dictionary<string, string>> AddOrderAsync(OrderInputDto order);
         Task RemoveOrderAsync(int id);
     }
 }

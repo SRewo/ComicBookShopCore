@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 
+//TODO: Order service tests
 namespace ComicBookShopCore.Services.Order
 {
     public class OrderService : IOrderService
@@ -30,20 +31,45 @@ namespace ComicBookShopCore.Services.Order
             return _mapper.Map<OrderDetailsDto>(order);
         }
 
-        public Task AddOrderAsync(OrderInputDto order)
+        public async Task<Dictionary<string, string>> AddOrderAsync(OrderInputDto order)
         {
             var ord = _mapper.Map<Data.Order>(order);
             ord.Validate();
+            var result = new Dictionary<string, string>();
+
             if (ord.HasErrors)
-                throw new ValidationException(ord.GetFirstError());
-            Parallel.ForEach(ord.OrderItems, x => x.Validate());
-            if (ord.OrderItems.Any(x => x.HasErrors))
             {
-                var item = ord.OrderItems.Single(x => x.HasErrors);
-                throw new ValidationException(item.GetFirstError());
+                var errors = ord.GetErrors();
+
+                foreach (var error in errors)
+                {
+                    foreach (var errorMessage in error.Value) result.Add(error.Key, errorMessage);
+                }
+
+                return result;
             }
 
-            return _repository.AddAsync(ord);
+            Parallel.ForEach(ord.OrderItems, x => x.Validate());
+
+            if (ord.OrderItems.Any(x => x.HasErrors))
+            {
+                var items = ord.OrderItems.Where(x => x.HasErrors);
+
+                foreach (var item in items)
+                {
+                    foreach (var error in item.GetErrors())
+                    {
+                        foreach (var errorMessage in error.Value)
+                        {
+                           result.Add($"{item.ComicBookId}: {error.Key}", errorMessage); 
+                        } 
+                    } 
+                }
+
+            }
+
+            await _repository.AddAsync(ord);
+            return result;
         }
 
         public async Task RemoveOrderAsync(int id)

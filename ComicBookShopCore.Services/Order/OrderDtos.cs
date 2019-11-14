@@ -8,7 +8,7 @@ namespace ComicBookShopCore.Services.Order
     public class OrderBasicDto
     {
         public int Id { get; private set; }
-        public int UserId { get; private set; }
+        public string UserId { get; private set; }
         public DateTime OrderDate { get; set; }
         public int NumberOfItems { get; set; }
         public double TotalPrice { get; set; }
@@ -25,7 +25,7 @@ namespace ComicBookShopCore.Services.Order
 
     public class OrderInputDto
     {
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public DateTime OrderDate { get; set; }
         public IEnumerable<OrderItemInputDto> OrderItems { get; set; }
     }
