@@ -2,9 +2,9 @@
 
 ComicBookShopCore is a group of .net core 3.0 apps for managing a comic book store. At the moment, the project consists of:
 * ComicBookShopCore.Data - library used for communication with database
-* ComicBookShopCore.Desktop - WPF + Prism app designed for managing data and taking in store orders
+* ComicBookShopCore.Desktop - WPF + Prism app designed for managing data and taking instore orders
 * ComicBookShopCore.WebAPI - Asp.net web API 
-* ComicBookShopCore.Web - ASP.NET MVC website designed for taking online users orders
+* ComicBookShopCoreWeb - Angular8 website designed for taking online users orders
 * ComicBookShopCore.*.Tests - Xuit tests for listed above apps
 
 Project created is mainly for educational purposes.
@@ -29,7 +29,7 @@ Login: Admin
 Password: @Dmin123
 ```
 * ***web*** - container with asp.net mvc website
-  - default port: _8080_
+  - default port: _4201_
 * ***webapi*** - container with asp.net WebAPI
   - default port: _8081_
   
