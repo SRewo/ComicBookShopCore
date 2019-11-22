@@ -3,16 +3,10 @@ version: '3'
 services:
   web:
     build:
-      context: ./
-      dockerfile: ./ComicBookShopCore.Web/Dockerfile
+      context: ./ComicBookShopCoreWeb
+      dockerfile: ./Dockerfile
     ports:
-        - "8080:80"
-        - "8443:443"
-    volumes:
-        - /etc/ssl/certs/ssl-cert-snakeoil.pem:/app/fullchain.pem
-        - /etc/ssl/private/ssl-cert-snakeoil.key:/app/privkey.pem
-    depends_on:
-        - db
+        - "4201:4200"
   db:
     build:
       context: ./ComicBookShopCore.Data/
