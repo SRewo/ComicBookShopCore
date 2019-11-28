@@ -28,7 +28,7 @@ Docker containers:
 Login: Admin
 Password: @Dmin123
 ```
-* ***web*** - container with asp.net mvc website
+* ***web*** - container with Angular8 website
   - default port: _4201_
 * ***webapi*** - container with asp.net WebAPI
   - default port: _8081_
