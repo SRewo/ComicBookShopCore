@@ -6,7 +6,9 @@ services:
       context: ./ComicBookShopCoreWeb
       dockerfile: ./Dockerfile
     ports:
-        - "4201:4200"
+      - "4201:4200"
+    depends_on:
+      - webapi
   db:
     build:
       context: ./ComicBookShopCore.Data/
@@ -20,8 +22,7 @@ services:
     ports:
       - "8081:80"
       - "8434:433"
-    volumes:
-    - /etc/ssl/certs/ssl-cert-snakeoil.pem:/app/fullchain.pem
-    - /etc/ssl/private/ssl-cert-snakeoil.key:/app/privkey.pem
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - db

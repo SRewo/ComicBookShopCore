@@ -1,10 +1,23 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {ComicBookService} from './shared/services/comic-book.service';
+import {Observable} from 'rxjs';
+import {ComicBook} from './shared/models/comic-book';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   title = 'ComicBookShopCoreWeb';
+  comics;
+
+  constructor(private service: ComicBookService) {
+  }
+
+  ngOnInit(): void {
+    this.service.getAllComics().subscribe((data) => {
+      this.comics = data;
+    } );
+ }
 }
