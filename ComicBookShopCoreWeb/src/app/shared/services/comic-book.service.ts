@@ -9,7 +9,7 @@ import {ComicBook} from '../models/comic-book';
 export class ComicBookService {
    url = 'http://localhost:8081/api/comicbook';
    constructor(private http: HttpClient) {}
-   getAllComics() {
+   getAllComics(): Observable<any> {
      return this.http.get<ComicBook>(this.url);
 }
 }
