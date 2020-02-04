@@ -4,13 +4,7 @@
 <div class="container d-flex flex-column">
   <main role="main" class="pb-3 flex-fill">
     <router-outlet></router-outlet>
-    <ul>
-      <li *ngFor="let comic of comics">
-        <h3 [innerHTML]="comic.title"></h3>
-        <p [innerHTML]="comic.shortDescription"></p>
-        <p [innerHTML]="comic.onSaleDate"></p>
-      </li>
-    </ul>
+    <app-item-card *ngFor="let comic of comics" [comic]="comic"></app-item-card>
   </main>
 </div>
 

@@ -13,7 +13,13 @@ exports.config = {
     './src/**/*.e2e-spec.ts'
   ],
   capabilities: {
-    browserName: 'chrome'
+    browserName: 'Chrome',
+    chromeOptions: {
+      args: [
+        '--no-sandbox',
+        '--disable-dev-shm-usage'
+      ]
+    }
   },
   directConnect: true,
   baseUrl: 'http://localhost:4200/',

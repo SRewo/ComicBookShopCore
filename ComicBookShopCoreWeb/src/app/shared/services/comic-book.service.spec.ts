@@ -17,7 +17,7 @@ describe('ComicBookService', () => {
       title: 'Batman #1',
       shortDescription: 'Desc',
       price: 20,
-      publisher: 'DC Comics',
+      publisherName: 'DC Comics',
       onSaleDate: '01-01-2020'
   }]
   };
