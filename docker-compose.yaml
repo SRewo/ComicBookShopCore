@@ -2,18 +2,23 @@ version: '3'
 
 services:
   web:
+    container_name: angular-container
     build:
       context: ./ComicBookShopCoreWeb
       dockerfile: ./Dockerfile
     ports:
       - "4201:4200"
+    depends_on:
+      - webapi
   db:
+    container_name: db
     build:
       context: ./ComicBookShopCore.Data/
       dockerfile: Dockerfile
     ports:
       - "1533:1433"
   webapi:
+    container_name: asp-webapi
     build:
       context: ./
       dockerfile: ./ComicBookShopCore.WebAPI/Dockerfile
