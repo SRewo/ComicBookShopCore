@@ -6,16 +6,9 @@ import {ComicBookService} from './shared/services/comic-book.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'ComicBookShopCoreWeb';
-  comics;
 
-  constructor(private service: ComicBookService) {
+  constructor() {
   }
-
-  ngOnInit(): void {
-    this.service.getAllComics().subscribe((data) => {
-      this.comics = data;
-    } );
- }
 }
