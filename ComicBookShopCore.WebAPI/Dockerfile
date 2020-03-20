@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS SDK
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS SDK
 EXPOSE 80
 EXPOSE 443
 WORKDIR /build
@@ -10,7 +10,7 @@ RUN dotnet restore ComicBookShopCore.WebAPI/*.csproj
 RUN dotnet publish ComicBookShopCore.WebAPI/*.csproj -c Release -o out
 
     
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 as build
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 as build
 WORKDIR /app
 COPY --from=SDK /build/out .
 ARG DB_PASSWORD=@Dmin123
