@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Services.Publisher;
+using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -12,9 +13,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ComicBookShopCore.WebAPI.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class PublisherController : ControllerBase
+    [Route("api/publisher")]
+    public class PublisherController : ODataController
     {
         private readonly IPublisherService _publisherService;
 
@@ -23,6 +23,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
             _publisherService = publisherService;
         }
 
+        [EnableQuery]
         [HttpGet]
         [AllowAnonymous]
         public Task<IEnumerable<PublisherBasicDto>> Get()
@@ -30,6 +31,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
             return _publisherService.PublisherListAsync();
         }
 
+        [EnableQuery]
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<ActionResult<PublisherDetailsDto>> GetById(int id)

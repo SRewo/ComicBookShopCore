@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ComicBookShopCore.Services.Order;
+using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-//TODO: Order controller tests
 namespace ComicBookShopCore.WebAPI.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class OrderController : ControllerBase
+    [Route("api/order")]
+    public class OrderController : ODataController
     {
         private readonly IOrderService _orderService;
 
@@ -23,6 +22,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpGet]
+        [EnableQuery]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult<IEnumerable<OrderBasicDto>>> GetOrders()
         {
@@ -35,6 +35,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
 
         [HttpGet("{id}")]
         [Authorize]
+        [EnableQuery]
         public async Task<ActionResult<OrderDetailsDto>> GetOrderDetails(int id)
         {
             var result = await _orderService.OrderDetailsAsync(id);

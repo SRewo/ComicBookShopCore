@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ComicBookShopCore.Data;
 using ComicBookShopCore.Data.Interfaces;
 using ComicBookShopCore.Services.Series;
+using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -15,8 +16,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ComicBookShopCore.WebAPI.Controllers
 {
-    [ApiController]
-    [Route("/api/[controller]")]
+    [Route("/api/series")]
     public class SeriesController : ControllerBase
     {
         private readonly ISeriesService _service;
@@ -25,7 +25,8 @@ namespace ComicBookShopCore.WebAPI.Controllers
         {
             _service = service;
         }
-
+        
+        [EnableQuery]
         [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<SeriesDto>>> Get()
@@ -35,6 +36,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
             return Ok(seriesList);
         }
 
+        [EnableQuery]
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<ActionResult<SeriesDetailsDto>> GetById(int id)

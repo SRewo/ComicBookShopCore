@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using ComicBookShopCore.Services.User;
+using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -17,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace ComicBookShopCore.WebAPI.Controllers
 {
     [ApiController]
+    [Route("api/user")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _service;
@@ -27,8 +29,8 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/userList")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
+        [EnableQuery]
         public async Task<ActionResult<IQueryable<UserDto>>> GetUserList()
         {
             var result = await _service.UserList();
@@ -40,8 +42,9 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/user")]
+        [Route("loggedUser")]
         [Authorize]
+        [EnableQuery]
         public async Task<ActionResult<UserDto>> GetLoggedUserInfo()
         {
             var idClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.PrimarySid);
@@ -58,8 +61,9 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/user/id/{id}")]
+        [Route("id/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
+        [EnableQuery]
         public async Task<ActionResult<UserDto>> GetUserById(string id)
         {
             if (id == null)
@@ -74,8 +78,9 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/user/{userName}")]
+        [Route("userName/{userName}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
+        [EnableQuery]
         public async Task<ActionResult<UserDto>> GetUserByUserName(string userName)
         {
             if (userName == null)
@@ -90,7 +95,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("api/login")]
+        [Route("login")]
         [AllowAnonymous]
         public async Task<ActionResult<string>> GetToken([FromBody] UserLoginDto user)
         {
@@ -122,7 +127,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("api/register")]
+        [Route("register")]
         [AllowAnonymous]
         public async Task<ActionResult> RegisterUser([FromBody] UserRegisterDto user)
         {
@@ -142,7 +147,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("api/employees/register")]
+        [Route("employees/register")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
         public async Task<ActionResult> RegisterEmployee([FromBody] UserRegisterDto user)
         {
@@ -164,7 +169,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("api/user/changePassword")]
+        [Route("loggedUser/changePassword")]
         [Authorize]
         public async Task<ActionResult> ChangePassword(ChangePasswordDto passwordDto)
         {
@@ -191,7 +196,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("api/users/update")]
+        [Route("update")]
         [Authorize]
         public async Task<ActionResult> UpdateUser(UserUpdateDto user)
         {
@@ -216,7 +221,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
         }
 
         [HttpPatch]
-        [Route("api/users/update")]
+        [Route("update")]
         [Authorize]
         public async Task<ActionResult> PatchUser(JsonPatchDocument<UserUpdateDto> patch)
         {

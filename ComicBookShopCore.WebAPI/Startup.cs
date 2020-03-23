@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
@@ -11,6 +12,10 @@ using ComicBookShopCore.Services.Order;
 using ComicBookShopCore.Services.Publisher;
 using ComicBookShopCore.Services.Series;
 using ComicBookShopCore.Services.User;
+using Microsoft.AspNet.OData.Batch;
+using Microsoft.AspNet.OData.Builder;
+using Microsoft.AspNet.OData.Extensions;
+using Microsoft.AspNet.OData.Formatter;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,6 +25,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OData.Edm;
 
 namespace ComicBookShopCore.WebAPI
 {
@@ -35,7 +41,7 @@ namespace ComicBookShopCore.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddOData();
             services.AddControllers().AddNewtonsoftJson();
             var mappingConfig = new MapperConfiguration(mc =>
             {
@@ -88,7 +94,19 @@ namespace ComicBookShopCore.WebAPI
                 opt.AddPolicy("Employee", policy => policy.RequireClaim(ClaimTypes.Role, "Admin", "Employee"));
             });
 
-            services.AddMvcCore();
+            services.AddMvcCore(options =>
+            {
+                foreach (var outputFormatter in options.OutputFormatters.OfType<ODataOutputFormatter>().Where(_ => _.SupportedMediaTypes.Count == 0))
+                {
+                    outputFormatter.SupportedMediaTypes.Add(new Microsoft.Net.Http.Headers.MediaTypeHeaderValue("application/prs.odatatestxx-odata"));
+                }
+
+                foreach (var inputFormatter in options.InputFormatters.OfType<ODataInputFormatter>().Where(_ => _.SupportedMediaTypes.Count == 0))
+                {
+                    inputFormatter.SupportedMediaTypes.Add(new Microsoft.Net.Http.Headers.MediaTypeHeaderValue("application/prs.odatatestxx-odata"));
+                }
+            });
+           
         }
 
 
@@ -110,15 +128,45 @@ namespace ComicBookShopCore.WebAPI
 
             app.UseAuthorization();
 
+            app.UseODataBatching();
+
+            var model = GetEdmModel();
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.Select().Expand().Filter().OrderBy().MaxTop(100).Count();
+                endpoints.MapODataRoute("apiPrefix", "api", model);
             });
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
 
+        }
+
+        IEdmModel GetEdmModel()
+        {
+            var builder = new ODataConventionModelBuilder();
+
+            var artists = builder.EntitySet<ArtistDto>("artist");
+            artists.EntityType.HasKey(x => x.Id);
+
+            var publisher = builder.EntitySet<PublisherDto>("publisher");
+            publisher.EntityType.HasKey(x => x.Id);
+
+            var series = builder.EntitySet<SeriesDto>("series");
+            series.EntityType.HasKey(x => x.Id);
+
+            var comicBook = builder.EntitySet<ComicBookListDto>("comic");
+            comicBook.EntityType.HasKey(x => x.Id);
+
+            var order = builder.EntitySet<OrderBasicDto>("order");
+            order.EntityType.HasKey(x => x.Id);
+
+            var user = builder.EntitySet<UserDto>("user");
+            user.EntityType.HasKey(x => x.Id);
+
+            return builder.GetEdmModel();
         }
     }
 }

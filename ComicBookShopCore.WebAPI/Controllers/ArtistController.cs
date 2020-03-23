@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using ComicBookShopCore.Services.Artist;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection.Repositories;
@@ -14,26 +16,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ComicBookShopCore.WebAPI.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ArtistController : ControllerBase
+    [Route("api/artist")]
+    public class ArtistController : ODataController
     {
         private readonly IArtistService _artistService;
-
         public ArtistController(IArtistService artistService)
         {
             _artistService = artistService;
         }
 
-        [HttpGet]
+        [EnableQuery]
         [AllowAnonymous]
+        [HttpGet()] 
         public Task<IEnumerable<ArtistDto>> Get()
         {
             return _artistService.ListAsync();
         }
 
-        [HttpGet("{id}")]
+        [EnableQuery]
         [AllowAnonymous]
+        [HttpGet("{id}")]
         public async Task<ActionResult<ArtistDetailsDto>> GetArtist(int id)
         {
             var item = await _artistService.DetailsAsync(id).ConfigureAwait(true);
@@ -45,7 +47,7 @@ namespace ComicBookShopCore.WebAPI.Controllers
             return item;
         }
 
-        [HttpPost]
+        [HttpPost()]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Employee")]
         public async Task<ActionResult> Post([FromBody]ArtistDetailsDto artist)
         {
